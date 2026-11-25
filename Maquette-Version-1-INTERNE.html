@@ -285,9 +285,15 @@
                     <span>Newsletter Clients</span>
                     <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-tp-sageLight text-tp-sage">Abonnés</span>
                 </button>
+                <button type="button" id="tab-btn-diff" onclick="switchInternalTab('diff')"
+                    class="px-4 py-2.5 rounded-xl text-xs sm:text-sm font-bold flex items-center gap-2 transition-all text-slate-600 hover:bg-tp-pearl hover:text-tp-navy cursor-pointer">
+                    <i data-lucide="sparkles" class="w-4 h-4 text-tp-sage"></i>
+                    <span>Mise en Avant Client (6 idées)</span>
+                    <span id="diff-active-badge" class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 text-tp-sage">6/6 actifs</span>
+                </button>
             </div>
             <span class="text-xs text-slate-500 px-3 hidden sm:inline">
-                Navigation rapide entre le suivi opérationnel et la diffusion d'informations projet
+                Navigation rapide entre le suivi opérationnel, la newsletter et l'administration vitrine client
             </span>
         </nav>
 
@@ -744,6 +750,63 @@
                             </div>
                         </div>
                     </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- =================================================================
+             ONGLET 3 : INTERFACE D'ADMINISTRATION — MISE EN AVANT CLIENT (6 IDÉES)
+        ================================================================== -->
+        <section id="tab-panel-diff" class="hidden space-y-6">
+            <div class="bg-white rounded-3xl border border-slate-200/90 shadow-soft p-6 sm:p-8 space-y-6">
+                <!-- En-tête de l'admin -->
+                <div class="flex flex-wrap items-start justify-between gap-4 pb-6 border-b border-slate-100">
+                    <div>
+                        <span class="text-xs font-bold uppercase tracking-widest text-tp-sage block mb-1">
+                            Administration Vitrine Client • Synchronisation Temps Réel
+                        </span>
+                        <h2 class="font-display font-bold text-2xl text-tp-navy">
+                            Pilotage des 6 Différenciations Côté Client
+                        </h2>
+                        <p class="text-sm text-slate-600 mt-1 max-w-3xl">
+                            Activez ou masquez chaque argument différenciant, ajustez les preuves, chiffres et messages clés : tout est enregistré automatiquement et répercuté dans la maquette client.
+                        </p>
+                    </div>
+                    <div class="flex flex-wrap items-center gap-2.5">
+                        <button type="button" onclick="resetClientDiffConfig()"
+                            class="px-3.5 py-2.5 rounded-xl border border-slate-200 bg-tp-pearl hover:bg-slate-100 text-xs font-bold text-slate-600 transition-colors cursor-pointer inline-flex items-center gap-1.5">
+                            <i data-lucide="rotate-ccw" class="w-3.5 h-3.5"></i>
+                            <span>Valeurs par défaut</span>
+                        </button>
+                        <a href="Maquette-Version-2-CLIENT.html#differenciation" target="_blank"
+                            class="px-4 py-2.5 rounded-xl bg-tp-navy hover:bg-tp-slate text-white text-xs font-bold transition-colors cursor-pointer inline-flex items-center gap-2 shadow-xs">
+                            <i data-lucide="external-link" class="w-3.5 h-3.5 text-emerald-300"></i>
+                            <span>Ouvrir la vue Client</span>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Sélecteur rapide des 6 idées (1 clic par idée = zéro surcharge) -->
+                <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2.5" id="diff-admin-pills">
+                    <!-- Peuplé par JS -->
+                </div>
+
+                <!-- Zone d'édition dédiée à l'idée sélectionnée -->
+                <div id="diff-admin-editor" class="bg-tp-pearl rounded-3xl p-6 border border-slate-200/90 space-y-5">
+                    <!-- Peuplé dynamiquement par JS -->
+                </div>
+
+                <!-- Barre de sauvegarde explicite -->
+                <div class="flex flex-wrap items-center justify-between gap-4 pt-2 border-t border-slate-100">
+                    <span class="text-xs text-slate-500 flex items-center gap-2">
+                        <span class="w-2 h-2 rounded-full bg-tp-sage"></span>
+                        Synchronisé avec <code class="px-1.5 py-0.5 rounded bg-slate-100 text-tp-navy font-semibold">localStorage</code> pour la vue client
+                    </span>
+                    <button type="button" onclick="saveAndNotifyDiff()"
+                        class="px-6 py-3 rounded-xl bg-tp-sage hover:bg-tp-greenHover text-white text-xs sm:text-sm font-bold shadow-xs inline-flex items-center gap-2 transition-colors cursor-pointer">
+                        <i data-lucide="check-circle-2" class="w-4 h-4"></i>
+                        <span>Enregistrer &amp; Publier sur la vue client</span>
+                    </button>
                 </div>
             </div>
         </section>
@@ -2185,33 +2248,421 @@
 
             // Initialisation Onglet Newsletter
             initNewsletterFeature();
+
+            // Initialisation Admin Mise en Avant Client (6 idées)
+            initClientDiffAdmin();
         }
 
         /**
-         * Gestion des onglets principaux (Suivi Chantier / Newsletter)
+         * Gestion des onglets principaux (Suivi Chantier / Newsletter / Mise en Avant Client)
          */
         function switchInternalTab(tabName) {
             const suiviPanel = document.getElementById('tab-panel-suivi');
             const nlPanel = document.getElementById('tab-panel-newsletter');
+            const diffPanel = document.getElementById('tab-panel-diff');
             const btnSuivi = document.getElementById('tab-btn-suivi');
             const btnNl = document.getElementById('tab-btn-newsletter');
+            const btnDiff = document.getElementById('tab-btn-diff');
+
+            const activeClass = 'px-4 py-2.5 rounded-xl text-xs sm:text-sm font-bold flex items-center gap-2 transition-all bg-tp-navy text-white shadow-xs cursor-pointer';
+            const inactiveClass = 'px-4 py-2.5 rounded-xl text-xs sm:text-sm font-bold flex items-center gap-2 transition-all text-slate-600 hover:bg-tp-pearl hover:text-tp-navy cursor-pointer';
+
+            suiviPanel.classList.add('hidden');
+            nlPanel.classList.add('hidden');
+            diffPanel.classList.add('hidden');
+
+            btnSuivi.className = inactiveClass;
+            btnNl.className = inactiveClass;
+            btnDiff.className = inactiveClass;
 
             if (tabName === 'newsletter') {
-                suiviPanel.classList.add('hidden');
                 nlPanel.classList.remove('hidden');
-                btnNl.className = 'px-4 py-2.5 rounded-xl text-xs sm:text-sm font-bold flex items-center gap-2 transition-all bg-tp-navy text-white shadow-xs cursor-pointer';
-                btnSuivi.className = 'px-4 py-2.5 rounded-xl text-xs sm:text-sm font-bold flex items-center gap-2 transition-all text-slate-600 hover:bg-tp-pearl hover:text-tp-navy cursor-pointer';
+                btnNl.className = activeClass;
                 const project = PROJECTS_DATA[state.currentProjectIndex];
                 const nameEl = document.getElementById('nl-project-name');
                 if (nameEl && project) nameEl.textContent = project.name;
                 renderNewsletterHistory();
+            } else if (tabName === 'diff') {
+                diffPanel.classList.remove('hidden');
+                btnDiff.className = activeClass;
+                renderDiffAdmin();
             } else {
-                nlPanel.classList.add('hidden');
                 suiviPanel.classList.remove('hidden');
-                btnSuivi.className = 'px-4 py-2.5 rounded-xl text-xs sm:text-sm font-bold flex items-center gap-2 transition-all bg-tp-navy text-white shadow-xs cursor-pointer';
-                btnNl.className = 'px-4 py-2.5 rounded-xl text-xs sm:text-sm font-bold flex items-center gap-2 transition-all text-slate-600 hover:bg-tp-pearl hover:text-tp-navy cursor-pointer';
+                btnSuivi.className = activeClass;
             }
             lucide.createIcons();
+        }
+
+        /**
+         * =====================================================================
+         * ADMINISTRATION DES 6 DIFFÉRENCIATIONS CLIENT (SYNCHRO LOCALSTORAGE)
+         * =====================================================================
+         */
+        const DIFF_STORAGE_KEY = 'tp_client_differentiators_v1';
+
+        const DEFAULT_DIFF_CONFIG = {
+            activeTab: 'copro',
+            modules: {
+                copro: {
+                    enabled: true,
+                    badge: '1. Zéro galère en copropriété',
+                    title: 'Ce qui est déjà réglé pour vous avant même votre arrivée',
+                    subtitle: 'Contrairement aux immeubles livrés nus où chaque décision devient source de blocage, nous anticipons dès la conception.',
+                    items: [
+                        { label: 'Cadre juridique toiture & solaire', detail: 'Droits d’usage et répartition clairs intégrés dès l’acte de base.' },
+                        { label: 'Pré-câblage électrique des parkings', detail: 'Infrastructure dimensionnée pour éviter des saignées et surcoûts futurs.' },
+                        { label: 'Règles d’usage partagées & claires', detail: 'Moins de tensions en assemblée générale dès l’emménagement.' }
+                    ]
+                },
+                comparatif: {
+                    enabled: true,
+                    badge: '2. Acheter aujourd’hui vs Être prêt pour demain',
+                    title: 'Acheter aujourd’hui vs Être prêt pour demain',
+                    subtitle: 'Un bien pensé globalement vieillit sereinement sans travaux d’adaptation coûteux après coup.',
+                    rows: [
+                        { critere: 'Panneaux solaires', classique: 'Souvent absents ou à voter plus tard', tp: 'Intégrés et dimensionnés dès le départ' },
+                        { critere: 'Batterie domestique / stockage', classique: 'Non anticipée, pose complexe et coûteuse', tp: 'Évolutif et prêt pour optimiser l’autoconsommation' },
+                        { critere: 'Pompe à chaleur mutualisée', classique: 'Chaudière individuelle ou adaptation lourde', tp: 'Performance durable et charges maîtrisées' },
+                        { critere: 'Local vélo sécurisé', classique: 'Espace réduit ou peu adapté aux vélos récents', tp: 'Sécurisé, pratique et pensé pour le quotidien' }
+                    ]
+                },
+                invisible: {
+                    enabled: true,
+                    badge: '3. L’invisible qui change tout',
+                    title: 'L’invisible qui change tout — Série courte (30 sec)',
+                    subtitle: 'Au-delà des finitions visibles, l’intelligence technique cachée derrière les murs protège votre budget et votre confort.',
+                    episodes: [
+                        {
+                            id: 'pac',
+                            duration: '30s',
+                            tag: 'Pilotage intelligent',
+                            title: 'La régulation fine des pompes à chaleur',
+                            benefit: 'Moins de charges',
+                            script: 'En 30s : notre pilotage adapte la chauffe aux besoins réels et aux heures favorables plutôt que de fonctionner en force brute.'
+                        },
+                        {
+                            id: 'solaire',
+                            duration: '30s',
+                            tag: 'Stockage malin',
+                            title: 'Valoriser le surplus solaire aux heures pleines',
+                            benefit: 'Plus de confort',
+                            script: 'En 30s : l’énergie produite le jour est exploitée intelligemment pour réduire votre dépendance au réseau quand les tarifs piquent.'
+                        },
+                        {
+                            id: 'serenite',
+                            duration: '30s',
+                            tag: 'Conception cohérente',
+                            title: 'L’équilibre technique qui évite les mauvaises surprises',
+                            benefit: 'Aucune mauvaise surprise',
+                            script: 'En 30s : isolation, ventilation et équipements communs sont pensés ensemble dès l’étude pour un habitat stable dans la durée.'
+                        }
+                    ]
+                },
+                passeport: {
+                    enabled: true,
+                    badge: '4. Passeport Valeur Verte',
+                    title: 'Le « Passeport Valeur Verte » remis à l’achat',
+                    subtitle: 'Un résumé clair et rassurant pour votre banque aujourd’hui, et pour un futur acheteur ou locataire demain.',
+                    pebLabel: 'Haute performance énergétique (Q-ZEN / PEB A)',
+                    autonomyLabel: 'Autonomie & optimisation solaire intégrées',
+                    mobilityLabel: 'Mobilité douce & pré-équipement parking prêts',
+                    bankReassurance: 'Un dossier structuré qui valorise la pérennité du bien auprès des organismes financiers et sécurise la valeur à la revente ou à la location.'
+                },
+                simulateur3clics: {
+                    enabled: true,
+                    badge: '5. Votre quotidien en 3 clics',
+                    title: 'Votre quotidien en 3 clics',
+                    subtitle: 'Cochez votre profil de vie pour voir comment l’immeuble travaille au quotidien pour alléger vos charges.',
+                    monthlySavings: {
+                        ev: 48,
+                        bike: 24,
+                        remote: 29
+                    }
+                },
+                accompagnement6m: {
+                    enabled: true,
+                    badge: '6. Accompagnement après les clés',
+                    title: 'La garantie « Accompagnement après les clés »',
+                    subtitle: 'Nous restons présents après la remise des clés pour transformer les promesses techniques en économies concrètes.',
+                    checkpointLabel: 'Point de suivi dédié à 6 mois après l’emménagement',
+                    description: 'Six mois après votre arrivée, nous faisons le point sur l’usage réel des systèmes mutualisés et intelligents afin d’affiner les réglages et vérifier que chacun profite pleinement des économies prévues.'
+                }
+            }
+        };
+
+        let diffConfig = loadClientDiffConfig();
+        let diffAdminSelectedKey = 'copro';
+
+        function loadClientDiffConfig() {
+            try {
+                const raw = localStorage.getItem(DIFF_STORAGE_KEY);
+                if (!raw) return JSON.parse(JSON.stringify(DEFAULT_DIFF_CONFIG));
+                const parsed = JSON.parse(raw);
+                return {
+                    ...JSON.parse(JSON.stringify(DEFAULT_DIFF_CONFIG)),
+                    ...parsed,
+                    modules: {
+                        ...JSON.parse(JSON.stringify(DEFAULT_DIFF_CONFIG.modules)),
+                        ...(parsed.modules || {})
+                    }
+                };
+            } catch (e) {
+                return JSON.parse(JSON.stringify(DEFAULT_DIFF_CONFIG));
+            }
+        }
+
+        function saveClientDiffConfig() {
+            try {
+                localStorage.setItem(DIFF_STORAGE_KEY, JSON.stringify(diffConfig));
+            } catch (e) { /* ignore storage quota errors */ }
+            updateDiffBadge();
+        }
+
+        function updateDiffBadge() {
+            const badge = document.getElementById('diff-active-badge');
+            if (!badge) return;
+            const keys = Object.keys(DEFAULT_DIFF_CONFIG.modules);
+            const activeCount = keys.filter(k => diffConfig.modules[k]?.enabled !== false).length;
+            badge.textContent = `${activeCount}/${keys.length} actifs`;
+        }
+
+        function initClientDiffAdmin() {
+            saveClientDiffConfig();
+            renderDiffAdmin();
+        }
+
+        function renderDiffAdmin() {
+            updateDiffBadge();
+            const pillsEl = document.getElementById('diff-admin-pills');
+            const editorEl = document.getElementById('diff-admin-editor');
+            if (!pillsEl || !editorEl) return;
+
+            const keys = Object.keys(DEFAULT_DIFF_CONFIG.modules);
+            pillsEl.innerHTML = keys.map((k, idx) => {
+                const mod = diffConfig.modules[k];
+                const isSel = diffAdminSelectedKey === k;
+                const isOn = mod.enabled !== false;
+                return `
+                    <button type="button" onclick="selectDiffAdminKey('${k}')"
+                        class="text-left p-3 rounded-2xl border transition-all cursor-pointer flex flex-col justify-between ${
+                            isSel
+                                ? 'bg-tp-navy text-white border-tp-navy shadow-xs'
+                                : 'bg-tp-pearl text-tp-navy border-slate-200 hover:bg-slate-100'
+                        }">
+                        <div class="flex items-center justify-between gap-1 mb-1">
+                            <span class="text-[10px] font-extrabold ${isSel ? 'text-emerald-300' : 'text-slate-400'}">IDÉE 0${idx + 1}</span>
+                            <span class="px-1.5 py-0.5 rounded-full text-[9px] font-bold ${
+                                isOn ? 'bg-emerald-100 text-tp-sage' : 'bg-slate-200 text-slate-600'
+                            }">${isOn ? 'Actif' : 'Masqué'}</span>
+                        </div>
+                        <span class="text-xs font-bold line-clamp-2 leading-snug">${mod.badge.replace(/^\d+\.\s*/, '')}</span>
+                    </button>
+                `;
+            }).join('');
+
+            const mod = diffConfig.modules[diffAdminSelectedKey];
+            const isOn = mod.enabled !== false;
+
+            let specificFieldsHtml = '';
+            if (diffAdminSelectedKey === 'copro') {
+                specificFieldsHtml = `
+                    <div class="space-y-2.5">
+                        <label class="block text-xs font-bold text-tp-navy">Points déjà réglés avant l'arrivée du client</label>
+                        ${(mod.items || []).map((it, i) => `
+                            <div class="grid grid-cols-1 sm:grid-cols-12 gap-2 bg-white p-3 rounded-xl border border-slate-200">
+                                <input type="text" value="${escapeAttr(it.label)}" oninput="updateDiffArrayItem('copro','items',${i},'label',this.value)"
+                                    placeholder="Titre du point réglé" class="sm:col-span-5 px-3 py-2 text-xs font-semibold rounded-lg border border-slate-200">
+                                <input type="text" value="${escapeAttr(it.detail)}" oninput="updateDiffArrayItem('copro','items',${i},'detail',this.value)"
+                                    placeholder="Bénéfice pour éviter les conflits" class="sm:col-span-7 px-3 py-2 text-xs rounded-lg border border-slate-200">
+                            </div>
+                        `).join('')}
+                    </div>
+                `;
+            } else if (diffAdminSelectedKey === 'comparatif') {
+                specificFieldsHtml = `
+                    <div class="space-y-2.5">
+                        <label class="block text-xs font-bold text-tp-navy">Lignes du tableau comparatif (4 lignes)</label>
+                        ${(mod.rows || []).map((r, i) => `
+                            <div class="grid grid-cols-1 sm:grid-cols-12 gap-2 bg-white p-3 rounded-xl border border-slate-200">
+                                <input type="text" value="${escapeAttr(r.critere)}" oninput="updateDiffArrayItem('comparatif','rows',${i},'critere',this.value)"
+                                    placeholder="Critère" class="sm:col-span-3 px-2.5 py-2 text-xs font-bold rounded-lg border border-slate-200">
+                                <input type="text" value="${escapeAttr(r.classique)}" oninput="updateDiffArrayItem('comparatif','rows',${i},'classique',this.value)"
+                                    placeholder="Appartement neuf classique" class="sm:col-span-4 px-2.5 py-2 text-xs rounded-lg border border-slate-200">
+                                <input type="text" value="${escapeAttr(r.tp)}" oninput="updateDiffArrayItem('comparatif','rows',${i},'tp',this.value)"
+                                    placeholder="Thomas & Piron" class="sm:col-span-5 px-2.5 py-2 text-xs font-semibold text-tp-sage rounded-lg border border-emerald-200 bg-emerald-50/40">
+                            </div>
+                        `).join('')}
+                    </div>
+                `;
+            } else if (diffAdminSelectedKey === 'invisible') {
+                specificFieldsHtml = `
+                    <div class="space-y-2.5">
+                        <label class="block text-xs font-bold text-tp-navy">Capsules vidéo courtes (30s) — « L'invisible qui change tout »</label>
+                        ${(mod.episodes || []).map((ep, i) => `
+                            <div class="bg-white p-3.5 rounded-xl border border-slate-200 space-y-2">
+                                <div class="grid grid-cols-1 sm:grid-cols-12 gap-2">
+                                    <input type="text" value="${escapeAttr(ep.title)}" oninput="updateDiffArrayItem('invisible','episodes',${i},'title',this.value)"
+                                        placeholder="Titre de la capsule" class="sm:col-span-7 px-3 py-2 text-xs font-bold rounded-lg border border-slate-200">
+                                    <input type="text" value="${escapeAttr(ep.benefit)}" oninput="updateDiffArrayItem('invisible','episodes',${i},'benefit',this.value)"
+                                        placeholder="Bénéfice direct" class="sm:col-span-5 px-3 py-2 text-xs font-semibold text-tp-sage rounded-lg border border-slate-200">
+                                </div>
+                                <input type="text" value="${escapeAttr(ep.script)}" oninput="updateDiffArrayItem('invisible','episodes',${i},'script',this.value)"
+                                    placeholder="Résumé 30s pour le client" class="w-full px-3 py-2 text-xs rounded-lg border border-slate-200">
+                            </div>
+                        `).join('')}
+                    </div>
+                `;
+            } else if (diffAdminSelectedKey === 'passeport') {
+                specificFieldsHtml = `
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                        <div>
+                            <label class="block text-xs font-bold text-tp-navy mb-1">Mention PEB / Performance</label>
+                            <input type="text" value="${escapeAttr(mod.pebLabel)}" oninput="updateDiffField('passeport','pebLabel',this.value)"
+                                class="w-full px-3 py-2 text-xs rounded-xl bg-white border border-slate-200">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-tp-navy mb-1">Mention Autonomie énergétique</label>
+                            <input type="text" value="${escapeAttr(mod.autonomyLabel)}" oninput="updateDiffField('passeport','autonomyLabel',this.value)"
+                                class="w-full px-3 py-2 text-xs rounded-xl bg-white border border-slate-200">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-tp-navy mb-1">Mention Mobilité</label>
+                            <input type="text" value="${escapeAttr(mod.mobilityLabel)}" oninput="updateDiffField('passeport','mobilityLabel',this.value)"
+                                class="w-full px-3 py-2 text-xs rounded-xl bg-white border border-slate-200">
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-tp-navy mb-1">Argument banque &amp; valeur à la revente / location</label>
+                        <textarea rows="2" oninput="updateDiffField('passeport','bankReassurance',this.value)"
+                            class="w-full px-3 py-2 text-xs rounded-xl bg-white border border-slate-200">${escapeHtml(mod.bankReassurance)}</textarea>
+                    </div>
+                `;
+            } else if (diffAdminSelectedKey === 'simulateur3clics') {
+                const ms = mod.monthlySavings || { ev: 48, bike: 24, remote: 29 };
+                specificFieldsHtml = `
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                        <div class="bg-white p-3.5 rounded-xl border border-slate-200">
+                            <label class="block text-xs font-bold text-tp-navy mb-1">⚡ Voiture électrique (€ / mois)</label>
+                            <input type="number" min="0" max="300" value="${ms.ev}" oninput="updateDiffSavings('ev', this.value)"
+                                class="w-full px-3 py-2 text-sm font-bold rounded-lg border border-slate-200">
+                        </div>
+                        <div class="bg-white p-3.5 rounded-xl border border-slate-200">
+                            <label class="block text-xs font-bold text-tp-navy mb-1">🚲 Vélo &amp; local sécurisé (€ / mois)</label>
+                            <input type="number" min="0" max="300" value="${ms.bike}" oninput="updateDiffSavings('bike', this.value)"
+                                class="w-full px-3 py-2 text-sm font-bold rounded-lg border border-slate-200">
+                        </div>
+                        <div class="bg-white p-3.5 rounded-xl border border-slate-200">
+                            <label class="block text-xs font-bold text-tp-navy mb-1">💻 Télétravail &amp; confort (€ / mois)</label>
+                            <input type="number" min="0" max="300" value="${ms.remote}" oninput="updateDiffSavings('remote', this.value)"
+                                class="w-full px-3 py-2 text-sm font-bold rounded-lg border border-slate-200">
+                        </div>
+                    </div>
+                `;
+            } else if (diffAdminSelectedKey === 'accompagnement6m') {
+                specificFieldsHtml = `
+                    <div class="grid grid-cols-1 sm:grid-cols-12 gap-3">
+                        <div class="sm:col-span-5">
+                            <label class="block text-xs font-bold text-tp-navy mb-1">Jalons du rendez-vous post-clés</label>
+                            <input type="text" value="${escapeAttr(mod.checkpointLabel)}" oninput="updateDiffField('accompagnement6m','checkpointLabel',this.value)"
+                                class="w-full px-3 py-2 text-xs rounded-xl bg-white border border-slate-200">
+                        </div>
+                        <div class="sm:col-span-7">
+                            <label class="block text-xs font-bold text-tp-navy mb-1">Promesse d'accompagnement à 6 mois</label>
+                            <input type="text" value="${escapeAttr(mod.description)}" oninput="updateDiffField('accompagnement6m','description',this.value)"
+                                class="w-full px-3 py-2 text-xs rounded-xl bg-white border border-slate-200">
+                        </div>
+                    </div>
+                `;
+            }
+
+            editorEl.innerHTML = `
+                <div class="flex flex-wrap items-center justify-between gap-4 pb-4 border-b border-slate-200">
+                    <div>
+                        <span class="text-xs font-bold uppercase tracking-wider text-tp-sage">${mod.badge}</span>
+                        <h3 class="font-display font-bold text-lg text-tp-navy mt-0.5">Configuration de l'affichage client</h3>
+                    </div>
+                    <label class="inline-flex items-center gap-3 bg-white px-4 py-2.5 rounded-2xl border border-slate-200 cursor-pointer select-none shadow-2xs">
+                        <input type="checkbox" ${isOn ? 'checked' : ''} onchange="toggleDiffModuleEnabled('${diffAdminSelectedKey}', this.checked)"
+                            class="w-4 h-4 rounded accent-tp-sage cursor-pointer">
+                        <span class="text-xs font-bold ${isOn ? 'text-tp-sage' : 'text-slate-500'}">
+                            ${isOn ? 'Visible côté client' : 'Masqué côté client'}
+                        </span>
+                    </label>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-xs font-bold text-tp-navy mb-1">Titre affiché côté client</label>
+                        <input type="text" value="${escapeAttr(mod.title)}" oninput="updateDiffField('${diffAdminSelectedKey}','title',this.value)"
+                            class="w-full px-3.5 py-2.5 text-sm font-semibold rounded-xl bg-white border border-slate-200">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-tp-navy mb-1">Accroche explicative simple</label>
+                        <input type="text" value="${escapeAttr(mod.subtitle)}" oninput="updateDiffField('${diffAdminSelectedKey}','subtitle',this.value)"
+                            class="w-full px-3.5 py-2.5 text-sm rounded-xl bg-white border border-slate-200">
+                    </div>
+                </div>
+
+                ${specificFieldsHtml}
+            `;
+            lucide.createIcons();
+        }
+
+        function escapeAttr(str) {
+            return String(str || '').replace(/"/g, '&quot;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+        }
+
+        function selectDiffAdminKey(key) {
+            diffAdminSelectedKey = key;
+            renderDiffAdmin();
+        }
+
+        function toggleDiffModuleEnabled(key, enabled) {
+            diffConfig.modules[key].enabled = enabled;
+            saveClientDiffConfig();
+            renderDiffAdmin();
+        }
+
+        function updateDiffField(key, field, value) {
+            diffConfig.modules[key][field] = value;
+            saveClientDiffConfig();
+        }
+
+        function updateDiffArrayItem(key, arrName, idx, field, value) {
+            if (diffConfig.modules[key][arrName] && diffConfig.modules[key][arrName][idx]) {
+                diffConfig.modules[key][arrName][idx][field] = value;
+                saveClientDiffConfig();
+            }
+        }
+
+        function updateDiffSavings(profileKey, val) {
+            const num = Math.max(0, parseInt(val || '0', 10));
+            if (!diffConfig.modules.simulateur3clics.monthlySavings) {
+                diffConfig.modules.simulateur3clics.monthlySavings = { ev: 48, bike: 24, remote: 29 };
+            }
+            diffConfig.modules.simulateur3clics.monthlySavings[profileKey] = num;
+            saveClientDiffConfig();
+        }
+
+        function resetClientDiffConfig() {
+            diffConfig = JSON.parse(JSON.stringify(DEFAULT_DIFF_CONFIG));
+            saveClientDiffConfig();
+            renderDiffAdmin();
+            showToast('Réinitialisation effectuée', 'Les 6 différenciations clients ont retrouvé leurs valeurs par défaut.', 'green');
+        }
+
+        function saveAndNotifyDiff() {
+            saveClientDiffConfig();
+            const project = PROJECTS_DATA[state.currentProjectIndex];
+            const activeStage = project.stages[project.activeStageIndex];
+            pushFeedNotification(
+                activeStage.name,
+                'Général',
+                'Avancement validé',
+                `Mise à jour de la vitrine client (${diffConfig.modules[diffAdminSelectedKey].badge}) enregistrée et synchronisée.`,
+                false
+            );
+            renderAll();
         }
 
         /**
