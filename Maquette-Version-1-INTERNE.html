@@ -88,42 +88,45 @@
     <!-- =====================================================================
          1. EN-TÊTE INTERNE (HEADER UNIFORMISÉ STYLE THOMAS & PIRON)
     ====================================================================== -->
-    <header class="sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-slate-200/80">
-        <div class="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex flex-wrap items-center justify-between min-h-[5rem] py-2.5 gap-4">
+    <!-- =====================================================================
+         1. EN-TÊTE INTERNE (HEADER UNIFORMISÉ STYLE THOMAS & PIRON)
+    ====================================================================== -->
+    <header class="sticky top-0 z-40 w-full bg-white/95 backdrop-blur-md border-b border-slate-200/80">
+        <div class="w-full px-4 sm:px-8 lg:px-12">
+            <div class="flex flex-wrap items-center justify-between min-h-[5rem] py-2.5 gap-6">
                 
                 <!-- Identité & Badge Interne -->
-                <div class="flex items-center gap-3">
+                <div class="flex items-center gap-3 shrink-0">
                     <div class="w-10 h-10 bg-tp-navy rounded-xl flex items-center justify-center relative overflow-hidden shadow-xs shrink-0">
                         <div class="w-5 h-5 border-2 border-white transform rotate-45 translate-x-0.5"></div>
                         <div class="w-2.5 h-2.5 bg-tp-red absolute bottom-1.5 right-1.5 rounded-xs"></div>
                     </div>
                     <div>
                         <div class="flex items-center gap-2.5">
-                            <h1 class="font-display font-extrabold text-base sm:text-lg tracking-tight text-tp-navy leading-none">
+                            <h1 class="font-display font-extrabold text-base sm:text-lg tracking-tight text-tp-navy leading-none whitespace-nowrap">
                                 THOMAS <span class="text-tp-red">&amp;</span> PIRON
                             </h1>
-                            <span class="hidden sm:inline-flex items-center px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-tp-sageLight text-tp-sage border border-emerald-200">
+                            <span class="hidden sm:inline-flex items-center px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-tp-sageLight text-tp-sage border border-emerald-200 whitespace-nowrap">
                                 USAGE INTERNE • CHANTIER
                             </span>
                         </div>
-                        <p class="text-[11px] text-slate-500 font-semibold mt-1">Suivi des Étapes &amp; Continuité des Engagements</p>
+                        <p class="text-[11px] text-slate-500 font-semibold mt-1 whitespace-nowrap">Suivi des Étapes &amp; Continuité des Engagements</p>
                     </div>
                 </div>
 
-                <!-- Contrôles Centraux : Accueil, Chantier Actif, Profil Utilisateur, Newsletter & Notifications -->
-                <div class="flex flex-wrap items-center gap-2.5 flex-1 justify-end">
+                <!-- Contrôles : Accueil, Chantier Actif, Profil Utilisateur, Newsletter & Notifications -->
+                <div class="flex flex-wrap items-center gap-3 sm:gap-4 justify-end shrink-0">
                     
                     <!-- Bouton Retour à l'accueil -->
                     <a href="index.html"
-                        class="inline-flex items-center gap-1.5 px-3 py-2.5 rounded-xl text-xs font-semibold border border-slate-200 bg-tp-pearl text-tp-navy hover:bg-slate-100 transition-colors"
+                        class="inline-flex items-center gap-1.5 px-3.5 py-2.5 rounded-xl text-xs font-semibold border border-slate-200 bg-tp-pearl text-tp-navy hover:bg-slate-100 transition-colors whitespace-nowrap"
                         title="Retour à l'accueil">
-                        <i data-lucide="arrow-left" class="w-3.5 h-3.5"></i>
+                        <i data-lucide="arrow-left" class="w-3.5 h-3.5 shrink-0"></i>
                         <span class="hidden sm:inline">Retour à l'accueil</span>
                     </a>
 
                     <!-- Sélecteur de Chantier -->
-                    <div class="relative flex items-center bg-tp-pearl border border-slate-200/90 rounded-xl px-3 py-1.5 hover:border-slate-300 transition-colors">
+                    <div class="relative flex items-center bg-tp-pearl border border-slate-200/90 rounded-xl px-3.5 py-1.5 hover:border-slate-300 transition-colors shrink-0">
                         <i data-lucide="hard-hat" class="w-4 h-4 text-tp-sage mr-2 shrink-0"></i>
                         <div class="flex flex-col">
                             <span class="text-[10px] uppercase tracking-wider text-slate-400 font-bold leading-none">Chantier actif</span>
@@ -134,7 +137,7 @@
                     </div>
 
                     <!-- Sélecteur de Profil Utilisateur Simulé -->
-                    <div class="relative flex items-center bg-tp-pearl border border-slate-200/90 rounded-xl px-3 py-1.5 hover:border-slate-300 transition-colors">
+                    <div class="relative flex items-center bg-tp-pearl border border-slate-200/90 rounded-xl px-3.5 py-1.5 hover:border-slate-300 transition-colors shrink-0">
                         <i data-lucide="user-check" class="w-4 h-4 text-tp-navy mr-2 shrink-0"></i>
                         <div class="flex flex-col">
                             <span class="text-[10px] uppercase tracking-wider text-slate-400 font-bold leading-none">Connecté en tant que</span>
@@ -150,13 +153,13 @@
                     </div>
 
                     <!-- Accès rapide Onglet Newsletter Clients -->
-                    <button id="newsletter-btn" type="button" onclick="switchInternalTab('newsletter')" class="inline-flex items-center gap-2 px-3.5 py-2.5 rounded-xl bg-tp-navy hover:bg-tp-slate text-white text-xs font-bold transition-colors shadow-xs cursor-pointer" aria-label="Ouvrir l'onglet Newsletter Clients">
-                        <i data-lucide="mail" class="w-4 h-4 text-emerald-300"></i>
+                    <button id="newsletter-btn" type="button" onclick="switchInternalTab('newsletter')" class="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-tp-navy hover:bg-tp-slate text-white text-xs font-bold transition-colors shadow-xs cursor-pointer whitespace-nowrap shrink-0" aria-label="Ouvrir l'onglet Newsletter Clients">
+                        <i data-lucide="mail" class="w-4 h-4 text-emerald-300 shrink-0"></i>
                         <span class="hidden md:inline">Newsletter Clients</span>
                     </button>
 
                     <!-- Centre de Notifications -->
-                    <div class="relative">
+                    <div class="relative shrink-0">
                         <button id="notif-bell-btn" class="relative p-2.5 rounded-xl bg-tp-pearl hover:bg-slate-100 border border-slate-200 text-tp-navy transition-all focus:outline-none focus:ring-2 focus:ring-tp-sage cursor-pointer" aria-label="Notifications">
                             <i data-lucide="bell" class="w-5 h-5"></i>
                             <span id="notif-badge" class="absolute -top-1.5 -right-1.5 min-w-[20px] h-5 px-1 rounded-full bg-tp-red text-white text-[11px] font-bold flex items-center justify-center shadow-sm border-2 border-white">
