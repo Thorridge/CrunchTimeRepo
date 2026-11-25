@@ -149,10 +149,10 @@
                         </div>
                     </div>
 
-                    <!-- Accès rapide Onglet Newsletter -->
-                    <button id="newsletter-btn" type="button" onclick="switchInternalTab('newsletter')" class="inline-flex items-center gap-2 px-3.5 py-2.5 rounded-xl bg-tp-navy hover:bg-tp-slate text-white text-xs font-bold transition-colors shadow-xs cursor-pointer" aria-label="Ouvrir l'onglet Newsletter">
+                    <!-- Accès rapide Onglet Newsletter Clients -->
+                    <button id="newsletter-btn" type="button" onclick="switchInternalTab('newsletter')" class="inline-flex items-center gap-2 px-3.5 py-2.5 rounded-xl bg-tp-navy hover:bg-tp-slate text-white text-xs font-bold transition-colors shadow-xs cursor-pointer" aria-label="Ouvrir l'onglet Newsletter Clients">
                         <i data-lucide="mail" class="w-4 h-4 text-emerald-300"></i>
-                        <span class="hidden md:inline">Newsletter Équipe</span>
+                        <span class="hidden md:inline">Newsletter Clients</span>
                     </button>
 
                     <!-- Centre de Notifications -->
@@ -282,8 +282,8 @@
                 <button type="button" id="tab-btn-newsletter" onclick="switchInternalTab('newsletter')"
                     class="px-4 py-2.5 rounded-xl text-xs sm:text-sm font-bold flex items-center gap-2 transition-all text-slate-600 hover:bg-tp-pearl hover:text-tp-navy cursor-pointer">
                     <i data-lucide="mail" class="w-4 h-4 text-tp-red"></i>
-                    <span>Newsletter &amp; E-mail Équipe</span>
-                    <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-tp-sageLight text-tp-sage">Nouveau</span>
+                    <span>Newsletter Clients</span>
+                    <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-tp-sageLight text-tp-sage">Abonnés</span>
                 </button>
             </div>
             <span class="text-xs text-slate-500 px-3 hidden sm:inline">
@@ -566,18 +566,18 @@
         </div><!-- FIN WRAPPER ONGLET 1 : SUIVI CHANTIER -->
 
         <!-- =================================================================
-             ONGLET 2 : NEWSLETTER & COMMUNICATION E-MAIL ÉQUIPE PROJET
+             ONGLET 2 : GESTION DE LA NEWSLETTER CLIENTS DU PROJET
         ================================================================== -->
         <section id="tab-panel-newsletter" class="hidden space-y-6">
             <div class="bg-white rounded-3xl border border-slate-200/90 shadow-soft p-6 sm:p-8">
                 <div class="flex flex-wrap items-center justify-between gap-4 pb-6 border-b border-slate-100">
                     <div>
-                        <span class="text-xs font-bold uppercase tracking-widest text-tp-red block mb-1">Communication Chantier</span>
+                        <span class="text-xs font-bold uppercase tracking-widest text-tp-red block mb-1">Relation Client • Suivi de Chantier</span>
                         <h2 class="font-display font-bold text-2xl text-tp-navy">
-                            Newsletter &amp; E-mail aux équipes du projet
+                            Newsletter Clients — Gestion &amp; Envoi
                         </h2>
                         <p class="text-sm text-slate-600 mt-1">
-                            Notifiez en un clic toutes les personnes travaillant sur <strong id="nl-project-name" class="text-tp-navy">ce chantier</strong> et envoyez un e-mail personnalisé avec photos jointes.
+                            Informez les clients inscrits à la newsletter de <strong id="nl-project-name" class="text-tp-navy">ce chantier</strong> avec un e-mail personnalisé et des photos d'avancement.
                         </p>
                     </div>
                     <button type="button" onclick="switchInternalTab('suivi')"
@@ -587,137 +587,160 @@
                 </div>
 
                 <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 pt-6">
-                    <!-- Formulaire Newsletter (7 cols) -->
+                    <!-- Formulaire Newsletter Clients (7 cols) -->
                     <form id="newsletter-form" class="lg:col-span-7 space-y-5">
-                        <!-- Destinataires sur le même projet -->
+                        <!-- Clients abonnés sur ce projet -->
                         <div class="bg-tp-pearl rounded-2xl p-4 border border-slate-200/80 space-y-3">
                             <div class="flex flex-wrap items-center justify-between gap-2">
                                 <span class="text-xs font-bold uppercase tracking-wider text-tp-navy flex items-center gap-2">
                                     <i data-lucide="users" class="w-4 h-4 text-tp-sage"></i>
-                                    Destinataires du projet (<span id="nl-recipient-count">6</span> équipes sélectionnées)
+                                    Clients inscrits (<span id="nl-recipient-count">4</span> sélectionné(s))
                                 </span>
                                 <label class="inline-flex items-center gap-2 text-xs font-bold text-tp-sage cursor-pointer">
                                     <input type="checkbox" id="nl-select-all" checked class="w-4 h-4 rounded accent-tp-sage">
-                                    Tout le monde sur le chantier
+                                    Tous les clients abonnés
                                 </label>
                             </div>
                             <div id="nl-recipients-list" class="flex flex-wrap gap-2">
-                                <label class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white border border-slate-200 text-xs font-semibold text-tp-navy cursor-pointer">
-                                    <input type="checkbox" name="nlRecipient" value="Conducteur de travaux" checked class="accent-tp-sage"> Conducteur de travaux
-                                </label>
-                                <label class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white border border-slate-200 text-xs font-semibold text-tp-navy cursor-pointer">
-                                    <input type="checkbox" name="nlRecipient" value="Bureau d'études" checked class="accent-tp-sage"> Bureau d'études
-                                </label>
-                                <label class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white border border-slate-200 text-xs font-semibold text-tp-navy cursor-pointer">
-                                    <input type="checkbox" name="nlRecipient" value="Coordinatrice SQEO" checked class="accent-tp-sage"> Coordinatrice SQEO
-                                </label>
-                                <label class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white border border-slate-200 text-xs font-semibold text-tp-navy cursor-pointer">
-                                    <input type="checkbox" name="nlRecipient" value="Acheteur Matériaux" checked class="accent-tp-sage"> Acheteur Matériaux
-                                </label>
-                                <label class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white border border-slate-200 text-xs font-semibold text-tp-navy cursor-pointer">
-                                    <input type="checkbox" name="nlRecipient" value="Chef de projet" checked class="accent-tp-sage"> Chef de projet
-                                </label>
-                                <label class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white border border-slate-200 text-xs font-semibold text-tp-navy cursor-pointer">
-                                    <input type="checkbox" name="nlRecipient" value="Équipes terrain & Sous-traitants" checked class="accent-tp-sage"> Équipes terrain &amp; Sous-traitants
-                                </label>
+                                <!-- Peuplé dynamiquement en JS -->
+                            </div>
+                            <!-- Ajout rapide d'un client abonné -->
+                            <div class="flex gap-2 pt-1">
+                                <input id="nl-new-client-email" type="email" placeholder="Ajouter l'e-mail d'un nouveau client..."
+                                    class="flex-1 px-3 py-2 text-xs rounded-xl bg-white border border-slate-200 focus:outline-none focus:border-tp-navy">
+                                <button type="button" onclick="addClientSubscriber()"
+                                    class="px-3.5 py-2 rounded-xl bg-tp-navy hover:bg-tp-slate text-white text-xs font-bold transition-colors cursor-pointer shrink-0">
+                                    + Ajouter
+                                </button>
                             </div>
                         </div>
 
-                        <!-- Modèles rapides -->
+                        <!-- Modèles rapides pour les clients -->
                         <div>
-                            <span class="block text-xs font-bold text-slate-500 mb-2">Modèles rapides (optionnel) :</span>
+                            <span class="block text-xs font-bold text-slate-500 mb-2">Modèles rapides (ton client, clair et rassurant) :</span>
                             <div class="flex flex-wrap gap-2">
                                 <button type="button" onclick="applyNewsletterTemplate('avancement')" class="px-3 py-1.5 rounded-xl bg-tp-pearl hover:bg-slate-200/70 border border-slate-200 text-xs font-semibold text-tp-navy cursor-pointer">
-                                    📋 Point d'avancement hebdo
+                                    🏗️ Avancement du mois
                                 </button>
                                 <button type="button" onclick="applyNewsletterTemplate('photos')" class="px-3 py-1.5 rounded-xl bg-tp-pearl hover:bg-slate-200/70 border border-slate-200 text-xs font-semibold text-tp-navy cursor-pointer">
-                                    📸 Compte-rendu photo chantier
+                                    📸 Galerie photos chantier
                                 </button>
-                                <button type="button" onclick="applyNewsletterTemplate('vigilance')" class="px-3 py-1.5 rounded-xl bg-amber-50 hover:bg-amber-100 border border-amber-200 text-xs font-semibold text-amber-800 cursor-pointer">
-                                    ⚠️ Consigne SQEO / Vigilance
+                                <button type="button" onclick="applyNewsletterTemplate('etape')" class="px-3 py-1.5 rounded-xl bg-tp-sageLight hover:bg-emerald-100 border border-emerald-200 text-xs font-semibold text-tp-sage cursor-pointer">
+                                    ✨ Nouvelle étape franchie
                                 </button>
                             </div>
                         </div>
 
                         <!-- Objet du mail -->
                         <div>
-                            <label for="nl-subject" class="block text-xs font-bold text-tp-navy mb-1.5">Objet de l'e-mail *</label>
-                            <input id="nl-subject" type="text" required placeholder="Ex : [Les Prés Verts] Point chantier semaine 48 — Isolation &amp; tri des déchets"
+                            <label for="nl-subject" class="block text-xs font-bold text-tp-navy mb-1.5">Objet de l'e-mail client *</label>
+                            <input id="nl-subject" type="text" required placeholder="Ex : Des nouvelles de votre futur logement — Avancement &amp; photos du mois"
                                 class="w-full px-4 py-3 text-sm rounded-xl bg-tp-pearl border border-slate-200 focus:bg-white focus:outline-none focus:border-tp-navy">
                         </div>
 
                         <!-- Corps du mail -->
                         <div>
                             <label for="nl-body" class="block text-xs font-bold text-tp-navy mb-1.5">Corps du message *</label>
-                            <textarea id="nl-body" rows="6" required placeholder="Rédigez ici votre message pour l'ensemble des équipes du projet (avancement, consignes de passation, points d'attention)..."
+                            <textarea id="nl-body" rows="6" required placeholder="Rédigez un message clair et rassurant pour vos clients (avancement des travaux, actions durables réalisées, prochaines étapes)..."
                                 class="w-full px-4 py-3 text-sm rounded-xl bg-tp-pearl border border-slate-200 focus:bg-white focus:outline-none focus:border-tp-navy resize-y"></textarea>
                         </div>
 
-                        <!-- Pièces jointes Photo -->
+                        <!-- Photos — sélectionner depuis la médiathèque -->
                         <div>
-                            <label class="block text-xs font-bold text-tp-navy mb-1.5">Pièces jointes « Photo » (JPG, PNG, WebP)</label>
-                            <label for="nl-photo-input" class="flex flex-col items-center justify-center border-2 border-dashed border-slate-300 hover:border-tp-sage rounded-2xl p-5 bg-tp-pearl/60 hover:bg-tp-sageLight/30 transition-colors cursor-pointer text-center">
-                                <i data-lucide="image-plus" class="w-7 h-7 text-tp-sage mb-2"></i>
-                                <span class="text-xs font-bold text-tp-navy">Cliquez pour ajouter une ou plusieurs photos du chantier</span>
-                                <span class="text-[11px] text-slate-500 mt-0.5">Les photos seront jointes à l'e-mail et affichées dans l'aperçu</span>
-                                <input id="nl-photo-input" type="file" accept="image/*" multiple class="hidden">
+                            <label class="block text-xs font-bold text-tp-navy mb-1.5">
+                                Photos jointes à la newsletter
                             </label>
+                            <div class="flex flex-col sm:flex-row gap-2">
+                                <div class="flex-1 flex items-center gap-3 px-4 py-3 rounded-xl bg-tp-pearl border border-slate-200 text-xs text-slate-500">
+                                    <i data-lucide="image" class="w-4 h-4 text-tp-sage shrink-0"></i>
+                                    <span id="nl-attach-summary">Aucune photo sélectionnée depuis la médiathèque</span>
+                                </div>
+                                <button type="button"
+                                    onclick="document.querySelector('.lg\\:col-span-5 #ml-upload-input').click()"
+                                    class="shrink-0 px-3.5 py-2.5 rounded-xl bg-tp-sage hover:bg-emerald-700 text-white text-xs font-bold inline-flex items-center gap-2 transition-colors cursor-pointer">
+                                    <i data-lucide="plus" class="w-3.5 h-3.5"></i>
+                                    Ajouter à la médiathèque
+                                </button>
+                            </div>
+                            <p class="text-[11px] text-slate-400 mt-1.5">
+                                Cochez les photos dans la <strong>Médiathèque</strong> à droite pour les joindre à cet e-mail.
+                            </p>
                             <div id="nl-photo-previews" class="grid grid-cols-2 sm:grid-cols-4 gap-3 mt-3"></div>
                         </div>
 
-                        <!-- Options de diffusion -->
+                        <!-- Option de traçabilité interne -->
                         <div class="flex flex-col sm:flex-row sm:items-center gap-4 pt-1">
-                            <label class="inline-flex items-center gap-2 text-xs font-semibold text-tp-navy cursor-pointer">
-                                <input id="nl-send-email" type="checkbox" checked class="w-4 h-4 rounded accent-tp-navy">
-                                Envoyer par e-mail aux membres
-                            </label>
-                            <label class="inline-flex items-center gap-2 text-xs font-semibold text-tp-sage cursor-pointer">
-                                <input id="nl-notify-app" type="checkbox" checked class="w-4 h-4 rounded accent-tp-sage">
-                                Notifier aussi dans le fil interne &amp; cloche
+                            <label class="inline-flex items-center gap-2 text-xs font-semibold text-slate-600 cursor-pointer">
+                                <input id="nl-log-internal" type="checkbox" checked class="w-4 h-4 rounded accent-tp-sage">
+                                Enregistrer une trace de cet envoi dans le journal interne
                             </label>
                         </div>
 
                         <button type="submit" class="w-full sm:w-auto px-7 py-3.5 rounded-xl bg-tp-red hover:bg-tp-redDark text-white text-sm font-bold shadow-xs inline-flex items-center justify-center gap-2 transition-colors cursor-pointer">
                             <i data-lucide="send" class="w-4 h-4"></i>
-                            <span>Diffuser la newsletter aux équipes</span>
+                            <span>Envoyer la newsletter aux clients</span>
                         </button>
                     </form>
 
-                    <!-- Aperçu en direct & Historique (5 cols) -->
-                    <div class="lg:col-span-5 space-y-6">
-                        <!-- Aperçu e-mail -->
-                        <div class="bg-tp-pearl rounded-2xl border border-slate-200/90 overflow-hidden">
+                    <!-- Médiathèque Photos & Historique (5 cols) -->
+                    <div class="lg:col-span-5 space-y-5">
+
+                        <!-- MÉDIATHÈQUE -->
+                        <div class="bg-white rounded-2xl border border-slate-200/90 overflow-hidden">
+                            <!-- En-tête -->
                             <div class="px-4 py-3 bg-tp-navy text-white flex items-center justify-between">
-                                <span class="text-xs font-bold uppercase tracking-wider">Aperçu de l'e-mail</span>
-                                <span class="text-[11px] text-emerald-300 font-semibold">Format Thomas &amp; Piron</span>
+                                <div class="flex items-center gap-2">
+                                    <i data-lucide="image" class="w-4 h-4 text-emerald-300"></i>
+                                    <span class="text-xs font-bold uppercase tracking-wider">Médiathèque Photos</span>
+                                </div>
+                                <span class="text-[11px] text-emerald-300 font-semibold" id="ml-count-label">0 photo(s)</span>
                             </div>
-                            <div class="p-5 space-y-3 text-xs">
-                                <div class="pb-2 border-b border-slate-200">
-                                    <span class="text-slate-400 font-semibold">À :</span>
-                                    <span id="nl-preview-to" class="text-tp-navy font-semibold">Toutes les équipes du chantier (6 pôles)</span>
+
+                            <div class="p-4 space-y-4">
+                                <!-- Zone de dépôt -->
+                                <label for="ml-upload-input"
+                                    class="flex flex-col items-center justify-center border-2 border-dashed border-slate-300 hover:border-tp-sage rounded-2xl py-5 px-3 bg-tp-pearl/60 hover:bg-tp-sageLight/30 transition-colors cursor-pointer text-center"
+                                    id="ml-drop-zone">
+                                    <i data-lucide="cloud-upload" class="w-8 h-8 text-tp-sage mb-2"></i>
+                                    <span class="text-xs font-bold text-tp-navy">Déposez vos photos ici ou cliquez pour parcourir</span>
+                                    <span class="text-[11px] text-slate-500 mt-0.5">JPG, PNG, WebP — les photos sont stockées dans la médiathèque</span>
+                                    <input id="ml-upload-input" type="file" accept="image/*" multiple class="hidden">
+                                </label>
+
+                                <!-- Filtres par tag -->
+                                <div>
+                                    <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400 block mb-2">Filtrer par tag</span>
+                                    <div class="flex flex-wrap gap-1.5" id="ml-tag-filters">
+                                        <!-- Peuplé par JS -->
+                                    </div>
                                 </div>
-                                <div class="pb-2 border-b border-slate-200">
-                                    <span class="text-slate-400 font-semibold">Objet :</span>
-                                    <span id="nl-preview-subject" class="text-tp-navy font-bold">(Saisissez un objet...)</span>
+
+                                <!-- Grille de photos -->
+                                <div id="ml-photo-grid" class="grid grid-cols-2 sm:grid-cols-3 gap-3 max-h-80 overflow-y-auto pr-1">
+                                    <div class="col-span-full text-center py-6 text-xs text-slate-400 italic">
+                                        Aucune photo dans la médiathèque. Ajoutez-en via la zone de dépôt ci-dessus.
+                                    </div>
                                 </div>
-                                <div id="nl-preview-body" class="text-slate-600 whitespace-pre-line leading-relaxed min-h-[90px]">
-                                    Votre message apparaîtra ici en temps réel avant l'envoi.
-                                </div>
-                                <div id="nl-preview-attachments" class="pt-2 border-t border-slate-200 hidden">
-                                    <span class="text-[11px] font-bold text-tp-navy block mb-1.5">Pièces jointes photo :</span>
-                                    <div id="nl-preview-thumbs" class="flex flex-wrap gap-2"></div>
+
+                                <!-- Résumé sélection -->
+                                <div class="flex items-center justify-between pt-1 border-t border-slate-100 text-xs">
+                                    <span class="text-slate-500" id="ml-selected-label">0 photo(s) sélectionnée(s) pour la newsletter</span>
+                                    <button type="button" onclick="clearLibrarySelection()"
+                                        class="text-[11px] font-semibold text-slate-400 hover:text-tp-red transition-colors cursor-pointer">
+                                        Tout désélectionner
+                                    </button>
                                 </div>
                             </div>
                         </div>
 
-                        <!-- Historique des newsletters envoyées -->
+                        <!-- Historique des newsletters envoyées aux clients -->
                         <div class="bg-white rounded-2xl border border-slate-200/90 p-5 space-y-3">
                             <h3 class="font-display font-bold text-sm text-tp-navy flex items-center gap-2">
                                 <i data-lucide="history" class="w-4 h-4 text-tp-sage"></i>
-                                Dernières newsletters envoyées sur ce projet
+                                Dernières newsletters envoyées aux clients
                             </h3>
                             <div id="nl-history-list" class="space-y-2.5 text-xs">
-                                <p class="text-slate-400 italic">Aucune newsletter envoyée durant cette session.</p>
+                                <p class="text-slate-400 italic">Aucune newsletter client envoyée durant cette session.</p>
                             </div>
                         </div>
                     </div>
@@ -2192,87 +2215,301 @@
         }
 
         /**
-         * Logique complète de l'onglet Newsletter (destinataires, modèles, pièces jointes photo, aperçu & envoi)
+         * Logique complète de l'onglet Newsletter Clients (abonnés, médiathèque, envoi)
          */
+
+        // --- Médiathèque (mock DB in-memory) ---
+        let mediaLibrary = []; // { id, name, dataUrl, tags: [], selected: false, projectId }
+        let mlActiveTagFilter = 'ALL';
+        const ML_PRESET_TAGS = ['Structure', 'Isolation', 'Façade', 'Finitions', 'Extérieur', 'Intérieur', 'Chantier'];
+
+        // Pré-remplir la médiathèque avec 4 photos fictives pour la démo
+        (function seedMediaLibrary() {
+            const seed = [
+                { name: 'dalle-r2-bat-b.jpg', tags: ['Structure', 'Chantier'], color: '#1B2E4B' },
+                { name: 'isolation-fibre-bois.jpg', tags: ['Isolation', 'Intérieur'], color: '#2E7D5B' },
+                { name: 'facade-brique-reemploi.jpg', tags: ['Façade', 'Extérieur'], color: '#D8232A' },
+                { name: 'arceaux-velos-pose.jpg', tags: ['Extérieur', 'Finitions'], color: '#263F66' }
+            ];
+            seed.forEach((s, i) => {
+                // Crée un canvas SVG-like pour simuler une vraie photo
+                const canvas = document.createElement('canvas');
+                canvas.width = 300; canvas.height = 200;
+                const ctx = canvas.getContext('2d');
+                ctx.fillStyle = s.color;
+                ctx.fillRect(0, 0, 300, 200);
+                ctx.fillStyle = 'rgba(255,255,255,0.08)';
+                ctx.fillRect(0, 100, 300, 100);
+                ctx.fillStyle = 'rgba(255,255,255,0.7)';
+                ctx.font = 'bold 13px sans-serif';
+                ctx.textAlign = 'center';
+                ctx.fillText(s.name, 150, 110);
+                ctx.font = '11px sans-serif';
+                ctx.fillStyle = 'rgba(255,255,255,0.5)';
+                ctx.fillText('Thomas & Piron • Aperçu démo', 150, 130);
+                mediaLibrary.push({ id: Date.now() + i, name: s.name, dataUrl: canvas.toDataURL(), tags: s.tags, selected: false });
+            });
+        })();
+
+        function addToMediaLibrary(files) {
+            let count = 0;
+            const total = files.length;
+            files.forEach(file => {
+                if (!file.type.startsWith('image/')) return;
+                const reader = new FileReader();
+                reader.onload = (ev) => {
+                    mediaLibrary.push({
+                        id: Date.now() + Math.random(),
+                        name: file.name,
+                        dataUrl: ev.target.result,
+                        tags: [],
+                        selected: false
+                    });
+                    count++;
+                    if (count === total) {
+                        renderMediaLibrary();
+                        showToast('Photo(s) ajoutée(s)', `${count} photo(s) ajoutée(s) à la médiathèque.`, 'green');
+                    }
+                };
+                reader.readAsDataURL(file);
+            });
+        }
+
+        function toggleMediaTag(tag) {
+            mlActiveTagFilter = mlActiveTagFilter === tag ? 'ALL' : tag;
+            renderMediaLibrary();
+        }
+
+        function toggleSelectLibraryPhoto(id) {
+            const photo = mediaLibrary.find(p => p.id === id);
+            if (photo) {
+                photo.selected = !photo.selected;
+                // Sync newsletterAttachments
+                newsletterAttachments = mediaLibrary.filter(p => p.selected).map(p => ({ name: p.name, dataUrl: p.dataUrl }));
+                renderMediaLibrary();
+                renderNewsletterAttachSummary();
+                renderNewsletterPhotos();
+            }
+        }
+
+        function addTagToPhoto(id, tag) {
+            const photo = mediaLibrary.find(p => p.id === id);
+            if (!photo || photo.tags.includes(tag)) return;
+            photo.tags.push(tag);
+            renderMediaLibrary();
+        }
+
+        function removeTagFromPhoto(id, tag) {
+            const photo = mediaLibrary.find(p => p.id === id);
+            if (!photo) return;
+            photo.tags = photo.tags.filter(t => t !== tag);
+            renderMediaLibrary();
+        }
+
+        function removeFromLibrary(id) {
+            mediaLibrary = mediaLibrary.filter(p => p.id !== id);
+            newsletterAttachments = mediaLibrary.filter(p => p.selected).map(p => ({ name: p.name, dataUrl: p.dataUrl }));
+            renderMediaLibrary();
+            renderNewsletterAttachSummary();
+            renderNewsletterPhotos();
+        }
+
+        function clearLibrarySelection() {
+            mediaLibrary.forEach(p => p.selected = false);
+            newsletterAttachments = [];
+            renderMediaLibrary();
+            renderNewsletterAttachSummary();
+            renderNewsletterPhotos();
+        }
+
+        function renderMediaLibrary() {
+            // Tag filter pills
+            const tagFilterEl = document.getElementById('ml-tag-filters');
+            if (tagFilterEl) {
+                const allTags = ML_PRESET_TAGS;
+                tagFilterEl.innerHTML = [
+                    `<button type="button" onclick="toggleMediaTag('ALL')"
+                        class="px-2.5 py-1 rounded-full text-[11px] font-bold border transition-all cursor-pointer ${mlActiveTagFilter === 'ALL' ? 'bg-tp-navy text-white border-tp-navy' : 'bg-white border-slate-200 text-slate-600 hover:border-tp-navy hover:text-tp-navy'}">
+                        Toutes
+                    </button>`
+                ].concat(allTags.map(tag => `
+                    <button type="button" onclick="toggleMediaTag('${tag}')"
+                        class="px-2.5 py-1 rounded-full text-[11px] font-bold border transition-all cursor-pointer ${mlActiveTagFilter === tag ? 'bg-tp-sage text-white border-tp-sage' : 'bg-white border-slate-200 text-slate-600 hover:border-tp-sage hover:text-tp-sage'}">
+                        ${tag}
+                    </button>
+                `)).join('');
+            }
+
+            // Count
+            const countLabel = document.getElementById('ml-count-label');
+            if (countLabel) countLabel.textContent = `${mediaLibrary.length} photo(s)`;
+
+            // Grid
+            const grid = document.getElementById('ml-photo-grid');
+            if (!grid) return;
+
+            const filtered = mlActiveTagFilter === 'ALL'
+                ? mediaLibrary
+                : mediaLibrary.filter(p => p.tags.includes(mlActiveTagFilter));
+
+            if (filtered.length === 0) {
+                grid.innerHTML = `<div class="col-span-full text-center py-6 text-xs text-slate-400 italic">
+                    ${mlActiveTagFilter === 'ALL' ? 'Aucune photo. Ajoutez-en via la zone de dépôt.' : 'Aucune photo avec ce tag.'}
+                </div>`;
+            } else {
+                grid.innerHTML = filtered.map(photo => `
+                    <div class="relative group rounded-xl overflow-hidden border-2 transition-all ${photo.selected ? 'border-tp-sage ring-2 ring-tp-sage/20' : 'border-slate-200 hover:border-slate-300'} bg-white cursor-pointer"
+                         onclick="toggleSelectLibraryPhoto(${photo.id})">
+                        <!-- Thumbnail -->
+                        <div class="relative">
+                            <img src="${photo.dataUrl}" alt="${photo.name}" class="w-full h-24 object-cover">
+                            <!-- Overlay sélection -->
+                            <div class="absolute inset-0 ${photo.selected ? 'bg-tp-sage/20' : 'bg-transparent group-hover:bg-black/5'} transition-colors flex items-center justify-center">
+                                ${photo.selected ? `<div class="w-6 h-6 rounded-full bg-tp-sage flex items-center justify-center shadow-md">
+                                    <i data-lucide="check" class="w-3.5 h-3.5 text-white"></i>
+                                </div>` : ''}
+                            </div>
+                            <!-- Bouton supprimer -->
+                            <button type="button" onclick="event.stopPropagation(); removeFromLibrary(${photo.id})"
+                                class="absolute top-1 right-1 w-5 h-5 rounded-full bg-tp-red text-white text-[10px] font-bold flex items-center justify-center shadow opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer z-10"
+                                title="Supprimer de la médiathèque">×</button>
+                        </div>
+                        <!-- Infos -->
+                        <div class="p-1.5 space-y-1" onclick="event.stopPropagation()">
+                            <p class="text-[10px] font-semibold text-slate-700 truncate leading-tight">${photo.name}</p>
+                            <!-- Tags existants -->
+                            <div class="flex flex-wrap gap-1">
+                                ${photo.tags.map(t => `
+                                    <span class="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded-md bg-tp-sageLight text-tp-sage text-[9px] font-bold">
+                                        ${t}
+                                        <button type="button" onclick="removeTagFromPhoto(${photo.id}, '${t}')" class="ml-0.5 hover:text-tp-red cursor-pointer leading-none">×</button>
+                                    </span>
+                                `).join('')}
+                            </div>
+                            <!-- Ajout de tag -->
+                            <select onchange="if(this.value){ addTagToPhoto(${photo.id}, this.value); this.value=''; }"
+                                class="w-full text-[9px] border border-slate-200 rounded-md px-1 py-0.5 bg-slate-50 text-slate-600 focus:outline-none cursor-pointer">
+                                <option value="">+ Tag...</option>
+                                ${ML_PRESET_TAGS.filter(t => !photo.tags.includes(t)).map(t => `<option value="${t}">${t}</option>`).join('')}
+                            </select>
+                        </div>
+                    </div>
+                `).join('');
+            }
+
+            // Résumé sélection
+            const selectedCount = mediaLibrary.filter(p => p.selected).length;
+            const selectedLabel = document.getElementById('ml-selected-label');
+            if (selectedLabel) selectedLabel.textContent = `${selectedCount} photo(s) sélectionnée(s) pour la newsletter`;
+
+            lucide.createIcons();
+        }
+
+        function renderNewsletterAttachSummary() {
+            const el = document.getElementById('nl-attach-summary');
+            if (!el) return;
+            const count = mediaLibrary.filter(p => p.selected).length;
+            el.textContent = count > 0
+                ? `${count} photo(s) sélectionnée(s) depuis la médiathèque`
+                : 'Aucune photo sélectionnée depuis la médiathèque';
+        }
+
+        // --- Abonnés clients ---
         let newsletterAttachments = [];
         const newsletterHistoryByProject = {};
+        const clientSubscribers = [
+            { name: 'Marie Laurent', email: 'marie.laurent@email.be', checked: true },
+            { name: 'Luc Janssens', email: 'luc.janssens@skynet.be', checked: true },
+            { name: 'Sophie Peeters', email: 's.peeters@gmail.com', checked: true },
+            { name: 'Marc & Claire Dubois', email: 'famille.dubois@outlook.be', checked: true }
+        ];
+
+        function renderClientSubscribers() {
+            const listEl = document.getElementById('nl-recipients-list');
+            const selectAll = document.getElementById('nl-select-all');
+            if (!listEl) return;
+
+            listEl.innerHTML = clientSubscribers.map((c, idx) => `
+                <label class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white border border-slate-200 text-xs font-semibold text-tp-navy cursor-pointer">
+                    <input type="checkbox" name="nlRecipient" value="${c.email}" ${c.checked ? 'checked' : ''} onchange="toggleClientSubscriber(${idx}, this.checked)" class="accent-tp-sage">
+                    <span>${c.name}</span>
+                    <span class="text-[10px] text-slate-400">(${c.email})</span>
+                </label>
+            `).join('');
+
+            const checkedCount = clientSubscribers.filter(c => c.checked).length;
+            document.getElementById('nl-recipient-count').textContent = checkedCount;
+            if (selectAll) selectAll.checked = checkedCount === clientSubscribers.length && clientSubscribers.length > 0;
+        }
+
+        function toggleClientSubscriber(idx, isChecked) {
+            if (clientSubscribers[idx]) clientSubscribers[idx].checked = isChecked;
+            renderClientSubscribers();
+        }
+
+        function addClientSubscriber() {
+            const input = document.getElementById('nl-new-client-email');
+            const email = input.value.trim();
+            if (!email || !email.includes('@')) {
+                showToast('E-mail invalide', 'Veuillez saisir une adresse e-mail client valide.', 'amber');
+                return;
+            }
+            const namePart = email.split('@')[0].replace(/[._-]/g, ' ');
+            clientSubscribers.push({ name: namePart, email, checked: true });
+            input.value = '';
+            renderClientSubscribers();
+            showToast('Client ajouté', `${email} a été ajouté à la liste d'envoi.`, 'green');
+        }
 
         function initNewsletterFeature() {
             const selectAll = document.getElementById('nl-select-all');
             const subjectInput = document.getElementById('nl-subject');
             const bodyInput = document.getElementById('nl-body');
-            const photoInput = document.getElementById('nl-photo-input');
+            const mlUploadInput = document.getElementById('ml-upload-input');
             const form = document.getElementById('newsletter-form');
 
             if (!form) return;
 
-            const updateRecipientsPreview = () => {
-                const boxes = Array.from(document.querySelectorAll('input[name="nlRecipient"]'));
-                const checked = boxes.filter(b => b.checked);
-                document.getElementById('nl-recipient-count').textContent = checked.length;
-                selectAll.checked = checked.length === boxes.length;
-                document.getElementById('nl-preview-to').textContent =
-                    checked.length === boxes.length
-                        ? `Toutes les équipes du chantier (${checked.length} pôles)`
-                        : (checked.length > 0 ? checked.map(c => c.value).join(', ') : 'Aucun destinataire sélectionné');
-            };
+            renderClientSubscribers();
+            renderMediaLibrary();
+            renderNewsletterAttachSummary();
 
             selectAll.addEventListener('change', () => {
-                document.querySelectorAll('input[name="nlRecipient"]').forEach(b => {
-                    b.checked = selectAll.checked;
+                clientSubscribers.forEach(c => { c.checked = selectAll.checked; });
+                renderClientSubscribers();
+            });
+
+            // Upload vers médiathèque
+            if (mlUploadInput) {
+                mlUploadInput.addEventListener('change', (e) => {
+                    const files = Array.from(e.target.files || []);
+                    if (files.length) addToMediaLibrary(files);
+                    mlUploadInput.value = '';
                 });
-                updateRecipientsPreview();
-            });
-
-            document.querySelectorAll('input[name="nlRecipient"]').forEach(b => {
-                b.addEventListener('change', updateRecipientsPreview);
-            });
-
-            subjectInput.addEventListener('input', () => {
-                document.getElementById('nl-preview-subject').textContent = subjectInput.value.trim() || '(Saisissez un objet...)';
-            });
-
-            bodyInput.addEventListener('input', () => {
-                document.getElementById('nl-preview-body').textContent = bodyInput.value.trim() || "Votre message apparaîtra ici en temps réel avant l'envoi.";
-            });
-
-            photoInput.addEventListener('change', (e) => {
-                const files = Array.from(e.target.files || []);
-                files.forEach(file => {
-                    if (!file.type.startsWith('image/')) return;
-                    const reader = new FileReader();
-                    reader.onload = (ev) => {
-                        newsletterAttachments.push({ name: file.name, dataUrl: ev.target.result });
-                        renderNewsletterPhotos();
-                    };
-                    reader.readAsDataURL(file);
-                });
-                photoInput.value = '';
-            });
+            }
 
             form.addEventListener('submit', (e) => {
                 e.preventDefault();
                 const project = PROJECTS_DATA[state.currentProjectIndex];
                 const subject = subjectInput.value.trim();
                 const body = bodyInput.value.trim();
-                const sendEmail = document.getElementById('nl-send-email').checked;
-                const notifyApp = document.getElementById('nl-notify-app').checked;
-                const recipients = Array.from(document.querySelectorAll('input[name="nlRecipient"]:checked')).map(c => c.value);
+                const logInternal = document.getElementById('nl-log-internal').checked;
+                const recipients = clientSubscribers.filter(c => c.checked);
 
                 if (recipients.length === 0) {
-                    showToast('Destinataire manquant', 'Veuillez sélectionner au moins une équipe du projet.', 'amber');
+                    showToast('Destinataire manquant', 'Veuillez sélectionner au moins un client abonné.', 'amber');
                     return;
                 }
                 if (!subject || !body) return;
 
-                if (notifyApp) {
+                if (logInternal) {
                     const activeStage = project.stages[project.activeStageIndex];
                     pushFeedNotification(
                         activeStage.name,
                         'Général',
                         'Avancement validé',
-                        `[Newsletter] ${subject} — ${body.slice(0, 120)}${body.length > 120 ? '...' : ''}`,
-                        true
+                        `[Newsletter Client envoyée à ${recipients.length} abonné(s)] ${subject}`,
+                        false
                     );
                 }
 
@@ -2281,27 +2518,25 @@
                     subject,
                     recipientsCount: recipients.length,
                     photosCount: newsletterAttachments.length,
-                    sendEmail,
-                    notifyApp,
                     time: "À l'instant"
                 });
 
                 showToast(
-                    'Newsletter diffusée !',
-                    `${sendEmail ? 'E-mail envoyé' : 'Message enregistré'} à ${recipients.length} pôle(s) avec ${newsletterAttachments.length} photo(s).`,
+                    'Newsletter envoyée aux clients !',
+                    `E-mail diffusé à ${recipients.length} client(s) abonné(s) avec ${newsletterAttachments.length} photo(s).`,
                     'green'
                 );
 
                 form.reset();
-                document.querySelectorAll('input[name="nlRecipient"]').forEach(b => b.checked = true);
-                selectAll.checked = true;
-                document.getElementById('nl-send-email').checked = true;
-                document.getElementById('nl-notify-app').checked = true;
+                clientSubscribers.forEach(c => c.checked = true);
+                document.getElementById('nl-log-internal').checked = true;
+                // On ne vide pas la médiathèque, on désélectionne juste
+                mediaLibrary.forEach(p => p.selected = false);
                 newsletterAttachments = [];
+                renderMediaLibrary();
                 renderNewsletterPhotos();
-                updateRecipientsPreview();
-                document.getElementById('nl-preview-subject').textContent = '(Saisissez un objet...)';
-                document.getElementById('nl-preview-body').textContent = "Votre message apparaîtra ici en temps réel avant l'envoi.";
+                renderNewsletterAttachSummary();
+                renderClientSubscribers();
                 renderNewsletterHistory();
                 renderAll();
             });
@@ -2309,29 +2544,14 @@
 
         function renderNewsletterPhotos() {
             const container = document.getElementById('nl-photo-previews');
-            const previewBox = document.getElementById('nl-preview-attachments');
-            const previewThumbs = document.getElementById('nl-preview-thumbs');
+            if (!container) return;
 
             container.innerHTML = newsletterAttachments.map((att, idx) => `
                 <div class="relative group rounded-xl overflow-hidden border border-slate-200 bg-white">
                     <img src="${att.dataUrl}" alt="${att.name}" class="w-full h-20 object-cover">
-                    <button type="button" onclick="removeNewsletterPhoto(${idx})"
-                        class="absolute top-1 right-1 w-6 h-6 rounded-full bg-tp-red text-white text-xs font-bold flex items-center justify-center shadow-sm cursor-pointer" title="Retirer">
-                        ×
-                    </button>
                     <span class="block text-[10px] text-slate-600 px-1.5 py-1 truncate">${att.name}</span>
                 </div>
             `).join('');
-
-            if (newsletterAttachments.length > 0) {
-                previewBox.classList.remove('hidden');
-                previewThumbs.innerHTML = newsletterAttachments.map(att => `
-                    <img src="${att.dataUrl}" alt="${att.name}" class="w-12 h-12 rounded-lg object-cover border border-slate-200">
-                `).join('');
-            } else {
-                previewBox.classList.add('hidden');
-                previewThumbs.innerHTML = '';
-            }
         }
 
         function removeNewsletterPhoto(index) {
@@ -2345,17 +2565,15 @@
             const bodyEl = document.getElementById('nl-body');
 
             if (type === 'avancement') {
-                subjectEl.value = `[${project.name}] Point d'avancement hebdomadaire`;
-                bodyEl.value = `Bonjour à toutes les équipes,\n\nVoici le point d'avancement sur le chantier ${project.name} (${project.ref}) :\n- Étape en cours : ${project.stages[project.activeStageIndex].name}\n- Engagements durables vérifiés cette semaine\n- Prochaines actions attendues pour la passation.\n\nMerci à tous pour votre vigilance sur le terrain.`;
+                subjectEl.value = `Des nouvelles de votre futur logement — ${project.name}`;
+                bodyEl.value = `Bonjour,\n\nLes travaux avancent très bien sur votre projet ${project.name} !\nNous sommes actuellement à l'étape « ${project.stages[project.activeStageIndex].name} » et veillons chaque jour au respect de nos 6 engagements durables.\n\nNous vous tiendrons informé(e) très vite de la suite.\nL'équipe Thomas & Piron`;
             } else if (type === 'photos') {
-                subjectEl.value = `[${project.name}] Compte-rendu photo du chantier`;
-                bodyEl.value = `Bonjour à tous,\n\nVous trouverez en pièces jointes les photos prises aujourd'hui sur le site (${project.name}) illustrant la mise en œuvre conforme de nos engagements.\n\nN'hésitez pas à réagir dans le fil de coordination si besoin.`;
-            } else if (type === 'vigilance') {
-                subjectEl.value = `[VIGILANCE SQEO] ${project.name} — Action requise`;
-                bodyEl.value = `Bonjour à toute l'équipe projet,\n\nMerci de porter une attention particulière au point suivant avant la prochaine étape :\n- Vérification des bordereaux / conformité sur site\n- Maintien des zones de tri et protection des sols.\n\nMerci de confirmer dès que c'est en ordre.`;
+                subjectEl.value = `En images : l'avancement de votre chantier ${project.name}`;
+                bodyEl.value = `Bonjour,\n\nDécouvrez en pièces jointes les dernières photos prises sur le chantier ${project.name}.\nVous pouvez y voir la mise en œuvre de l'isolation et le soin apporté à la propreté du site.\n\nBelle journée à vous,\nL'équipe Thomas & Piron`;
+            } else if (type === 'etape') {
+                subjectEl.value = `Une nouvelle étape franchie pour ${project.name} !`;
+                bodyEl.value = `Bonjour,\n\nBonne nouvelle : une nouvelle étape clé vient d'être validée par nos experts qualité sur votre projet ${project.name}.\nTout est conforme aux engagements pris lors de votre réservation.\n\nBien à vous,\nL'équipe Thomas & Piron`;
             }
-            subjectEl.dispatchEvent(new Event('input'));
-            bodyEl.dispatchEvent(new Event('input'));
         }
 
         function renderNewsletterHistory() {
@@ -2364,7 +2582,7 @@
             if (!list || !project) return;
             const items = newsletterHistoryByProject[project.id] || [];
             if (items.length === 0) {
-                list.innerHTML = `<p class="text-slate-400 italic">Aucune newsletter envoyée durant cette session.</p>`;
+                list.innerHTML = `<p class="text-slate-400 italic">Aucune newsletter client envoyée durant cette session.</p>`;
                 return;
             }
             list.innerHTML = items.map(item => `
@@ -2374,7 +2592,7 @@
                         <span class="text-[10px] text-slate-400 shrink-0">${item.time}</span>
                     </div>
                     <p class="text-[11px] text-slate-600 mt-1">
-                        ${item.recipientsCount} pôle(s) notifié(s) • ${item.photosCount} photo(s) jointe(s)
+                        Envoyée à ${item.recipientsCount} client(s) abonné(s) • ${item.photosCount} photo(s) jointe(s)
                     </p>
                 </div>
             `).join('');
