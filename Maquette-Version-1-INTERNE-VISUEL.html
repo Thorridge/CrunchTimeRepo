@@ -1,0 +1,852 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Thomas &amp; Piron | Portail Interne Chantier &amp; Engagements</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --tp-slate: #1E293B;
+            --tp-dark: #0F172A;
+            --tp-bg: #F8FAFC;
+            --tp-green: #15803D;
+            --tp-green-light: #DCFCE7;
+            --border: #E2E8F0;
+            --text-muted: #64748B;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--tp-bg);
+            color: var(--tp-slate);
+            line-height: 1.5;
+        }
+
+        h1, h2, h3, h4 {
+            margin: 0;
+            color: var(--tp-dark);
+        }
+
+        .container {
+            max-width: 1480px;
+            margin: 0 auto;
+            padding: 24px;
+        }
+
+        /* Header */
+        header {
+            background: var(--tp-slate);
+            color: #FFFFFF;
+            border-bottom: 1px solid #334155;
+            padding: 14px 24px;
+        }
+
+        .header-inner {
+            max-width: 1480px;
+            margin: 0 auto;
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: space-between;
+            gap: 16px;
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .brand-logo {
+            width: 40px;
+            height: 40px;
+            border-radius: 12px;
+            background: linear-gradient(135deg, var(--tp-green), #10B981);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 800;
+            color: #FFFFFF;
+        }
+
+        .badge-internal {
+            font-size: 11px;
+            font-weight: 700;
+            padding: 2px 8px;
+            border-radius: 999px;
+            background: rgba(16, 185, 129, 0.2);
+            color: #6EE7B7;
+            border: 1px solid rgba(16, 185, 129, 0.35);
+            margin-left: 8px;
+        }
+
+        .header-meta {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            font-size: 12px;
+        }
+
+        .meta-chip {
+            background: rgba(15, 23, 42, 0.65);
+            border: 1px solid #475569;
+            border-radius: 12px;
+            padding: 8px 12px;
+        }
+
+        .meta-chip span {
+            display: block;
+            font-size: 10px;
+            text-transform: uppercase;
+            color: #94A3B8;
+            font-weight: 700;
+        }
+
+        /* Grid & Cards */
+        .kpi-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+
+        .card {
+            background: #FFFFFF;
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 20px;
+        }
+
+        .kpi-label {
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: #94A3B8;
+        }
+
+        .kpi-value {
+            font-size: 28px;
+            font-weight: 800;
+            color: var(--tp-dark);
+            margin: 6px 0;
+        }
+
+        .kpi-value.green {
+            color: var(--tp-green);
+        }
+
+        .kpi-sub {
+            font-size: 12px;
+            color: var(--text-muted);
+        }
+
+        .bar-bg {
+            width: 100%;
+            height: 8px;
+            background: #F1F5F9;
+            border-radius: 999px;
+            overflow: hidden;
+            margin-top: 10px;
+        }
+
+        .bar-fill-sky {
+            height: 100%;
+            width: 46%;
+            background: #0284C7;
+        }
+
+        .bar-fill-green {
+            height: 100%;
+            width: 88%;
+            background: var(--tp-green);
+        }
+
+        /* 8 Stages Stepper */
+        .stages-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(165px, 1fr));
+            gap: 12px;
+            margin-top: 14px;
+        }
+
+        .stage-card {
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 12px;
+            background: #FFFFFF;
+        }
+
+        .stage-card.active {
+            border-color: var(--tp-slate);
+            background: #F1F5F9;
+            box-shadow: 0 0 0 2px rgba(30, 41, 59, 0.12);
+        }
+
+        .stage-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 11px;
+            font-weight: 700;
+            margin-bottom: 6px;
+        }
+
+        .tag {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 999px;
+            font-size: 11px;
+            font-weight: 700;
+        }
+
+        .tag-done {
+            background: var(--tp-green-light);
+            color: var(--tp-green);
+        }
+
+        .tag-current {
+            background: #E0F2FE;
+            color: #0369A1;
+        }
+
+        .tag-alert {
+            background: #FEF3C7;
+            color: #92400E;
+        }
+
+        .tag-todo {
+            background: #F1F5F9;
+            color: #475569;
+        }
+
+        /* Main Split */
+        .main-split {
+            display: grid;
+            grid-template-columns: minmax(0, 2fr) minmax(320px, 1fr);
+            gap: 24px;
+            margin-top: 24px;
+            align-items: start;
+        }
+
+        @media (max-width: 1100px) {
+            .main-split {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .handover-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 14px;
+            margin-top: 16px;
+        }
+
+        .handover-in {
+            background: #F8FAFC;
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 14px;
+            font-size: 12px;
+        }
+
+        .handover-out {
+            background: #F0FDF4;
+            border: 1px solid #BBF7D0;
+            border-radius: 12px;
+            padding: 14px;
+            font-size: 12px;
+        }
+
+        .commitments-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 16px;
+            margin-top: 14px;
+        }
+
+        .c-card {
+            background: #FFFFFF;
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            padding: 16px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            gap: 12px;
+        }
+
+        .c-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 8px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #F1F5F9;
+        }
+
+        .task-list {
+            list-style: none;
+            padding: 0;
+            margin: 8px 0 0;
+            font-size: 12px;
+        }
+
+        .task-list li {
+            padding: 4px 0;
+            color: #334155;
+        }
+
+        .handover-note {
+            background: #F8FAFC;
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 10px;
+            font-size: 11px;
+            color: #475569;
+        }
+
+        /* Feed */
+        .feed-item {
+            background: #F8FAFC;
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 12px;
+            margin-bottom: 12px;
+            font-size: 12px;
+        }
+
+        .feed-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 6px;
+        }
+
+        .feed-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            margin-bottom: 6px;
+        }
+
+        .pill-slate {
+            background: var(--tp-slate);
+            color: #FFFFFF;
+            font-size: 10px;
+            font-weight: 700;
+            padding: 2px 8px;
+            border-radius: 6px;
+        }
+
+        .pill-white {
+            background: #FFFFFF;
+            border: 1px solid var(--border);
+            color: var(--tp-slate);
+            font-size: 10px;
+            font-weight: 700;
+            padding: 2px 8px;
+            border-radius: 6px;
+        }
+
+        .feed-footer {
+            display: flex;
+            justify-content: space-between;
+            font-size: 11px;
+            color: var(--text-muted);
+            margin-top: 8px;
+            padding-top: 6px;
+            border-top: 1px solid #E2E8F0;
+        }
+
+        /* Matrix Table */
+        .matrix-wrap {
+            margin-top: 24px;
+            overflow-x: auto;
+        }
+
+        table.matrix {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 12px;
+            min-width: 920px;
+        }
+
+        table.matrix th, table.matrix td {
+            border: 1px solid var(--border);
+            padding: 10px;
+            text-align: center;
+        }
+
+        table.matrix th {
+            background: #F1F5F9;
+            font-weight: 700;
+        }
+
+        table.matrix td:first-child {
+            text-align: left;
+            font-weight: 700;
+            background: #F8FAFC;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- 1. EN-TÊTE INTERNE -->
+    <header>
+        <div class="header-inner">
+            <div class="brand">
+                <div class="brand-logo">T&amp;P</div>
+                <div>
+                    <div style="display: flex; align-items: center; flex-wrap: wrap;">
+                        <strong style="font-size: 17px;">Thomas &amp; Piron</strong>
+                        <span class="badge-internal">USAGE INTERNE • CHANTIER</span>
+                    </div>
+                    <div style="font-size: 12px; color: #CBD5E1;">Suivi des Étapes &amp; Continuité des Engagements</div>
+                </div>
+            </div>
+
+            <div class="header-meta">
+                <div class="meta-chip">
+                    <span>Chantier actif</span>
+                    <strong>Éco-quartier Les Prés Verts - Lot B</strong>
+                </div>
+                <div class="meta-chip">
+                    <span>Pilote d'étape</span>
+                    <strong>Marc D. - Conducteur de travaux</strong>
+                </div>
+                <div class="meta-chip">
+                    <span>Points de vigilance</span>
+                    <strong>2 actifs • Synchronisation interne</strong>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main class="container">
+
+        <!-- 2. SYNTHÈSE / KPIs -->
+        <section class="kpi-grid">
+            <div class="card">
+                <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 10px;">
+                    <div>
+                        <span class="kpi-label">Fiche Projet</span>
+                        <h2 style="font-size: 16px; margin-top: 4px;">Éco-quartier Les Prés Verts - Lot B</h2>
+                        <div class="kpi-sub" style="margin-top: 4px;">Wavre • 42 logements Q-ZEN &amp; crèche</div>
+                    </div>
+                    <span class="pill-white" style="font-size: 11px;">TP-2026-084</span>
+                </div>
+                <div class="kpi-sub" style="margin-top: 14px; padding-top: 10px; border-top: 1px solid #F1F5F9; display: flex; justify-content: space-between;">
+                    <span>Équipes connectées : <strong>14 membres</strong></span>
+                    <strong style="color: var(--tp-green);">Actif</strong>
+                </div>
+            </div>
+
+            <div class="card">
+                <span class="kpi-label">Avancement Global</span>
+                <div class="kpi-value">46%</div>
+                <div class="kpi-sub">Phase active : Chantier</div>
+                <div class="bar-bg"><div class="bar-fill-sky"></div></div>
+            </div>
+
+            <div class="card">
+                <span class="kpi-label">Respect des 6 Engagements</span>
+                <div class="kpi-value green">88%</div>
+                <div class="kpi-sub">Jalons actifs validés sur le projet</div>
+                <div class="bar-bg"><div class="bar-fill-green"></div></div>
+            </div>
+
+            <div class="card">
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <span class="kpi-label">Points de Vigilance</span>
+                    <span class="tag tag-alert">2 points actifs</span>
+                </div>
+                <p class="kpi-sub" style="margin-top: 8px;">
+                    Vigilance sur la gestion des eaux de ruissellement (Chantier) et les fiches FDES / traçabilité matériaux (Contrôles SQEO).
+                </p>
+            </div>
+        </section>
+
+        <!-- 3. LES 8 ÉTAPES DU PROJET -->
+        <section class="card">
+            <div style="display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 8px;">
+                <h2 style="font-size: 13px; text-transform: uppercase; letter-spacing: 0.05em; color: #475569;">
+                    Cycle de vie du projet — Les 8 Étapes Clés
+                </h2>
+                <div style="font-size: 11px; color: var(--text-muted);">
+                    ● Terminée &nbsp;|&nbsp; ● En cours &nbsp;|&nbsp; ● Point d'attention &nbsp;|&nbsp; ● À venir
+                </div>
+            </div>
+
+            <div class="stages-grid">
+                <div class="stage-card">
+                    <div class="stage-top"><span>01</span><span class="tag tag-done">Terminée</span></div>
+                    <strong style="font-size: 12px;">Stratégies et permis</strong>
+                    <div class="kpi-sub" style="margin-top: 6px;">100% • 6/6 eng.</div>
+                </div>
+
+                <div class="stage-card">
+                    <div class="stage-top"><span>02</span><span class="tag tag-done">Terminée</span></div>
+                    <strong style="font-size: 12px;">Études</strong>
+                    <div class="kpi-sub" style="margin-top: 6px;">100% • 6/6 eng.</div>
+                </div>
+
+                <div class="stage-card">
+                    <div class="stage-top"><span>03</span><span class="tag tag-done">Terminée</span></div>
+                    <strong style="font-size: 12px;">Devis et achats</strong>
+                    <div class="kpi-sub" style="margin-top: 6px;">100% • 6/6 eng.</div>
+                </div>
+
+                <div class="stage-card active">
+                    <div class="stage-top"><span>04</span><span class="tag tag-current">En cours</span></div>
+                    <strong style="font-size: 12px;">Chantier</strong>
+                    <div class="kpi-sub" style="margin-top: 6px;">65% • 3/6 eng. validés</div>
+                </div>
+
+                <div class="stage-card">
+                    <div class="stage-top"><span>05</span><span class="tag tag-alert">Point d'attention</span></div>
+                    <strong style="font-size: 12px;">Contrôles SQEO</strong>
+                    <div class="kpi-sub" style="margin-top: 6px;">15% • 0/6 eng. validés</div>
+                </div>
+
+                <div class="stage-card">
+                    <div class="stage-top"><span>06</span><span class="tag tag-todo">À venir</span></div>
+                    <strong style="font-size: 12px;">Réception</strong>
+                    <div class="kpi-sub" style="margin-top: 6px;">0% • À venir</div>
+                </div>
+
+                <div class="stage-card">
+                    <div class="stage-top"><span>07</span><span class="tag tag-todo">À venir</span></div>
+                    <strong style="font-size: 12px;">Livraison</strong>
+                    <div class="kpi-sub" style="margin-top: 6px;">0% • À venir</div>
+                </div>
+
+                <div class="stage-card">
+                    <div class="stage-top"><span>08</span><span class="tag tag-todo">À venir</span></div>
+                    <strong style="font-size: 12px;">SAV et usage</strong>
+                    <div class="kpi-sub" style="margin-top: 6px;">0% • À venir</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 4 & 5. ÉTAPE ACTIVE + 6 ENGAGEMENTS + FIL DE COORDINATION -->
+        <div class="main-split">
+            <div style="display: flex; flex-direction: column; gap: 20px;">
+                <section class="card">
+                    <div style="display: flex; flex-wrap: wrap; justify-content: space-between; align-items: flex-start; gap: 12px; padding-bottom: 14px; border-bottom: 1px solid #F1F5F9;">
+                        <div>
+                            <div style="display: flex; flex-wrap: wrap; align-items: center; gap: 8px;">
+                                <span class="pill-slate" style="font-size: 11px; padding: 4px 10px;">ÉTAPE 4 / 8</span>
+                                <h2 style="font-size: 20px;">Chantier</h2>
+                                <span class="tag tag-current">En cours • 65%</span>
+                            </div>
+                            <div class="kpi-sub" style="margin-top: 6px;">
+                                Pilote d'étape : <strong>Marc D. (Conducteur de travaux)</strong> &nbsp;|&nbsp; Période : <strong>15/03/2026 — 20/11/2026</strong>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="handover-grid">
+                        <div class="handover-in">
+                            <strong style="display: block; color: #0369A1; margin-bottom: 4px;">↓ Reçu de l'étape précédente (Devis et achats)</strong>
+                            <p style="margin: 0; color: #475569;">
+                                Commandes fermes passées avec clauses RSE. Vigilance transmise par les Achats sur le stockage de la terre végétale et la gestion des eaux de fouilles.
+                            </p>
+                        </div>
+
+                        <div class="handover-out">
+                            <strong style="display: block; color: var(--tp-green); margin-bottom: 4px;">↑ Relais à préparer pour (Contrôles SQEO)</strong>
+                            <p style="margin: 0; color: #334155;">
+                                Collecter les bons de livraison béton bas carbone, registres déchets 7 flux et photos d'étanchéité à l'air pour les contrôles SQEO.
+                            </p>
+                        </div>
+                    </div>
+                </section>
+
+                <section>
+                    <h3 style="font-size: 16px;">Les 6 Engagements Thomas &amp; Piron sur l'étape « Chantier »</h3>
+                    <p class="kpi-sub">Objectifs, points de contrôle et consignes de continuité à transmettre.</p>
+
+                    <div class="commitments-grid">
+                        <div class="c-card">
+                            <div>
+                                <div class="c-header">
+                                    <strong>Énergie et climat</strong>
+                                    <span class="tag tag-done">✓ Validé</span>
+                                </div>
+                                <p style="font-size: 12px; font-weight: 600; margin: 10px 0 6px;">Suivre le coulage béton bas carbone CEM III et garantir la continuité de l'isolation.</p>
+                                <ul class="task-list">
+                                    <li>☑ Raccordement électrique chantier 100% vert actif</li>
+                                    <li>☑ Contrôle visuel de pose des rupteurs thermiques balcons</li>
+                                    <li>☐ Pose des membranes d'étanchéité à l'air Bâtiment B</li>
+                                </ul>
+                            </div>
+                            <div class="handover-note">
+                                <strong>À ne pas perdre pour la suite :</strong> Archiver 100% des bons de livraison béton avec mention CEM III pour bilan carbone.
+                            </div>
+                        </div>
+
+                        <div class="c-card">
+                            <div>
+                                <div class="c-header">
+                                    <strong>Ressources</strong>
+                                    <span class="tag tag-current">↻ En cours</span>
+                                </div>
+                                <p style="font-size: 12px; font-weight: 600; margin: 10px 0 6px;">Tri sélectif strict en 7 flux sur chantier et mise en œuvre des briques/pavés de réemploi.</p>
+                                <ul class="task-list">
+                                    <li>☑ Installation de l'îlot de tri 7 flux signalétique claire</li>
+                                    <li>☑ Rotation des palettes consignées avec le négoce</li>
+                                    <li>☐ Pose des 450 m² de pavés de réemploi sur voirie douce</li>
+                                </ul>
+                            </div>
+                            <div class="handover-note">
+                                <strong>À ne pas perdre pour la suite :</strong> Transmettre le registre de traçabilité des bennes à Claire V. (SQEO).
+                            </div>
+                        </div>
+
+                        <div class="c-card">
+                            <div>
+                                <div class="c-header">
+                                    <strong>Eau</strong>
+                                    <span class="tag tag-alert">⚠ Vigilance</span>
+                                </div>
+                                <p style="font-size: 12px; font-weight: 600; margin: 10px 0 6px;">Prévenir toute pollution des eaux de ruissellement et poser les citernes de récupération.</p>
+                                <ul class="task-list">
+                                    <li>☑ Installation du bac de lavage goulottes béton en circuit fermé</li>
+                                    <li>☑ Pose et raccordement des deux citernes 15.000L</li>
+                                    <li>☐ Curage préventif du bassin de décantation provisoire</li>
+                                </ul>
+                            </div>
+                            <div class="handover-note">
+                                <strong>À ne pas perdre pour la suite :</strong> Vérifier l'étanchéité du bac de décantation laitances béton après les fortes pluies.
+                            </div>
+                        </div>
+
+                        <div class="c-card">
+                            <div>
+                                <div class="c-header">
+                                    <strong>Sol et nature</strong>
+                                    <span class="tag tag-done">✓ Validé</span>
+                                </div>
+                                <p style="font-size: 12px; font-weight: 600; margin: 10px 0 6px;">Maintenir intactes les clôtures de protection des arbres et préserver la terre végétale.</p>
+                                <ul class="task-list">
+                                    <li>☑ Sanctuarisation physique des 8 arbres remarquables vérifiée</li>
+                                    <li>☑ Stockage séparé de 620 m³ de terre végétale sans compaction</li>
+                                </ul>
+                            </div>
+                            <div class="handover-note">
+                                <strong>À ne pas perdre pour la suite :</strong> La terre végétale stockée en andain Nord est prête pour le régalage paysager.
+                            </div>
+                        </div>
+
+                        <div class="c-card">
+                            <div>
+                                <div class="c-header">
+                                    <strong>Santé et bien-être</strong>
+                                    <span class="tag tag-current">↻ En cours</span>
+                                </div>
+                                <p style="font-size: 12px; font-weight: 600; margin: 10px 0 6px;">Zéro accident, aspiration à la source des poussières de silice et stockage ventilé.</p>
+                                <ul class="task-list">
+                                    <li>☑ Outillage électroportatif avec aspiration intégrée obligatoire</li>
+                                    <li>☑ Protection des gaines VMC stockées contre la poussière</li>
+                                    <li>☐ Quart d'heure sécurité acoustique et ergonomie avec sous-traitants</li>
+                                </ul>
+                            </div>
+                            <div class="handover-note">
+                                <strong>À ne pas perdre pour la suite :</strong> Maintenir les bouchons d'obturation sur les gaines VMC jusqu'à la mise en service.
+                            </div>
+                        </div>
+
+                        <div class="c-card">
+                            <div>
+                                <div class="c-header">
+                                    <strong>Mobilité</strong>
+                                    <span class="tag tag-done">✓ Validé</span>
+                                </div>
+                                <p style="font-size: 12px; font-weight: 600; margin: 10px 0 6px;">Organiser le covoiturage des équipes et respecter les créneaux de livraison.</p>
+                                <ul class="task-list">
+                                    <li>☑ Navette équipe mise en place depuis le parking de délestage</li>
+                                    <li>☑ Zéro livraison poids lourd aux heures d'entrée des écoles</li>
+                                </ul>
+                            </div>
+                            <div class="handover-note">
+                                <strong>À ne pas perdre pour la suite :</strong> Taux de covoiturage équipes T&amp;P mesuré à 68% ce mois-ci.
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </div>
+
+            <!-- FIL DE COORDINATION -->
+            <aside class="card">
+                <h3 style="font-size: 15px; margin-bottom: 12px;">Fil de Coordination Interne</h3>
+
+                <div class="feed-item">
+                    <div class="feed-meta">
+                        <span class="tag tag-alert">⚠ Point de vigilance</span>
+                        <span class="kpi-sub">Il y a 25 min</span>
+                    </div>
+                    <div class="feed-tags">
+                        <span class="pill-slate">Chantier</span>
+                        <span class="pill-white">Eau</span>
+                    </div>
+                    <p style="margin: 0; color: #334155;">Suite aux fortes averses de cette nuit, le bassin de décantation provisoire atteint 80% de sa capacité. Curage programmé demain matin à 7h30 avant tout nouveau pompage de fouilles.</p>
+                    <div class="feed-footer">
+                        <strong>Marc D.</strong>
+                        <span>Conducteur de travaux</span>
+                    </div>
+                </div>
+
+                <div class="feed-item">
+                    <div class="feed-meta">
+                        <span class="tag tag-current">⇄ Passation d'étape</span>
+                        <span class="kpi-sub">Il y a 2 heures</span>
+                    </div>
+                    <div class="feed-tags">
+                        <span class="pill-slate">Contrôles SQEO</span>
+                        <span class="pill-white">Ressources</span>
+                    </div>
+                    <p style="margin: 0; color: #334155;">Préparation du relais Chantier -&gt; SQEO : il nous manque encore 3 fiches FDES du sous-traitant cloisons sèches pour valider la traçabilité matériaux. Merci de les joindre avant vendredi.</p>
+                    <div class="feed-footer">
+                        <strong>Claire V.</strong>
+                        <span>Coordinatrice SQEO</span>
+                    </div>
+                </div>
+
+                <div class="feed-item">
+                    <div class="feed-meta">
+                        <span class="tag tag-done">✓ Avancement validé</span>
+                        <span class="kpi-sub">Hier à 16:40</span>
+                    </div>
+                    <div class="feed-tags">
+                        <span class="pill-slate">Chantier</span>
+                        <span class="pill-white">Énergie et climat</span>
+                    </div>
+                    <p style="margin: 0; color: #334155;">Coulage de la dalle R+2 Bâtiment B terminé avec béton bas carbone CEM III/B (centrale de Nivelles). Les 14 bons de livraison sont numérisés dans le dossier.</p>
+                    <div class="feed-footer">
+                        <strong>Marc D.</strong>
+                        <span>Conducteur de travaux</span>
+                    </div>
+                </div>
+
+                <div class="feed-item" style="margin-bottom: 0;">
+                    <div class="feed-meta">
+                        <span class="tag tag-done">✓ Avancement validé</span>
+                        <span class="kpi-sub">Hier à 11:15</span>
+                    </div>
+                    <div class="feed-tags">
+                        <span class="pill-slate">Chantier</span>
+                        <span class="pill-white">Mobilité</span>
+                    </div>
+                    <p style="margin: 0; color: #334155;">Très bon retour de la commune : aucune nuisance signalée grâce au respect strict des créneaux de livraison hors heures scolaires.</p>
+                    <div class="feed-footer">
+                        <strong>Julien R.</strong>
+                        <span>Chef de projet</span>
+                    </div>
+                </div>
+            </aside>
+        </div>
+
+        <!-- 6. SYNTHÈSE TRANSVERSALE (8 ÉTAPES x 6 ENGAGEMENTS) -->
+        <section class="card matrix-wrap">
+            <h2 style="font-size: 15px; margin-bottom: 6px;">Synthèse Transversale des Engagements par Étape</h2>
+            <p class="kpi-sub" style="margin-bottom: 14px;">Vue d'ensemble statique de l'état des 6 engagements sur les 8 étapes du projet (Éco-quartier Les Prés Verts - Lot B).</p>
+
+            <table class="matrix">
+                <thead>
+                    <tr>
+                        <th>Engagement</th>
+                        <th>01. Stratégies &amp; permis</th>
+                        <th>02. Études</th>
+                        <th>03. Devis &amp; achats</th>
+                        <th>04. Chantier</th>
+                        <th>05. Contrôles SQEO</th>
+                        <th>06. Réception</th>
+                        <th>07. Livraison</th>
+                        <th>08. SAV &amp; usage</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Énergie et climat</td>
+                        <td><span class="tag tag-done">✓ Validé</span></td>
+                        <td><span class="tag tag-done">✓ Validé</span></td>
+                        <td><span class="tag tag-done">✓ Validé</span></td>
+                        <td><span class="tag tag-done">✓ Validé</span></td>
+                        <td><span class="tag tag-current">↻ En cours</span></td>
+                        <td><span class="tag tag-todo">À venir</span></td>
+                        <td><span class="tag tag-todo">À venir</span></td>
+                        <td><span class="tag tag-todo">À venir</span></td>
+                    </tr>
+                    <tr>
+                        <td>Ressources</td>
+                        <td><span class="tag tag-done">✓ Validé</span></td>
+                        <td><span class="tag tag-done">✓ Validé</span></td>
+                        <td><span class="tag tag-done">✓ Validé</span></td>
+                        <td><span class="tag tag-current">↻ En cours</span></td>
+                        <td><span class="tag tag-alert">⚠ Vigilance</span></td>
+                        <td><span class="tag tag-todo">À venir</span></td>
+                        <td><span class="tag tag-todo">À venir</span></td>
+                        <td><span class="tag tag-todo">À venir</span></td>
+                    </tr>
+                    <tr>
+                        <td>Eau</td>
+                        <td><span class="tag tag-done">✓ Validé</span></td>
+                        <td><span class="tag tag-done">✓ Validé</span></td>
+                        <td><span class="tag tag-done">✓ Validé</span></td>
+                        <td><span class="tag tag-alert">⚠ Vigilance</span></td>
+                        <td><span class="tag tag-todo">À venir</span></td>
+                        <td><span class="tag tag-todo">À venir</span></td>
+                        <td><span class="tag tag-todo">À venir</span></td>
+                        <td><span class="tag tag-todo">À venir</span></td>
+                    </tr>
+                    <tr>
+                        <td>Sol et nature</td>
+                        <td><span class="tag tag-done">✓ Validé</span></td>
+                        <td><span class="tag tag-done">✓ Validé</span></td>
+                        <td><span class="tag tag-done">✓ Validé</span></td>
+                        <td><span class="tag tag-done">✓ Validé</span></td>
+                        <td><span class="tag tag-todo">À venir</span></td>
+                        <td><span class="tag tag-todo">À venir</span></td>
+                        <td><span class="tag tag-todo">À venir</span></td>
+                        <td><span class="tag tag-todo">À venir</span></td>
+                    </tr>
+                    <tr>
+                        <td>Santé et bien-être</td>
+                        <td><span class="tag tag-done">✓ Validé</span></td>
+                        <td><span class="tag tag-done">✓ Validé</span></td>
+                        <td><span class="tag tag-done">✓ Validé</span></td>
+                        <td><span class="tag tag-current">↻ En cours</span></td>
+                        <td><span class="tag tag-todo">À venir</span></td>
+                        <td><span class="tag tag-todo">À venir</span></td>
+                        <td><span class="tag tag-todo">À venir</span></td>
+                        <td><span class="tag tag-todo">À venir</span></td>
+                    </tr>
+                    <tr>
+                        <td>Mobilité</td>
+                        <td><span class="tag tag-done">✓ Validé</span></td>
+                        <td><span class="tag tag-done">✓ Validé</span></td>
+                        <td><span class="tag tag-done">✓ Validé</span></td>
+                        <td><span class="tag tag-done">✓ Validé</span></td>
+                        <td><span class="tag tag-todo">À venir</span></td>
+                        <td><span class="tag tag-todo">À venir</span></td>
+                        <td><span class="tag tag-todo">À venir</span></td>
+                        <td><span class="tag tag-todo">À venir</span></td>
+                    </tr>
+                </tbody>
+            </table>
+        </section>
+
+    </main>
+
+</body>
+</html>

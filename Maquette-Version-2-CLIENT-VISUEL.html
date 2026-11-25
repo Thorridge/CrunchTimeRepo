@@ -1,0 +1,1190 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Thomas &amp; Piron — Les Terrasses de la Woluwe | Votre futur logement neuf</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Montserrat:wght@600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --tp-navy: #1B2E4B;
+            --tp-slate: #263F66;
+            --tp-red: #D8232A;
+            --tp-red-dark: #B3191F;
+            --tp-pearl: #F8F9FA;
+            --tp-sage: #2E7D5B;
+            --tp-sage-light: #ECFDF5;
+            --border: #E2E8F0;
+            --text-muted: #475569;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            margin: 0;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background-color: #FFFFFF;
+            color: var(--tp-navy);
+            line-height: 1.55;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        h1, h2, h3, .font-display {
+            font-family: 'Montserrat', 'Inter', sans-serif;
+            color: var(--tp-navy);
+            margin-top: 0;
+        }
+
+        a {
+            color: inherit;
+            text-decoration: none;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        /* Header */
+        header {
+            position: sticky;
+            top: 0;
+            z-index: 30;
+            background: rgba(255, 255, 255, 0.96);
+            border-bottom: 1px solid var(--border);
+        }
+
+        .header-inner {
+            min-height: 76px;
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: space-between;
+            gap: 16px;
+            padding: 10px 0;
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .brand-mark {
+            width: 40px;
+            height: 40px;
+            border-radius: 12px;
+            background: var(--tp-navy);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            flex-shrink: 0;
+        }
+
+        .brand-diamond {
+            width: 18px;
+            height: 18px;
+            border: 2px solid #FFFFFF;
+            transform: rotate(45deg);
+        }
+
+        .brand-dot {
+            width: 9px;
+            height: 9px;
+            border-radius: 2px;
+            background: var(--tp-red);
+            position: absolute;
+            bottom: 6px;
+            right: 6px;
+        }
+
+        .brand-name {
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 800;
+            font-size: 19px;
+            letter-spacing: -0.02em;
+            line-height: 1;
+        }
+
+        .brand-name span {
+            color: var(--tp-red);
+        }
+
+        .brand-sub {
+            font-size: 10px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            color: #64748B;
+            margin-top: 4px;
+            display: block;
+        }
+
+        nav {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--text-muted);
+        }
+
+        nav a:hover {
+            color: var(--tp-navy);
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            padding: 11px 18px;
+            border-radius: 12px;
+            font-size: 13px;
+            font-weight: 700;
+            border: 1px solid transparent;
+        }
+
+        .btn-red {
+            background: var(--tp-red);
+            color: #FFFFFF;
+        }
+
+        .btn-red:hover {
+            background: var(--tp-red-dark);
+        }
+
+        .btn-outline {
+            background: #FFFFFF;
+            color: var(--tp-navy);
+            border-color: #CBD5E1;
+        }
+
+        /* Hero */
+        .hero {
+            background: var(--tp-pearl);
+            border-bottom: 1px solid var(--border);
+            padding: 48px 0;
+        }
+
+        .hero-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 36px;
+            align-items: center;
+        }
+
+        .badges-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 16px;
+        }
+
+        .pill-dark {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: var(--tp-navy);
+            color: #FFFFFF;
+            font-size: 12px;
+            font-weight: 600;
+            padding: 6px 14px;
+            border-radius: 999px;
+        }
+
+        .dot-green {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #34D399;
+            display: inline-block;
+        }
+
+        .pill-light {
+            display: inline-flex;
+            align-items: center;
+            background: #FFFFFF;
+            border: 1px solid var(--border);
+            color: var(--tp-navy);
+            font-size: 12px;
+            font-weight: 600;
+            padding: 6px 14px;
+            border-radius: 999px;
+        }
+
+        .pill-light strong {
+            color: var(--tp-red);
+            margin-left: 4px;
+        }
+
+        .project-kicker {
+            font-size: 13px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            color: var(--tp-sage);
+            margin-bottom: 8px;
+        }
+
+        .hero h1 {
+            font-size: 34px;
+            font-weight: 800;
+            line-height: 1.18;
+            margin-bottom: 14px;
+        }
+
+        .hero p.lead {
+            color: var(--text-muted);
+            font-size: 16px;
+            margin-bottom: 22px;
+        }
+
+        .promises-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+            gap: 12px;
+            margin-bottom: 22px;
+        }
+
+        .promise-card {
+            background: #FFFFFF;
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 14px;
+            font-size: 13px;
+            font-weight: 700;
+            color: var(--tp-navy);
+        }
+
+        .progress-box {
+            background: #FFFFFF;
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 18px;
+            margin-bottom: 22px;
+        }
+
+        .progress-label {
+            font-size: 14px;
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+
+        .progress-label .pct {
+            color: var(--tp-sage);
+        }
+
+        .progress-track {
+            width: 100%;
+            height: 12px;
+            background: #F1F5F9;
+            border: 1px solid var(--border);
+            border-radius: 999px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            width: 65%;
+            height: 100%;
+            background: linear-gradient(90deg, var(--tp-navy), var(--tp-sage));
+            border-radius: 999px;
+        }
+
+        .visual-card {
+            background: #FFFFFF;
+            border: 1px solid var(--border);
+            border-radius: 24px;
+            padding: 20px;
+        }
+
+        .visual-box {
+            background: linear-gradient(180deg, #F0F9FF 0%, #FFFFFF 55%, #ECFDF5 100%);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 12px;
+        }
+
+        .visual-caption {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            margin-top: 14px;
+            font-size: 13px;
+        }
+
+        .tag-sage {
+            background: var(--tp-sage-light);
+            color: var(--tp-sage);
+            font-size: 12px;
+            font-weight: 700;
+            padding: 6px 12px;
+            border-radius: 12px;
+            white-space: nowrap;
+        }
+
+        /* Sections */
+        section.band {
+            padding: 64px 0;
+            border-bottom: 1px solid var(--border);
+        }
+
+        section.band-pearl {
+            background: var(--tp-pearl);
+        }
+
+        .section-header {
+            text-align: center;
+            max-width: 720px;
+            margin: 0 auto 40px;
+        }
+
+        .section-header.left {
+            text-align: left;
+            margin-left: 0;
+        }
+
+        .kicker {
+            display: block;
+            font-size: 12px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            color: var(--tp-red);
+            margin-bottom: 8px;
+        }
+
+        .kicker.sage {
+            color: var(--tp-sage);
+        }
+
+        .kicker.navy {
+            color: var(--tp-navy);
+        }
+
+        .section-header h2 {
+            font-size: 28px;
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+
+        .section-header p {
+            color: var(--text-muted);
+            margin: 0;
+        }
+
+        .grid-3 {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(290px, 1fr));
+            gap: 24px;
+        }
+
+        .card {
+            background: var(--tp-pearl);
+            border: 1px solid var(--border);
+            border-radius: 24px;
+            padding: 26px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .card-white {
+            background: #FFFFFF;
+            border: 1px solid var(--border);
+            border-radius: 24px;
+            padding: 24px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .card h3 {
+            font-size: 19px;
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+
+        .card p {
+            color: var(--text-muted);
+            font-size: 14px;
+            margin: 0;
+        }
+
+        .card-footer-note {
+            margin-top: 20px;
+            padding-top: 14px;
+            border-top: 1px solid var(--border);
+            font-size: 13px;
+        }
+
+        .old-note {
+            color: #94A3B8;
+            margin: 0 0 6px;
+        }
+
+        .new-note {
+            color: var(--tp-sage);
+            font-weight: 700;
+            margin: 0;
+        }
+
+        /* Commitments & Steps */
+        .card-top {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+            margin-bottom: 14px;
+        }
+
+        .pill-tag {
+            font-size: 11px;
+            font-weight: 700;
+            padding: 4px 10px;
+            border-radius: 999px;
+            background: var(--tp-pearl);
+            border: 1px solid var(--border);
+            color: #334155;
+        }
+
+        .step-num {
+            width: 32px;
+            height: 32px;
+            border-radius: 10px;
+            background: var(--tp-navy);
+            color: #FFFFFF;
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 700;
+            font-size: 12px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .status-badge {
+            font-size: 12px;
+            font-weight: 700;
+            padding: 4px 12px;
+            border-radius: 999px;
+        }
+
+        .status-done {
+            background: var(--tp-sage-light);
+            color: var(--tp-sage);
+            border: 1px solid #A7F3D0;
+        }
+
+        .status-active {
+            background: #FEF3C7;
+            color: #92400E;
+            border: 1px solid #FDE68A;
+        }
+
+        .status-upcoming {
+            background: #F1F5F9;
+            color: #475569;
+            border: 1px solid #E2E8F0;
+        }
+
+        .step-tagline {
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--tp-sage);
+            margin: 4px 0 12px;
+        }
+
+        .badges-mini {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            margin-bottom: 14px;
+        }
+
+        .badge-mini {
+            font-size: 11px;
+            font-weight: 700;
+            padding: 3px 8px;
+            border-radius: 8px;
+            background: #F8FAFC;
+            border: 1px solid #CBD5E1;
+            color: var(--tp-navy);
+        }
+
+        .step-block-label {
+            display: block;
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--tp-navy);
+            margin-bottom: 4px;
+        }
+
+        .step-text {
+            font-size: 13px;
+            color: var(--text-muted);
+            margin: 0 0 12px;
+        }
+
+        .step-guarantee {
+            background: var(--tp-sage-light);
+            border: 1px solid #A7F3D0;
+            border-radius: 14px;
+            padding: 12px;
+            font-size: 13px;
+            color: var(--tp-navy);
+            font-weight: 500;
+        }
+
+        .step-guarantee .step-block-label {
+            color: var(--tp-sage);
+        }
+
+        /* Simulator Box */
+        .sim-box {
+            background: var(--tp-navy);
+            color: #FFFFFF;
+            border-radius: 24px;
+            padding: 36px;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 28px;
+            align-items: center;
+        }
+
+        .sim-box h2, .sim-box h3 {
+            color: #FFFFFF;
+        }
+
+        .sim-box p {
+            color: #CBD5E1;
+            font-size: 14px;
+        }
+
+        .sim-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 14px;
+            font-size: 13px;
+        }
+
+        .sim-table th, .sim-table td {
+            padding: 8px 10px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.14);
+            text-align: left;
+        }
+
+        .sim-result {
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.16);
+            border-radius: 18px;
+            padding: 24px;
+            text-align: center;
+        }
+
+        .sim-amount {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 36px;
+            font-weight: 800;
+            color: #34D399;
+            margin: 8px 0;
+        }
+
+        /* Form */
+        .form-card {
+            max-width: 780px;
+            margin: 0 auto;
+            background: #FFFFFF;
+            border: 1px solid var(--border);
+            border-radius: 24px;
+            padding: 36px;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 16px;
+            margin-bottom: 16px;
+        }
+
+        label {
+            display: block;
+            font-size: 12px;
+            font-weight: 700;
+            color: var(--tp-navy);
+            margin-bottom: 6px;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 11px 14px;
+            font-size: 14px;
+            font-family: inherit;
+            border: 1px solid #CBD5E1;
+            border-radius: 12px;
+            background: #FFFFFF;
+            color: var(--tp-navy);
+        }
+
+        .form-note {
+            font-size: 12px;
+            color: #64748B;
+            margin-top: 12px;
+            text-align: center;
+        }
+
+        /* Footer */
+        footer {
+            background: var(--tp-navy);
+            color: #CBD5E1;
+            padding: 28px 0;
+            font-size: 12px;
+        }
+
+        .footer-inner {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: space-between;
+            gap: 16px;
+        }
+
+        .footer-brand {
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 700;
+            font-size: 14px;
+            color: #FFFFFF;
+        }
+
+        .footer-brand span {
+            color: var(--tp-red);
+        }
+    </style>
+</head>
+<body>
+
+    <!-- 1. BARRE DE NAVIGATION -->
+    <header>
+        <div class="container header-inner">
+            <a href="#" class="brand">
+                <div class="brand-mark">
+                    <div class="brand-diamond"></div>
+                    <div class="brand-dot"></div>
+                </div>
+                <div>
+                    <span class="brand-name">THOMAS <span>&amp;</span> PIRON</span>
+                    <span class="brand-sub">Construisons votre avenir</span>
+                </div>
+            </a>
+
+            <nav>
+                <a href="#le-projet">Le Projet</a>
+                <a href="#vos-avantages">Vos Avantages</a>
+                <a href="#engagements">Nos 6 Engagements</a>
+                <a href="#les-etapes">Les Étapes</a>
+                <a href="#contact">Contact</a>
+            </nav>
+
+            <a href="#contact" class="btn btn-red">Être rappelé</a>
+        </div>
+    </header>
+
+    <main>
+        <!-- 2. HERO SECTION -->
+        <section id="le-projet" class="hero">
+            <div class="container hero-grid">
+                <div>
+                    <div class="badges-row">
+                        <span class="pill-dark">
+                            <span class="dot-green"></span>
+                            Appartements neufs • Woluwe-Saint-Lambert
+                        </span>
+                        <span class="pill-light">
+                            À partir de <strong>285.000 €</strong>
+                        </span>
+                    </div>
+
+                    <p class="project-kicker">Résidence « Les Terrasses de la Woluwe »</p>
+                    <h1>Achetez sur plan en toute confiance : votre futur chez-vous, plus économique et plus vert.</h1>
+                    <p class="lead">
+                        Offrez-vous le confort d'un appartement neuf lumineux avec terrasse, conçu pour réduire vos factures dès le premier jour et construit sous vos yeux selon nos <strong>6 engagements durables</strong>.
+                    </p>
+
+                    <div class="promises-grid">
+                        <div class="promise-card">Factures d'énergie réduites</div>
+                        <div class="promise-card">Paiement 100 % sécurisé</div>
+                        <div class="promise-card">Suivi transparent en direct</div>
+                    </div>
+
+                    <div class="progress-box">
+                        <div class="progress-label">
+                            Construction en cours : <span class="pct">65 % réalisés</span> — Emménagement prévu : <strong>Automne 2027</strong>
+                        </div>
+                        <div class="progress-track">
+                            <div class="progress-fill"></div>
+                        </div>
+                    </div>
+
+                    <div style="display: flex; flex-wrap: wrap; gap: 12px;">
+                        <a href="#contact" class="btn btn-red">Découvrir les appartements</a>
+                        <a href="#les-etapes" class="btn btn-outline">Suivre les étapes du chantier</a>
+                    </div>
+                </div>
+
+                <div class="visual-card">
+                    <div class="visual-box">
+                        <svg viewBox="0 0 420 290" width="100%" height="auto" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <circle cx="355" cy="48" r="28" fill="#FEF3C7"/>
+                            <circle cx="355" cy="48" r="15" fill="#FDE68A"/>
+                            <circle cx="95" cy="52" r="18" fill="#FFFFFF" opacity="0.9"/>
+                            <circle cx="112" cy="55" r="14" fill="#FFFFFF" opacity="0.9"/>
+
+                            <rect x="14" y="232" width="392" height="14" rx="7" fill="#DCFCE7"/>
+                            <line x1="14" y1="232" x2="406" y2="232" stroke="#86EFAC" stroke-width="2"/>
+
+                            <rect x="68" y="88" width="166" height="144" rx="4" fill="#FFFFFF" stroke="#1B2E4B" stroke-width="2"/>
+                            <rect x="64" y="81" width="174" height="7" rx="2" fill="#1B2E4B"/>
+                            <path d="M72 81 C82 72, 94 72, 104 81 C114 71, 126 71, 136 81 C146 72, 158 72, 168 81" stroke="#2E7D5B" stroke-width="3" stroke-linecap="round"/>
+                            <polygon points="178,81 196,67 226,67 210,81" fill="#263F66" stroke="#1B2E4B" stroke-width="1.2"/>
+
+                            <rect x="84" y="102" width="56" height="40" rx="2" fill="#E0F2FE" stroke="#1B2E4B" stroke-width="1.4"/>
+                            <line x1="112" y1="102" x2="112" y2="142" stroke="#1B2E4B" stroke-width="1"/>
+                            <rect x="156" y="102" width="60" height="40" rx="2" fill="#E0F2FE" stroke="#1B2E4B" stroke-width="1.4"/>
+                            <line x1="186" y1="102" x2="186" y2="142" stroke="#1B2E4B" stroke-width="1"/>
+
+                            <rect x="76" y="136" width="150" height="11" rx="2" fill="#BAE6FD" fill-opacity="0.55" stroke="#1B2E4B" stroke-width="1.2"/>
+                            <circle cx="92" cy="134" r="5" fill="#2E7D5B"/>
+                            <circle cx="101" cy="135" r="4" fill="#3B966E"/>
+                            <circle cx="204" cy="134" r="5" fill="#2E7D5B"/>
+                            <circle cx="213" cy="135" r="4" fill="#3B966E"/>
+
+                            <rect x="84" y="164" width="72" height="68" rx="2" fill="#E0F2FE" stroke="#1B2E4B" stroke-width="1.4"/>
+                            <line x1="120" y1="164" x2="120" y2="232" stroke="#1B2E4B" stroke-width="1"/>
+                            <rect x="174" y="172" width="34" height="60" rx="2" fill="#1B2E4B"/>
+                            <rect x="167" y="172" width="4" height="60" rx="1" fill="#D8232A"/>
+
+                            <rect x="234" y="118" width="118" height="114" rx="4" fill="#F8F9FA" stroke="#1B2E4B" stroke-width="2"/>
+                            <rect x="232" y="111" width="122" height="7" rx="2" fill="#1B2E4B"/>
+                            <rect x="256" y="136" width="74" height="68" rx="2" fill="#E0F2FE" stroke="#1B2E4B" stroke-width="1.4"/>
+                            <line x1="293" y1="136" x2="293" y2="204" stroke="#1B2E4B" stroke-width="1"/>
+                            <rect x="248" y="196" width="90" height="11" rx="2" fill="#BAE6FD" fill-opacity="0.55" stroke="#1B2E4B" stroke-width="1.2"/>
+                            <circle cx="262" cy="194" r="5" fill="#2E7D5B"/>
+                            <circle cx="324" cy="194" r="5" fill="#2E7D5B"/>
+
+                            <circle cx="42" cy="204" r="22" fill="#2E7D5B"/>
+                            <circle cx="56" cy="213" r="14" fill="#3B966E"/>
+                            <line x1="42" y1="214" x2="42" y2="232" stroke="#1B2E4B" stroke-width="2.2"/>
+
+                            <circle cx="376" cy="200" r="24" fill="#2E7D5B"/>
+                            <circle cx="360" cy="211" r="15" fill="#3B966E"/>
+                            <line x1="376" y1="212" x2="376" y2="232" stroke="#1B2E4B" stroke-width="2.2"/>
+
+                            <rect x="52" y="256" width="146" height="24" rx="12" fill="#ECFDF5" stroke="#2E7D5B" stroke-width="1.2"/>
+                            <text x="125" y="271" text-anchor="middle" fill="#2E7D5B" font-size="9.5" font-family="Inter, sans-serif" font-weight="700">Isolation &amp; Panneaux Solaires</text>
+
+                            <rect x="212" y="256" width="156" height="24" rx="12" fill="#EFF6FF" stroke="#1B2E4B" stroke-width="1.2"/>
+                            <text x="290" y="271" text-anchor="middle" fill="#1B2E4B" font-size="9.5" font-family="Inter, sans-serif" font-weight="700">Jardins Partagés &amp; Terrasses</text>
+                        </svg>
+                    </div>
+
+                    <div class="visual-caption">
+                        <div>
+                            <strong>Du studio lumineux au 3 chambres</strong><br>
+                            <span style="color: var(--text-muted);">Avec terrasse privative, cave et parking vélo sécurisé</span>
+                        </div>
+                        <span class="tag-sage">Derniers lots</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 3. VOS AVANTAGES ACQUÉREUR -->
+        <section id="vos-avantages" class="band">
+            <div class="container">
+                <div class="section-header">
+                    <span class="kicker">Vos Avantages Acquéreur</span>
+                    <h2>Pourquoi acheter ce projet avec Thomas &amp; Piron ?</h2>
+                    <p>Acheter un logement en cours de construction n'a jamais été aussi simple. Voici ce que vous gagnez concrètement en choisissant un constructeur reconnu.</p>
+                </div>
+
+                <div class="grid-3">
+                    <div class="card">
+                        <div>
+                            <h3>Économies au quotidien</h3>
+                            <p>Grâce à une isolation renforcée, au triple vitrage et à un chauffage moderne, vous consommez beaucoup moins d'énergie qu'un logement ancien.</p>
+                        </div>
+                        <div class="card-footer-note">
+                            <p class="old-note">Logement ancien : factures élevées &amp; travaux</p>
+                            <p class="new-note">✓ Votre logement neuf : jusqu'à 3x moins de chauffage</p>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div>
+                            <h3>Sérénité totale</h3>
+                            <p>Votre prix est fixé dès la signature et vous ne payez qu'au fur et à mesure de l'avancement réel des travaux, après vérification de nos experts.</p>
+                        </div>
+                        <div class="card-footer-note">
+                            <p class="old-note">Achat classique : mauvaises surprises possibles</p>
+                            <p class="new-note">✓ Prix garanti &amp; paiement protégé étape par étape</p>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div>
+                            <h3>Valeur durable</h3>
+                            <p>Un appartement moderne, sain et prêt pour les mobilités de demain garde toute sa valeur si vous souhaitez le revendre ou le louer plus tard.</p>
+                        </div>
+                        <div class="card-footer-note">
+                            <p class="old-note">Bien énergivore : perte de valeur dans le temps</p>
+                            <p class="new-note">✓ Un investissement sûr et recherché pour l'avenir</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 4. NOS 6 ENGAGEMENTS CONCRETS -->
+        <section id="engagements" class="band">
+            <div class="container">
+                <div class="section-header left">
+                    <span class="kicker sage">Confort &amp; Qualité de Vie</span>
+                    <h2>Nos 6 engagements concrets pour votre confort</h2>
+                    <p>Chaque engagement est intégré à la conception et au suivi de votre futur logement.</p>
+                </div>
+
+                <div class="grid-3">
+                    <div class="card-white">
+                        <div>
+                            <div class="card-top">
+                                <strong>Énergie &amp; Climat</strong>
+                                <span class="pill-tag">Engagement 01</span>
+                            </div>
+                            <h3>« Des factures allégées toute l'année »</h3>
+                            <p style="color: var(--text-muted); font-size: 14px;">Une isolation très performante, du triple vitrage et des panneaux solaires pour garder la chaleur en hiver et la fraîcheur en été.</p>
+                        </div>
+                    </div>
+
+                    <div class="card-white">
+                        <div>
+                            <div class="card-top">
+                                <strong>Ressources</strong>
+                                <span class="pill-tag">Engagement 02</span>
+                            </div>
+                            <h3>« Des matériaux sains et durables »</h3>
+                            <p style="color: var(--text-muted); font-size: 14px;">Des matériaux choisis pour leur solidité et leur provenance responsable : votre logement est construit pour durer sans gros travaux.</p>
+                        </div>
+                    </div>
+
+                    <div class="card-white">
+                        <div>
+                            <div class="card-top">
+                                <strong>Eau</strong>
+                                <span class="pill-tag">Engagement 03</span>
+                            </div>
+                            <h3>« Une gestion intelligente de l'eau »</h3>
+                            <p style="color: var(--text-muted); font-size: 14px;">Récupération de l'eau de pluie pour l'arrosage des jardins partagés et certains usages sanitaires afin de réduire vos charges communes.</p>
+                        </div>
+                    </div>
+
+                    <div class="card-white">
+                        <div>
+                            <div class="card-top">
+                                <strong>Sol &amp; Nature</strong>
+                                <span class="pill-tag">Engagement 04</span>
+                            </div>
+                            <h3>« Un cadre de vie verdoyant »</h3>
+                            <p style="color: var(--text-muted); font-size: 14px;">Des espaces verts préservés, des plantations locales et de vrais jardins au pied de la résidence pour respirer au quotidien.</p>
+                        </div>
+                    </div>
+
+                    <div class="card-white">
+                        <div>
+                            <div class="card-top">
+                                <strong>Santé &amp; Bien-être</strong>
+                                <span class="pill-tag">Engagement 05</span>
+                            </div>
+                            <h3>« Un air pur et un calme absolu »</h3>
+                            <p style="color: var(--text-muted); font-size: 14px;">Une ventilation qui renouvelle l'air en continu, des peintures sans substances nocives et une excellente isolation contre le bruit.</p>
+                        </div>
+                    </div>
+
+                    <div class="card-white">
+                        <div>
+                            <div class="card-top">
+                                <strong>Mobilité</strong>
+                                <span class="pill-tag">Engagement 06</span>
+                            </div>
+                            <h3>« Tout est accessible facilement »</h3>
+                            <p style="color: var(--text-muted); font-size: 14px;">Parkings pré-équipés pour bornes électriques, grand local vélos sécurisé de plain-pied et accès rapide aux transports en commun.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 5. LES 6 ÉTAPES TRANSPARENTES -->
+        <section id="les-etapes" class="band band-pearl">
+            <div class="container">
+                <div class="section-header left">
+                    <span class="kicker navy">Transparence à chaque étape</span>
+                    <h2>Comment votre logement prend vie : nos 6 étapes transparentes</h2>
+                    <p>De la première esquisse jusqu'à votre emménagement, nos engagements sont vérifiés à chaque étape clé.</p>
+                </div>
+
+                <div class="grid-3">
+                    <div class="card-white">
+                        <div>
+                            <div class="card-top">
+                                <span class="step-num">01</span>
+                                <span class="status-badge status-done">Terminé</span>
+                            </div>
+                            <h3>Conception &amp; Études</h3>
+                            <p class="step-tagline">« On imagine un logement lumineux et économe »</p>
+                            <div class="badges-mini">
+                                <span class="badge-mini">Énergie &amp; Climat</span>
+                                <span class="badge-mini">Sol &amp; Nature</span>
+                                <span class="badge-mini">Santé &amp; Bien-être</span>
+                            </div>
+                            <span class="step-block-label">Ce que nous faisons :</span>
+                            <p class="step-text">Nos architectes orientent l'immeuble pour profiter au maximum de la lumière naturelle et préserver les espaces verts autour de la résidence.</p>
+                        </div>
+                        <div class="step-guarantee">
+                            <span class="step-block-label">Ce que ça change pour vous :</span>
+                            Un appartement baigné de soleil toute l'année et moins besoin d'allumer le chauffage ou la lumière.
+                        </div>
+                    </div>
+
+                    <div class="card-white">
+                        <div>
+                            <div class="card-top">
+                                <span class="step-num">02</span>
+                                <span class="status-badge status-done">Terminé</span>
+                            </div>
+                            <h3>Choix des matériaux &amp; Achats</h3>
+                            <p class="step-tagline">« On sélectionne des matériaux durables et responsables »</p>
+                            <div class="badges-mini">
+                                <span class="badge-mini">Ressources</span>
+                                <span class="badge-mini">Santé &amp; Bien-être</span>
+                                <span class="badge-mini">Eau</span>
+                            </div>
+                            <span class="step-block-label">Ce que nous faisons :</span>
+                            <p class="step-text">Nous commandons à l'avance des isolants performants, des fenêtres haute qualité et des matériaux sains auprès de partenaires de confiance.</p>
+                        </div>
+                        <div class="step-guarantee">
+                            <span class="step-block-label">Ce que ça change pour vous :</span>
+                            Votre prix d'achat est bloqué sans mauvaise surprise et votre logement est construit avec des matériaux qui durent.
+                        </div>
+                    </div>
+
+                    <div class="card-white">
+                        <div>
+                            <div class="card-top">
+                                <span class="step-num">03</span>
+                                <span class="status-badge status-active">En cours - 65%</span>
+                            </div>
+                            <h3>Construction sur chantier</h3>
+                            <p class="step-tagline">« Votre immeuble sort de terre dans le respect de l'environnement »</p>
+                            <div class="badges-mini">
+                                <span class="badge-mini">Eau</span>
+                                <span class="badge-mini">Sol &amp; Nature</span>
+                                <span class="badge-mini">Ressources</span>
+                            </div>
+                            <span class="step-block-label">Ce que nous faisons :</span>
+                            <p class="step-text">Nos équipes montent la structure, posent l'isolation et trient les déchets du chantier tout en protégeant la nature environnante.</p>
+                        </div>
+                        <div class="step-guarantee">
+                            <span class="step-block-label">Ce que ça change pour vous :</span>
+                            Vous pouvez suivre l'évolution réelle des travaux et visualiser concrètement votre futur quartier prendre forme.
+                        </div>
+                    </div>
+
+                    <div class="card-white">
+                        <div>
+                            <div class="card-top">
+                                <span class="step-num">04</span>
+                                <span class="status-badge status-active">En cours</span>
+                            </div>
+                            <h3>Contrôle Qualité &amp; Sécurité</h3>
+                            <p class="step-tagline">« Nos experts vérifient chaque détail avant de continuer »</p>
+                            <div class="badges-mini">
+                                <span class="badge-mini">Santé &amp; Bien-être</span>
+                                <span class="badge-mini">Énergie &amp; Climat</span>
+                                <span class="badge-mini">Ressources</span>
+                            </div>
+                            <span class="step-block-label">Ce que nous faisons :</span>
+                            <p class="step-text">Avant de fermer les murs et plafonds, nos inspecteurs internes testent l'étanchéité, l'isolation contre le bruit et la bonne ventilation.</p>
+                        </div>
+                        <div class="step-guarantee">
+                            <span class="step-block-label">Ce que ça change pour vous :</span>
+                            La certitude d'emménager dans un logement parfaitement isolé, silencieux et sans défaut caché.
+                        </div>
+                    </div>
+
+                    <div class="card-white">
+                        <div>
+                            <div class="card-top">
+                                <span class="step-num">05</span>
+                                <span class="status-badge status-upcoming">À venir</span>
+                            </div>
+                            <h3>Remise des clés &amp; Réception</h3>
+                            <p class="step-tagline">« Vous visitez et validez votre logement prêt à vivre »</p>
+                            <div class="badges-mini">
+                                <span class="badge-mini">Santé &amp; Bien-être</span>
+                                <span class="badge-mini">Énergie &amp; Climat</span>
+                                <span class="badge-mini">Mobilité</span>
+                            </div>
+                            <span class="step-block-label">Ce que nous faisons :</span>
+                            <p class="step-text">Nous faisons le tour complet de votre appartement ensemble, réglons votre chauffage et vous remettons un guide simple d'utilisation.</p>
+                        </div>
+                        <div class="step-guarantee">
+                            <span class="step-block-label">Ce que ça change pour vous :</span>
+                            Vous posez vos valises sereinement dans un appartement neuf, propre et personnalisé selon vos choix.
+                        </div>
+                    </div>
+
+                    <div class="card-white">
+                        <div>
+                            <div class="card-top">
+                                <span class="step-num">06</span>
+                                <span class="status-badge status-upcoming">À venir</span>
+                            </div>
+                            <h3>Accompagnement après emménagement</h3>
+                            <p class="step-tagline">« Nous restons à vos côtés même après votre installation »</p>
+                            <div class="badges-mini">
+                                <span class="badge-mini">Énergie &amp; Climat</span>
+                                <span class="badge-mini">Eau</span>
+                                <span class="badge-mini">Mobilité</span>
+                            </div>
+                            <span class="step-block-label">Ce que nous faisons :</span>
+                            <p class="step-text">Notre service client dédié répond à vos questions, assure les garanties constructeur et vérifie le bon fonctionnement de vos équipements.</p>
+                        </div>
+                        <div class="step-guarantee">
+                            <span class="step-block-label">Ce que ça change pour vous :</span>
+                            La tranquillité d'esprit pendant des années avec un interlocuteur unique Thomas &amp; Piron.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 6. REPERES D'ÉCONOMIES D'ÉNERGIE -->
+        <section class="band">
+            <div class="container">
+                <div class="sim-box">
+                    <div>
+                        <span class="pill-tag" style="background: rgba(255,255,255,0.12); color: #6EE7B7; border-color: transparent;">Repères d'Économies</span>
+                        <h2 style="margin-top: 12px;">Combien allez-vous économiser chaque année ?</h2>
+                        <p>Estimations moyennes d'économies sur vos factures d'énergie par rapport à un logement ancien, selon la typologie de l'appartement :</p>
+
+                        <table class="sim-table">
+                            <thead>
+                                <tr>
+                                    <th>Typologie</th>
+                                    <th>Économie / mois</th>
+                                    <th>Économie / an</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>Studio / 1 chambre</td>
+                                    <td>~ 112 € / mois</td>
+                                    <td><strong>1.350 € / an</strong></td>
+                                </tr>
+                                <tr>
+                                    <td>Appartement 2 chambres</td>
+                                    <td>~ 155 € / mois</td>
+                                    <td><strong>1.850 € / an</strong></td>
+                                </tr>
+                                <tr>
+                                    <td>Appartement 3 chambres</td>
+                                    <td>~ 200 € / mois</td>
+                                    <td><strong>2.400 € / an</strong></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div class="sim-result">
+                        <span style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.08em; color: #CBD5E1; font-weight: 700;">
+                            Exemple de référence (2 chambres)
+                        </span>
+                        <div class="sim-amount">1.850 € / an</div>
+                        <p>Soit environ <strong>155 € d'économie chaque mois</strong> pour un appartement 2 chambres lumineux.</p>
+                        <a href="#contact" class="btn btn-red" style="width: 100%; margin-top: 10px;">Recevoir les plans de ce type de bien</a>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 7. FORMULAIRE DE DEMANDE DE BROCHURE -->
+        <section id="contact" class="band band-pearl" style="border-bottom: none;">
+            <div class="container">
+                <div class="form-card">
+                    <div class="section-header" style="margin-bottom: 24px;">
+                        <span class="kicker">Sans engagement</span>
+                        <h2>Recevoir la brochure et les plans</h2>
+                        <p>Laissez-nous vos coordonnées pour recevoir la brochure complète, les prix détaillés et les plans des appartements disponibles.</p>
+                    </div>
+
+                    <form method="post" action="#">
+                        <div class="form-grid">
+                            <div>
+                                <label for="nom">Votre prénom et nom *</label>
+                                <input id="nom" name="nom" type="text" required placeholder="Ex : Marie Laurent">
+                            </div>
+                            <div>
+                                <label for="tel">Votre téléphone *</label>
+                                <input id="tel" name="tel" type="tel" required placeholder="Ex : 0470 12 34 56">
+                            </div>
+                        </div>
+
+                        <div class="form-grid">
+                            <div>
+                                <label for="email">Votre adresse e-mail *</label>
+                                <input id="email" name="email" type="email" required placeholder="marie.laurent@email.be">
+                            </div>
+                            <div>
+                                <label for="type_bien">Appartement recherché</label>
+                                <select id="type_bien" name="type_bien">
+                                    <option>Studio / 1 chambre</option>
+                                    <option selected>Appartement 2 chambres</option>
+                                    <option>Appartement 3 chambres</option>
+                                    <option>Je souhaite être conseillé(e)</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div style="text-align: center; margin-top: 20px;">
+                            <button type="submit" class="btn btn-red" style="padding: 14px 28px;">
+                                Recevoir la brochure et les plans gratuitement
+                            </button>
+                            <p class="form-note">✓ Envoi immédiat • ✓ Un conseiller dédié à votre écoute si vous le souhaitez</p>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <div class="container footer-inner">
+            <div class="footer-brand">THOMAS <span>&amp;</span> PIRON</div>
+            <div>Habitat durable, confort quotidien et accompagnement transparent • Tous droits réservés</div>
+        </div>
+    </footer>
+
+</body>
+</html>

@@ -1,0 +1,1939 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Thomas & Piron | Portail Interne Chantier & Engagements</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts: Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                    colors: {
+                        tp: {
+                            slate: '#1E293B',
+                            dark: '#0F172A',
+                            bg: '#F8FAFC',
+                            green: '#15803D',
+                            greenLight: '#DCFCE7',
+                            greenHover: '#166534',
+                            accent: '#B91C1C', // Subtil accent brique/rouge TP
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        /* Personnalisation fine des barres de défilement et transitions */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #F1F5F9;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #CBD5E1;
+            border-radius: 9999px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #94A3B8;
+        }
+        .step-connector {
+            transition: all 0.3s ease;
+        }
+        .card-hover {
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+        .card-hover:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.06), 0 4px 6px -2px rgba(0, 0, 0, 0.03);
+        }
+        @keyframes slideInRight {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+        .toast-enter {
+            animation: slideInRight 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+    </style>
+</head>
+<body class="bg-tp-bg text-slate-800 antialiased selection:bg-tp-green selection:text-white">
+
+    <!-- Conteneur de Toasts (Notifications instantanées sans alert()) -->
+    <div id="toast-container" class="fixed bottom-5 right-5 z-50 flex flex-col gap-3 max-w-md w-full pointer-events-none px-4 sm:px-0"></div>
+
+    <!-- =====================================================================
+         1. EN-TÊTE INTERNE (HEADER)
+    ====================================================================== -->
+    <header class="bg-tp-slate text-white sticky top-0 z-40 shadow-md border-b border-slate-700">
+        <div class="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex flex-wrap items-center justify-between min-h-[4.5rem] py-2 gap-4">
+                
+                <!-- Identité & Badge Interne -->
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-tp-green to-emerald-600 flex items-center justify-center shadow-inner border border-emerald-400/30 shrink-0">
+                        <span class="font-extrabold text-lg tracking-tighter text-white">T&P</span>
+                    </div>
+                    <div>
+                        <div class="flex items-center gap-2">
+                            <h1 class="font-bold text-base sm:text-lg tracking-tight text-white leading-tight">
+                                Thomas & Piron
+                            </h1>
+                            <span class="hidden sm:inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-semibold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
+                                USAGE INTERNE • CHANTIER
+                            </span>
+                        </div>
+                        <p class="text-xs text-slate-300 font-medium">Suivi des Étapes & Continuité des Engagements</p>
+                    </div>
+                </div>
+
+                <!-- Contrôles Centraux : Chantier Actif & Profil Utilisateur -->
+                <div class="flex flex-wrap items-center gap-3 flex-1 justify-end">
+                    
+                    <!-- Sélecteur de Chantier -->
+                    <div class="relative flex items-center bg-slate-800/90 border border-slate-600/80 rounded-xl px-3 py-1.5 hover:border-slate-500 transition-colors">
+                        <i data-lucide="hard-hat" class="w-4 h-4 text-emerald-400 mr-2 shrink-0"></i>
+                        <div class="flex flex-col">
+                            <span class="text-[10px] uppercase tracking-wider text-slate-400 font-semibold leading-none">Chantier actif</span>
+                            <select id="project-selector" class="bg-transparent text-xs sm:text-sm font-semibold text-white focus:outline-none cursor-pointer pr-2 mt-0.5">
+                                <!-- Peuplé dynamiquement en JS -->
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Sélecteur de Profil Utilisateur Simulé -->
+                    <div class="relative flex items-center bg-slate-800/90 border border-slate-600/80 rounded-xl px-3 py-1.5 hover:border-slate-500 transition-colors">
+                        <i data-lucide="user-check" class="w-4 h-4 text-sky-400 mr-2 shrink-0"></i>
+                        <div class="flex flex-col">
+                            <span class="text-[10px] uppercase tracking-wider text-slate-400 font-semibold leading-none">Connecté en tant que</span>
+                            <select id="user-selector" class="bg-transparent text-xs sm:text-sm font-semibold text-white focus:outline-none cursor-pointer pr-2 mt-0.5">
+                                <option value="Marc D. - Conducteur de travaux" class="bg-slate-800">Marc D. - Conducteur de travaux</option>
+                                <option value="Sophie L. - Bureau d'études" class="bg-slate-800">Sophie L. - Bureau d'études</option>
+                                <option value="Claire V. - Coordinatrice SQEO" class="bg-slate-800">Claire V. - Coordinatrice SQEO</option>
+                                <option value="Thomas M. - Acheteur Matériaux" class="bg-slate-800">Thomas M. - Acheteur Matériaux</option>
+                                <option value="Julien R. - Chef de projet" class="bg-slate-800">Julien R. - Chef de projet</option>
+                                <option value="Élodie B. - Responsable SAV" class="bg-slate-800">Élodie B. - Responsable SAV</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Centre de Notifications -->
+                    <div class="relative">
+                        <button id="notif-bell-btn" class="relative p-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 border border-slate-600/80 text-slate-200 transition-all focus:outline-none focus:ring-2 focus:ring-emerald-500" aria-label="Notifications">
+                            <i data-lucide="bell" class="w-5 h-5"></i>
+                            <span id="notif-badge" class="absolute -top-1.5 -right-1.5 min-w-[20px] h-5 px-1 rounded-full bg-red-600 text-white text-[11px] font-bold flex items-center justify-center shadow-sm border-2 border-tp-slate">
+                                3
+                            </span>
+                        </button>
+
+                        <!-- Panneau Déroulant Notifications -->
+                        <div id="notif-dropdown" class="hidden absolute right-0 mt-3 w-80 sm:w-96 bg-white rounded-2xl shadow-2xl border border-slate-200 text-slate-800 z-50 overflow-hidden">
+                            <div class="px-4 py-3 bg-slate-50 border-b border-slate-200 flex items-center justify-between">
+                                <div class="flex items-center gap-2">
+                                    <span class="font-bold text-sm text-slate-800">Notifications d'équipe</span>
+                                    <span id="notif-dropdown-count" class="px-2 py-0.5 text-xs font-semibold rounded-full bg-emerald-100 text-tp-green">3 non lues</span>
+                                </div>
+                                <button id="mark-all-read-btn" class="text-xs font-semibold text-tp-green hover:text-tp-greenHover underline">
+                                    Tout marquer comme lu
+                                </button>
+                            </div>
+                            <div id="notif-list" class="max-h-96 overflow-y-auto divide-y divide-slate-100">
+                                <!-- Peuplé dynamiquement -->
+                            </div>
+                            <div class="px-4 py-2.5 bg-slate-50 border-t border-slate-200 text-center">
+                                <span class="text-[11px] text-slate-500">Synchronisation temps réel • Équipes Thomas & Piron</span>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- =====================================================================
+         CONTENU PRINCIPAL
+    ====================================================================== -->
+    <main class="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
+
+        <!-- 2. TABLEAU DE BORD DE SYNTHÈSE (KPIs & BASCULE DE VUE) -->
+        <section class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4">
+            <!-- Carte Info Chantier -->
+            <div class="bg-white rounded-2xl p-5 border border-slate-200/80 shadow-sm flex flex-col justify-between">
+                <div class="flex items-start justify-between">
+                    <div>
+                        <span class="text-xs font-semibold uppercase tracking-wider text-slate-400">Fiche Projet</span>
+                        <h2 id="project-title-display" class="text-base font-bold text-slate-900 mt-0.5 line-clamp-1">Éco-quartier Les Prés Verts - Lot B</h2>
+                        <p id="project-meta-display" class="text-xs text-slate-500 mt-1 flex items-center gap-1.5">
+                            <i data-lucide="map-pin" class="w-3.5 h-3.5 text-slate-400"></i>
+                            <span>Wavre • 42 logements Q-ZEN</span>
+                        </p>
+                    </div>
+                    <span class="px-2.5 py-1 rounded-lg bg-slate-100 text-slate-700 text-xs font-bold border border-slate-200" id="project-ref-display">TP-2026-084</span>
+                </div>
+                <div class="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between text-xs">
+                    <span class="text-slate-500">Équipes connectées : <strong class="text-slate-800">14 membres</strong></span>
+                    <span class="inline-flex items-center gap-1 text-tp-green font-semibold">
+                        <span class="w-2 h-2 rounded-full bg-tp-green animate-pulse"></span> Actif
+                    </span>
+                </div>
+            </div>
+
+            <!-- KPI 1 : Avancement Global du Chantier -->
+            <div class="bg-white rounded-2xl p-5 border border-slate-200/80 shadow-sm flex flex-col justify-between">
+                <div class="flex items-center justify-between">
+                    <span class="text-xs font-semibold uppercase tracking-wider text-slate-400">Avancement Global</span>
+                    <div class="w-8 h-8 rounded-lg bg-sky-50 text-sky-600 flex items-center justify-center">
+                        <i data-lucide="trending-up" class="w-4 h-4"></i>
+                    </div>
+                </div>
+                <div class="mt-2 flex items-baseline gap-2">
+                    <span id="kpi-global-progress" class="text-3xl font-extrabold text-slate-900">46%</span>
+                    <span id="kpi-current-stage-label" class="text-xs font-medium text-slate-500">Phase : Chantier</span>
+                </div>
+                <div class="w-full bg-slate-100 rounded-full h-2.5 mt-3 overflow-hidden">
+                    <div id="kpi-global-bar" class="bg-sky-600 h-2.5 rounded-full transition-all duration-500" style="width: 46%"></div>
+                </div>
+            </div>
+
+            <!-- KPI 2 : Respect des 6 Engagements -->
+            <div class="bg-white rounded-2xl p-5 border border-slate-200/80 shadow-sm flex flex-col justify-between">
+                <div class="flex items-center justify-between">
+                    <span class="text-xs font-semibold uppercase tracking-wider text-slate-400">Respect des 6 Engagements</span>
+                    <div class="w-8 h-8 rounded-lg bg-emerald-50 text-tp-green flex items-center justify-center">
+                        <i data-lucide="shield-check" class="w-4 h-4"></i>
+                    </div>
+                </div>
+                <div class="mt-2 flex items-baseline gap-2">
+                    <span id="kpi-commitments-rate" class="text-3xl font-extrabold text-tp-green">88%</span>
+                    <span id="kpi-commitments-detail" class="text-xs font-medium text-slate-500">42/48 jalons conformes</span>
+                </div>
+                <div class="w-full bg-slate-100 rounded-full h-2.5 mt-3 overflow-hidden">
+                    <div id="kpi-commitments-bar" class="bg-tp-green h-2.5 rounded-full transition-all duration-500" style="width: 88%"></div>
+                </div>
+            </div>
+
+            <!-- KPI 3 : Vigilances & Bascule Vue Transversale -->
+            <div class="bg-white rounded-2xl p-5 border border-slate-200/80 shadow-sm flex flex-col justify-between">
+                <div class="flex items-center justify-between">
+                    <span class="text-xs font-semibold uppercase tracking-wider text-slate-400">Points de Vigilance</span>
+                    <span id="kpi-alerts-badge" class="px-2.5 py-0.5 rounded-full text-xs font-bold bg-amber-100 text-amber-800 border border-amber-200">
+                        2 points actifs
+                    </span>
+                </div>
+                <p id="kpi-alerts-summary" class="text-xs text-slate-600 mt-2 line-clamp-2">
+                    Passation critique entre <strong>Devis/Achats</strong> et <strong>Chantier</strong> sur le réemploi des matériaux et le bassin d'orage.
+                </p>
+                <div class="mt-3 pt-2 border-t border-slate-100 flex items-center gap-2">
+                    <button id="toggle-view-btn" class="w-full py-2 px-3 rounded-xl bg-tp-slate hover:bg-slate-800 text-white text-xs font-semibold flex items-center justify-center gap-2 transition-colors shadow-sm">
+                        <i data-lucide="layout-grid" class="w-4 h-4 text-emerald-400"></i>
+                        <span id="toggle-view-text">Ouvrir la Vue Transversale (8×6)</span>
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- =================================================================
+             VUE TRANSVERSALE (MATRICE GLOBALE 8 ÉTAPES x 6 ENGAGEMENTS)
+             Masquée par défaut, affichable d'un clic pour garantir zéro perte
+        ================================================================== -->
+        <section id="transversal-matrix-section" class="hidden bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+            <div class="p-5 bg-slate-900 text-white flex flex-wrap items-center justify-between gap-4">
+                <div>
+                    <div class="flex items-center gap-2">
+                        <i data-lucide="table-properties" class="w-5 h-5 text-emerald-400"></i>
+                        <h2 class="text-base sm:text-lg font-bold">Matrice Transversale de Continuité des Engagements</h2>
+                    </div>
+                    <p class="text-xs text-slate-300 mt-1">
+                        Visualisez d'un seul coup d'œil la traçabilité des 6 engagements de la conception jusqu'au SAV pour éviter toute perte d'information. Cliquez sur une cellule pour accéder directement à l'étape.
+                    </p>
+                </div>
+                <div class="flex items-center gap-4 text-xs">
+                    <span class="flex items-center gap-1.5"><span class="w-3 h-3 rounded-full bg-tp-green inline-block"></span> Validé</span>
+                    <span class="flex items-center gap-1.5"><span class="w-3 h-3 rounded-full bg-sky-500 inline-block"></span> En cours</span>
+                    <span class="flex items-center gap-1.5"><span class="w-3 h-3 rounded-full bg-amber-500 inline-block"></span> Vigilance</span>
+                    <span class="flex items-center gap-1.5"><span class="w-3 h-3 rounded-full bg-slate-400 inline-block"></span> À venir</span>
+                    <button id="close-matrix-btn" class="ml-2 px-3 py-1.5 rounded-lg bg-slate-700 hover:bg-slate-600 text-white font-semibold">
+                        Fermer la matrice
+                    </button>
+                </div>
+            </div>
+            <div class="overflow-x-auto">
+                <table class="w-full text-left border-collapse min-w-[1000px]">
+                    <thead>
+                        <tr id="matrix-table-head" class="bg-slate-50 border-b border-slate-200 text-xs font-bold text-slate-700">
+                            <!-- Généré par JS -->
+                        </tr>
+                    </thead>
+                    <tbody id="matrix-table-body" class="divide-y divide-slate-200 text-xs">
+                        <!-- Généré par JS -->
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- =================================================================
+             3. LES 8 ÉTAPES DU PROJET (TIMELINE / STEPPER HORIZONTAL)
+        ================================================================== -->
+        <section class="bg-white rounded-2xl p-5 border border-slate-200/80 shadow-sm">
+            <div class="flex flex-wrap items-center justify-between gap-2 mb-4">
+                <div>
+                    <h2 class="text-sm font-bold uppercase tracking-wider text-slate-500 flex items-center gap-2">
+                        <i data-lucide="git-commit-horizontal" class="w-4 h-4 text-tp-green"></i>
+                        Cycle de vie du projet — Les 8 Étapes Clés
+                    </h2>
+                </div>
+                <div class="flex items-center gap-3 text-xs text-slate-500">
+                    <span class="inline-flex items-center gap-1"><span class="w-2.5 h-2.5 rounded-full bg-tp-green"></span> Terminée</span>
+                    <span class="inline-flex items-center gap-1"><span class="w-2.5 h-2.5 rounded-full bg-sky-600"></span> En cours</span>
+                    <span class="inline-flex items-center gap-1"><span class="w-2.5 h-2.5 rounded-full bg-amber-500"></span> Point d'attention</span>
+                    <span class="inline-flex items-center gap-1"><span class="w-2.5 h-2.5 rounded-full bg-slate-300"></span> À venir</span>
+                </div>
+            </div>
+
+            <!-- Conteneur Stepper Horizontal Responsive -->
+            <div id="stages-stepper" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-8 gap-3">
+                <!-- Peuplé dynamiquement en JS -->
+            </div>
+        </section>
+
+        <!-- =================================================================
+             GRILLE PRINCIPALE : VUE DÉTAILLÉE DE L'ÉTAPE (GAUCHE) + FIL DE COORDINATION (DROITE)
+        ================================================================== -->
+        <div class="grid grid-cols-1 xl:grid-cols-12 gap-6 items-start">
+
+            <!-- 4. VUE DÉTAILLÉE DE L'ÉTAPE SÉLECTIONNÉE (8 colonnes sur XL) -->
+            <div class="xl:col-span-8 space-y-6">
+                
+                <!-- En-tête de l'étape & Relais de Passation -->
+                <div class="bg-white rounded-2xl p-6 border border-slate-200/80 shadow-sm">
+                    <div class="flex flex-wrap items-start justify-between gap-4 pb-5 border-b border-slate-100">
+                        <div class="space-y-1">
+                            <div class="flex flex-wrap items-center gap-2.5">
+                                <span id="stage-number-badge" class="px-2.5 py-1 rounded-lg bg-tp-slate text-white text-xs font-extrabold">
+                                    ÉTAPE 4 / 8
+                                </span>
+                                <h2 id="stage-title" class="text-xl sm:text-2xl font-extrabold text-slate-900">
+                                    Chantier
+                                </h2>
+                                <span id="stage-status-pill" class="px-3 py-1 rounded-full text-xs font-bold bg-sky-100 text-sky-800 border border-sky-200">
+                                    En cours
+                                </span>
+                            </div>
+                            <div class="flex flex-wrap items-center gap-4 text-xs text-slate-500 pt-1">
+                                <span class="flex items-center gap-1.5">
+                                    <i data-lucide="user-cog" class="w-4 h-4 text-slate-400"></i>
+                                    Pilote d'étape : <strong id="stage-owner" class="text-slate-800">Marc D. (Conducteur de travaux)</strong>
+                                </span>
+                                <span class="flex items-center gap-1.5">
+                                    <i data-lucide="calendar" class="w-4 h-4 text-slate-400"></i>
+                                    Période : <strong id="stage-dates" class="text-slate-800">15/03/2026 — 20/11/2026</strong>
+                                </span>
+                            </div>
+                        </div>
+
+                        <!-- Contrôle d'avancement et statut de l'étape -->
+                        <div class="flex flex-wrap items-center gap-3 bg-slate-50 p-3 rounded-xl border border-slate-200/80">
+                            <div>
+                                <label for="stage-status-select" class="block text-[10px] font-bold uppercase text-slate-400">Statut de l'étape</label>
+                                <select id="stage-status-select" class="mt-0.5 bg-white border border-slate-300 rounded-lg px-2.5 py-1 text-xs font-semibold text-slate-800 focus:outline-none focus:ring-2 focus:ring-tp-green">
+                                    <option value="Terminée">Terminée</option>
+                                    <option value="En cours">En cours</option>
+                                    <option value="Point d'attention">Point d'attention</option>
+                                    <option value="À venir">À venir</option>
+                                </select>
+                            </div>
+                            <div class="w-28">
+                                <div class="flex justify-between text-[10px] font-bold text-slate-500 mb-1">
+                                    <span>Avancement</span>
+                                    <span id="stage-progress-text">65%</span>
+                                </div>
+                                <input id="stage-progress-slider" type="range" min="0" max="100" step="5" value="65" class="w-full accent-tp-green cursor-pointer h-1.5 bg-slate-200 rounded-lg">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Encart RELAIS D'ÉTAPE (Anti-perte d'information) -->
+                    <div class="mt-5 grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <!-- Ce qui vient de l'étape précédente -->
+                        <div class="rounded-xl bg-slate-50 border border-slate-200/90 p-4">
+                            <div class="flex items-center gap-2 text-xs font-bold text-slate-700 uppercase tracking-wide mb-1.5">
+                                <i data-lucide="arrow-down-left" class="w-4 h-4 text-sky-600"></i>
+                                <span>Reçu de l'étape précédente (<span id="prev-stage-name">Devis et achats</span>)</span>
+                            </div>
+                            <p id="stage-handover-in" class="text-xs text-slate-600 leading-relaxed">
+                                Cahier des charges béton bas carbone CEM III validé avec le fournisseur. Bordereaux de réemploi des briques et isolants biosourcés réceptionnés.
+                            </p>
+                        </div>
+
+                        <!-- Ce qu'il faut impérativement transmettre à l'étape suivante -->
+                        <div class="rounded-xl bg-emerald-50/70 border border-emerald-200 p-4">
+                            <div class="flex items-center gap-2 text-xs font-bold text-tp-green uppercase tracking-wide mb-1.5">
+                                <i data-lucide="arrow-up-right" class="w-4 h-4 text-tp-green"></i>
+                                <span>Relais à préparer pour (<span id="next-stage-name">Contrôles SQEO</span>)</span>
+                            </div>
+                            <p id="stage-handover-out" class="text-xs text-slate-700 leading-relaxed">
+                                Collecter les bons de livraison béton bas carbone, les bordereaux de suivi des déchets (7 flux) et les photos d'étanchéité avant fermeture des parois.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Barre de filtre des 6 engagements -->
+                <div class="flex flex-wrap items-center justify-between gap-3">
+                    <div>
+                        <h3 class="text-base font-extrabold text-slate-900 flex items-center gap-2">
+                            <i data-lucide="leaf" class="w-5 h-5 text-tp-green"></i>
+                            Les 6 Engagements Thomas & Piron sur cette étape
+                        </h3>
+                        <p class="text-xs text-slate-500">Cochez les actions réalisées et mettez à jour le statut de conformité pour informer les autres équipes.</p>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <span class="text-xs font-semibold text-slate-500">Filtrer :</span>
+                        <select id="commitment-filter" class="bg-white border border-slate-200 rounded-xl px-3 py-1.5 text-xs font-semibold text-slate-700 shadow-sm focus:outline-none focus:ring-2 focus:ring-tp-green">
+                            <option value="ALL">Tous les engagements (6)</option>
+                            <option value="VIGILANCE">Uniquement en vigilance / en cours</option>
+                            <option value="VALIDATED">Uniquement validés</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Grille des 6 Cartes d'Engagements -->
+                <div id="commitments-grid" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <!-- Peuplé dynamiquement en JS -->
+                </div>
+
+            </div>
+
+            <!-- 5. FIL DE COORDINATION & NOTIFICATIONS D'AVANCEMENT (4 colonnes sur XL) -->
+            <aside class="xl:col-span-4 space-y-6 sticky top-24">
+                
+                <!-- Formulaire rapide de publication d'avancement / alerte -->
+                <div class="bg-white rounded-2xl p-5 border border-slate-200/80 shadow-sm">
+                    <div class="flex items-center justify-between mb-3">
+                        <h3 class="text-sm font-extrabold text-slate-900 flex items-center gap-2">
+                            <i data-lucide="send" class="w-4 h-4 text-tp-green"></i>
+                            Diffuser une mise à jour chantier
+                        </h3>
+                        <span class="text-[11px] font-medium text-slate-400">Journal interne</span>
+                    </div>
+
+                    <form id="feed-post-form" class="space-y-3">
+                        <div class="grid grid-cols-2 gap-2.5">
+                            <div>
+                                <label class="block text-[11px] font-semibold text-slate-600 mb-1">Étape concernée</label>
+                                <select id="post-stage-select" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-2.5 py-2 text-xs font-medium text-slate-800 focus:outline-none focus:ring-2 focus:ring-tp-green">
+                                    <!-- Peuplé par JS -->
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-[11px] font-semibold text-slate-600 mb-1">Engagement lié</label>
+                                <select id="post-commitment-select" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-2.5 py-2 text-xs font-medium text-slate-800 focus:outline-none focus:ring-2 focus:ring-tp-green">
+                                    <option value="Général">Général / Multi-engagements</option>
+                                    <option value="Énergie et climat">Énergie et climat</option>
+                                    <option value="Ressources">Ressources</option>
+                                    <option value="Eau">Eau</option>
+                                    <option value="Sol et nature">Sol et nature</option>
+                                    <option value="Santé et bien-être">Santé et bien-être</option>
+                                    <option value="Mobilité">Mobilité</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div>
+                            <label class="block text-[11px] font-semibold text-slate-600 mb-1">Type de communication</label>
+                            <div class="grid grid-cols-3 gap-2">
+                                <label class="cursor-pointer">
+                                    <input type="radio" name="postType" value="Avancement validé" class="peer sr-only" checked>
+                                    <div class="text-center py-1.5 px-2 rounded-xl border border-slate-200 text-[11px] font-semibold text-slate-600 peer-checked:bg-emerald-50 peer-checked:border-tp-green peer-checked:text-tp-green transition-all">
+                                        ✓ Avancement
+                                    </div>
+                                </label>
+                                <label class="cursor-pointer">
+                                    <input type="radio" name="postType" value="Passation d'étape" class="peer sr-only">
+                                    <div class="text-center py-1.5 px-2 rounded-xl border border-slate-200 text-[11px] font-semibold text-slate-600 peer-checked:bg-sky-50 peer-checked:border-sky-600 peer-checked:text-sky-700 transition-all">
+                                        ⇄ Passation
+                                    </div>
+                                </label>
+                                <label class="cursor-pointer">
+                                    <input type="radio" name="postType" value="Point de vigilance" class="peer sr-only">
+                                    <div class="text-center py-1.5 px-2 rounded-xl border border-slate-200 text-[11px] font-semibold text-slate-600 peer-checked:bg-amber-50 peer-checked:border-amber-500 peer-checked:text-amber-800 transition-all">
+                                        ⚠ Vigilance
+                                    </div>
+                                </label>
+                            </div>
+                        </div>
+
+                        <div>
+                            <label for="post-message" class="block text-[11px] font-semibold text-slate-600 mb-1">Détail de l'avancement ou consigne à transmettre</label>
+                            <textarea id="post-message" rows="3" required placeholder="Ex: Réception des châssis triple vitrage bâtiment B conforme aux exigences PEB. L'équipe pose peut intervenir dès lundi..." class="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 text-xs text-slate-800 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-tp-green resize-none"></textarea>
+                        </div>
+
+                        <div class="flex items-center justify-between pt-1">
+                            <label class="inline-flex items-center gap-2 cursor-pointer select-none">
+                                <input id="post-notify-all" type="checkbox" checked class="w-4 h-4 rounded text-tp-green focus:ring-tp-green border-slate-300">
+                                <span class="text-xs font-medium text-slate-700">Notifier immédiatement toutes les équipes</span>
+                            </label>
+                        </div>
+
+                        <button type="submit" class="w-full py-2.5 px-4 rounded-xl bg-tp-green hover:bg-tp-greenHover text-white text-xs font-bold shadow-sm flex items-center justify-center gap-2 transition-colors">
+                            <i data-lucide="bell-ring" class="w-4 h-4"></i>
+                            Publier et synchroniser le chantier
+                        </button>
+                    </form>
+                </div>
+
+                <!-- Flux Chronologique de Coordination -->
+                <div class="bg-white rounded-2xl border border-slate-200/80 shadow-sm overflow-hidden flex flex-col">
+                    <div class="p-4 bg-slate-50 border-b border-slate-200/80 flex items-center justify-between">
+                        <div class="flex items-center gap-2">
+                            <i data-lucide="messages-square" class="w-4 h-4 text-tp-slate"></i>
+                            <h3 class="text-sm font-extrabold text-slate-900">Fil de Coordination Interne</h3>
+                        </div>
+                        <select id="feed-filter-stage" class="bg-white border border-slate-200 rounded-lg px-2 py-1 text-[11px] font-semibold text-slate-600 focus:outline-none">
+                            <option value="ALL">Toutes les étapes</option>
+                            <option value="CURRENT">Étape sélectionnée</option>
+                        </select>
+                    </div>
+
+                    <div id="coordination-feed" class="p-4 space-y-3.5 max-h-[540px] overflow-y-auto">
+                        <!-- Peuplé dynamiquement en JS -->
+                    </div>
+                </div>
+
+            </aside>
+        </div>
+
+    </main>
+
+    <!-- Modale légère pour ajouter une note rapide sur un engagement précis -->
+    <div id="quick-note-modal" class="hidden fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl border border-slate-200">
+            <div class="flex items-center justify-between pb-3 border-b border-slate-100">
+                <h4 class="font-bold text-base text-slate-900" id="modal-title">Signaler un point sur l'engagement</h4>
+                <button id="close-modal-btn" class="p-1 rounded-lg text-slate-400 hover:text-slate-700 hover:bg-slate-100">
+                    <i data-lucide="x" class="w-5 h-5"></i>
+                </button>
+            </div>
+            <form id="quick-note-form" class="mt-4 space-y-4">
+                <input type="hidden" id="modal-commitment-name">
+                <div>
+                    <label class="block text-xs font-semibold text-slate-600 mb-1">Action / Type d'alerte</label>
+                    <select id="modal-alert-type" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs font-semibold text-slate-800">
+                        <option value="Point de vigilance">⚠ Déclencher un point de vigilance aux équipes</option>
+                        <option value="Avancement validé">✓ Confirmer la validation terrain</option>
+                        <option value="Passation d'étape">⇄ Ajouter une consigne de passation</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-slate-600 mb-1">Message détaillé pour l'équipe chantier</label>
+                    <textarea id="modal-note-text" rows="3" required placeholder="Précisez l'observation, la référence du document ou l'action attendue..." class="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 text-xs text-slate-800 focus:outline-none focus:ring-2 focus:ring-tp-green"></textarea>
+                </div>
+                <div class="flex justify-end gap-2 pt-2">
+                    <button type="button" id="cancel-modal-btn" class="px-4 py-2 rounded-xl border border-slate-200 text-xs font-semibold text-slate-600 hover:bg-slate-50">Annuler</button>
+                    <button type="submit" class="px-4 py-2 rounded-xl bg-tp-green hover:bg-tp-greenHover text-white text-xs font-bold shadow-sm">Envoyer aux équipes</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- =====================================================================
+         LOGIQUE APPLICATIVE & DONNÉES MÉTIER THOMAS & PIRON
+    ====================================================================== -->
+    <script>
+        /**
+         * Définition des 6 Engagements fondamentaux de Thomas & Piron
+         */
+        const COMMITMENTS_META = [
+            {
+                id: 'energie',
+                name: 'Énergie et climat',
+                icon: 'zap',
+                color: 'amber',
+                badgeBg: 'bg-amber-50 text-amber-700 border-amber-200',
+                iconBg: 'bg-amber-100 text-amber-700'
+            },
+            {
+                id: 'ressources',
+                name: 'Ressources',
+                icon: 'recycle',
+                color: 'emerald',
+                badgeBg: 'bg-emerald-50 text-emerald-700 border-emerald-200',
+                iconBg: 'bg-emerald-100 text-emerald-700'
+            },
+            {
+                id: 'eau',
+                name: 'Eau',
+                icon: 'droplets',
+                color: 'sky',
+                badgeBg: 'bg-sky-50 text-sky-700 border-sky-200',
+                iconBg: 'bg-sky-100 text-sky-700'
+            },
+            {
+                id: 'sol',
+                name: 'Sol et nature',
+                icon: 'trees',
+                color: 'green',
+                badgeBg: 'bg-green-50 text-green-800 border-green-200',
+                iconBg: 'bg-green-100 text-green-800'
+            },
+            {
+                id: 'sante',
+                name: 'Santé et bien-être',
+                icon: 'heart-pulse',
+                color: 'rose',
+                badgeBg: 'bg-rose-50 text-rose-700 border-rose-200',
+                iconBg: 'bg-rose-100 text-rose-700'
+            },
+            {
+                id: 'mobilite',
+                name: 'Mobilité',
+                icon: 'bike',
+                color: 'indigo',
+                badgeBg: 'bg-indigo-50 text-indigo-700 border-indigo-200',
+                iconBg: 'bg-indigo-100 text-indigo-700'
+            }
+        ];
+
+        /**
+         * Les 8 Étapes réglementaires et opérationnelles du projet
+         */
+        const STAGES_LIST = [
+            "Stratégies et permis",
+            "Études",
+            "Devis et achats",
+            "Chantier",
+            "Contrôles SQEO",
+            "Réception",
+            "Livraison",
+            "SAV et usage"
+        ];
+
+        /**
+         * Base de données simulée riche et réaliste pour plusieurs chantiers Thomas & Piron
+         */
+        const PROJECTS_DATA = [
+            {
+                id: 'tp-pres-verts',
+                name: 'Éco-quartier Les Prés Verts - Lot B',
+                ref: 'TP-2026-084',
+                location: 'Wavre • 42 logements Q-ZEN & crèche',
+                activeStageIndex: 3, // Étape 4 : Chantier
+                stages: [
+                    {
+                        name: 'Stratégies et permis',
+                        status: 'Terminée',
+                        progress: 100,
+                        owner: 'Julien R. (Chef de projet)',
+                        dates: '02/09/2025 — 15/11/2025',
+                        handoverIn: 'Programme maître d’ouvrage et diagnostic environnemental initial du terrain.',
+                        handoverOut: 'Permis d’urbanisme purgé de tout recours, objectif Q-ZEN (E-peil ≤ 30) et zone de protection des arbres centenaires figée au plan.',
+                        commitments: {
+                            energie: {
+                                status: 'Validé',
+                                objective: 'Définir le cap énergétique Q-ZEN (E-peil ≤ 30) et réseau de chaleur collectif.',
+                                handoverNote: 'Exigence pompe à chaleur collective + pré-équipement photovoltaïque intégrée au permis.',
+                                tasks: [
+                                    { text: 'Validation de la note de calcul préliminaire PEB / Q-ZEN', done: true },
+                                    { text: 'Intégration de l’orientation bioclimatique dans le permis d’urbanisme', done: true }
+                                ]
+                            },
+                            ressources: {
+                                status: 'Validé',
+                                objective: 'Réaliser l’inventaire pré-démolition et fixer le taux de réemploi cible (15%).',
+                                handoverNote: 'Lot de 450 m² de pavés porphyre et charpente chêne inventoriés à conserver.',
+                                tasks: [
+                                    { text: 'Audit ressources réalisé sur l’ancien hangar agricole', done: true },
+                                    { text: 'Clause de circularité inscrite dans le cahier stratégique', done: true }
+                                ]
+                            },
+                            eau: {
+                                status: 'Validé',
+                                objective: 'Zéro rejet d’eaux pluviales à l’égout public (infiltration à la parcelle).',
+                                handoverNote: 'Dimensionnement des noues paysagères et citernes 15.000L imposé au permis.',
+                                tasks: [
+                                    { text: 'Test de perméabilité des sols (test Porchet) validé', done: true },
+                                    { text: 'Accord du service technique communal sur les noues d’infiltration', done: true }
+                                ]
+                            },
+                            sol: {
+                                status: 'Validé',
+                                objective: 'Limiter l’imperméabilisation à 32% et préserver la bande boisée Nord.',
+                                handoverNote: 'Périmètre de sanctuarisation des racines (rayon 6m) obligatoire dès l’ouverture chantier.',
+                                tasks: [
+                                    { text: 'Relevé phytosanitaire des arbres existants annexé au permis', done: true },
+                                    { text: 'Coefficient de biotope par surface (CBS) > 0,65 validé', done: true }
+                                ]
+                            },
+                            sante: {
+                                status: 'Validé',
+                                objective: 'Garantir l’accès à la lumière naturelle et le confort acoustique (norme NBN S 01-400-1).',
+                                handoverNote: 'Exigence acoustique renforcée imposée en façade Sud.',
+                                tasks: [
+                                    { text: 'Étude d’ensoleillement des logements traversants', done: true },
+                                    { text: 'Validation du niveau d’isolation acoustique de façade', done: true }
+                                ]
+                            },
+                            mobilite: {
+                                status: 'Validé',
+                                objective: 'Ratio de 2,5 emplacements vélos sécurisés par logement et borne IRVE.',
+                                handoverNote: 'Local vélo de plain-pied avec station de lavage intégré au plan masse.',
+                                tasks: [
+                                    { text: 'Validation du plan de mobilité doux avec la commune', done: true },
+                                    { text: 'Pré-câblage 100% des places de parking souterrain', done: true }
+                                ]
+                            }
+                        }
+                    },
+                    {
+                        name: 'Études',
+                        status: 'Terminée',
+                        progress: 100,
+                        owner: 'Sophie L. (Bureau d\'études)',
+                        dates: '16/11/2025 — 25/01/2026',
+                        handoverIn: 'Permis d’urbanisme accordé et prescriptions environnementales associées.',
+                        handoverOut: 'Plans d’exécution BIM, métrés détaillés avec variantes bas carbone et schémas hydrauliques validés pour consultation fournisseurs.',
+                        commitments: {
+                            energie: {
+                                status: 'Validé',
+                                objective: 'Modélisation thermique dynamique et traitement des nœuds constructifs sans ponts thermiques.',
+                                handoverNote: 'Prescrire rupteurs thermiques de balcons type Schöck et triple vitrage Ug 0.6.',
+                                tasks: [
+                                    { text: 'Calculs PEB détaillés par appartement (E26 moyen atteint)', done: true },
+                                    { text: 'Détails d’étanchéité à l’air modélisés en BIM', done: true }
+                                ]
+                            },
+                            ressources: {
+                                status: 'Validé',
+                                objective: 'Optimisation structurelle (réduction de 12% des volumes de béton) et intégration d’isolants biosourcés.',
+                                handoverNote: 'Utiliser béton CEM III/B pour les voiles et fibre de bois en façade.',
+                                tasks: [
+                                    { text: 'Note de calcul optimisation des dalles alvéolaires', done: true },
+                                    { text: 'Fiches techniques matériaux biosourcés validées', done: true }
+                                ]
+                            },
+                            eau: {
+                                status: 'Validé',
+                                objective: 'Dimensionner le réseau séparatif et la récupération d’eau de pluie pour WC et buanderies.',
+                                handoverNote: 'Prévoir pompes surpresseuses à variation de vitesse et filtration 25 microns.',
+                                tasks: [
+                                    { text: 'Plans d’exécution des citernes enterrées et trop-pleins', done: true },
+                                    { text: 'Calcul de rétention orage décennal validé', done: true }
+                                ]
+                            },
+                            sol: {
+                                status: 'Validé',
+                                objective: 'Plan de gestion des terres excavées (équilibre déblais/remblais sur site).',
+                                handoverNote: 'Stockage séparé de la terre végétale en andains de max 1,80m de hauteur.',
+                                tasks: [
+                                    { text: 'Certificat de contrôle qualité des terres (Walterre) obtenu', done: true },
+                                    { text: 'Plan de terrassement en circuit court finalisé', done: true }
+                                ]
+                            },
+                            sante: {
+                                status: 'Validé',
+                                objective: 'Dimensionner la ventilation double flux avec récupération de chaleur et filtration F7.',
+                                handoverNote: 'Sélectionner peintures et colles labellisées A+ / Indoor Air Comfort Gold.',
+                                tasks: [
+                                    { text: 'Schémas aérauliques VMC double flux validés', done: true },
+                                    { text: 'Prescriptions matériaux faibles émissions COV dans le cahier des charges', done: true }
+                                ]
+                            },
+                            mobilite: {
+                                status: 'Validé',
+                                objective: 'Définir le plan d’accès chantier pour limiter les nuisances riverains et les trajets à vide.',
+                                handoverNote: 'Zone de déchargement unique rue des Peupliers avec créneaux horaires.',
+                                tasks: [
+                                    { text: 'Plan d’installation de chantier (PIC) validé en bureau d’études', done: true },
+                                    { text: 'Dimensionnement électrique pour recharge véhicules utilitaires', done: true }
+                                ]
+                            }
+                        }
+                    },
+                    {
+                        name: 'Devis et achats',
+                        status: 'Terminée',
+                        progress: 100,
+                        owner: 'Thomas M. (Acheteur Matériaux)',
+                        dates: '26/01/2026 — 14/03/2026',
+                        handoverIn: 'Métrés d’exécution BIM et prescriptions techniques RSE issues du bureau d’études.',
+                        handoverOut: 'Commandes fermes passées avec clauses RSE contractuelles. Attention : délai fournisseur sur les pavés de réemploi signalé au conducteur.',
+                        commitments: {
+                            energie: {
+                                status: 'Validé',
+                                objective: 'Sélectionner des fournisseurs locaux (< 60 km) et béton bas carbone CEM III/B.',
+                                handoverNote: 'Centrale à béton de Nivelles retenue (empreinte -38% CO2).',
+                                tasks: [
+                                    { text: 'Comparatif carbone des offres béton et acier recyclé', done: true },
+                                    { text: 'Commande des PAC géothermiques et panneaux PV signée', done: true }
+                                ]
+                            },
+                            ressources: {
+                                status: 'Validé',
+                                objective: 'Contractualiser la reprise des chutes de chantier et l’achat des matériaux de réemploi.',
+                                handoverNote: 'Fournisseur RotorDC / partenaire local engagé pour les pavés et portes intérieures.',
+                                tasks: [
+                                    { text: 'Clause de reprise des palettes consignées et chutes isolants signée', done: true },
+                                    { text: 'Bon de commande matériaux de réemploi validé', done: true }
+                                ]
+                            },
+                            eau: {
+                                status: 'Validé',
+                                objective: 'Commander des équipements hydro-économes certifiés (mitigeurs débit limité, WC double chasse).',
+                                handoverNote: 'Fiches techniques robinetterie transmises au conducteur de travaux.',
+                                tasks: [
+                                    { text: 'Validation des citernes béton préfabriquées 2x15m³', done: true },
+                                    { text: 'Commande des équipements sanitaires classe A eau', done: true }
+                                ]
+                            },
+                            sol: {
+                                status: 'Validé',
+                                objective: 'Sélectionner des substrats de toitures végétalisées sans tourbe et essences indigènes.',
+                                handoverNote: 'Pépinière wallonne réservée pour plantations d’automne.',
+                                tasks: [
+                                    { text: 'Commande des clôtures de protection racinaire', done: true },
+                                    { text: 'Contrat pépiniériste essences locales signé', done: true }
+                                ]
+                            },
+                            sante: {
+                                status: 'Validé',
+                                objective: 'Exiger les FDES et labels faibles émissions COV pour tous les lots parachèvements.',
+                                handoverNote: 'Interdiction stricte de produits solvantés non validés par SQEO sur chantier.',
+                                tasks: [
+                                    { text: 'Vérification des fiches de données sécurité (FDS) avant commande', done: true },
+                                    { text: 'Commande des blocs-portes acoustiques 39 dB', done: true }
+                                ]
+                            },
+                            mobilite: {
+                                status: 'Validé',
+                                objective: 'Grouper les livraisons (massification) et privilégier les transporteurs Euro 6 / HVO.',
+                                handoverNote: 'Planning de livraison cadencé intégré dans le portail logistique.',
+                                tasks: [
+                                    { text: 'Charte logistique signée par les 12 sous-traitants principaux', done: true },
+                                    { text: 'Commande des arceaux vélos double étage', done: true }
+                                ]
+                            }
+                        }
+                    },
+                    {
+                        name: 'Chantier',
+                        status: 'En cours',
+                        progress: 65,
+                        owner: 'Marc D. (Conducteur de travaux)',
+                        dates: '15/03/2026 — 20/11/2026',
+                        handoverIn: 'Commandes fermes passées avec clauses RSE. Vigilance transmise par les Achats sur le stockage de la terre végétale et la gestion des eaux de fouilles.',
+                        handoverOut: 'Collecter les bons de livraison béton bas carbone, registres déchets 7 flux et photos d’étanchéité à l’air pour les contrôles SQEO.',
+                        commitments: {
+                            energie: {
+                                status: 'Validé',
+                                objective: 'Suivre le coulage béton bas carbone CEM III et garantir la continuité de l’isolation.',
+                                handoverNote: 'Archiver 100% des bons de livraison béton avec mention CEM III pour bilan carbone.',
+                                tasks: [
+                                    { text: 'Raccordement électrique chantier 100% vert actif', done: true },
+                                    { text: 'Contrôle visuel de pose des rupteurs thermiques balcons', done: true },
+                                    { text: 'Pose des membranes d’étanchéité à l’air Bâtiment B', done: false }
+                                ]
+                            },
+                            ressources: {
+                                status: 'En cours',
+                                objective: 'Tri sélectif strict en 7 flux sur chantier et mise en œuvre des briques/pavés de réemploi.',
+                                handoverNote: 'Transmettre le registre de traçabilité des bennes à Claire V. (SQEO).',
+                                tasks: [
+                                    { text: 'Installation de l’îlot de tri 7 flux signalétique claire', done: true },
+                                    { text: 'Rotation des palettes consignées avec le négoce', done: true },
+                                    { text: 'Pose des 450 m² de pavés de réemploi sur voirie douce', done: false }
+                                ]
+                            },
+                            eau: {
+                                status: 'Vigilance',
+                                objective: 'Prévenir toute pollution des eaux de ruissellement et poser les citernes de récupération.',
+                                handoverNote: 'Vérifier l’étanchéité du bac de décantation laitances béton après les fortes pluies.',
+                                tasks: [
+                                    { text: 'Installation du bac de lavage goulottes béton en circuit fermé', done: true },
+                                    { text: 'Pose et raccordement des deux citernes 15.000L', done: true },
+                                    { text: 'Curage préventif du bassin de décantation provisoire', done: false }
+                                ]
+                            },
+                            sol: {
+                                status: 'Validé',
+                                objective: 'Maintenir intactes les clôtures de protection des arbres et préserver la terre végétale.',
+                                handoverNote: 'La terre végétale stockée en andain Nord est prête pour le régalage paysager.',
+                                tasks: [
+                                    { text: 'Sanctuarisation physique des 8 arbres remarquables vérifiée', done: true },
+                                    { text: 'Stockage séparé de 620 m³ de terre végétale sans compaction', done: true }
+                                ]
+                            },
+                            sante: {
+                                status: 'En cours',
+                                objective: 'Zéro accident, aspiration à la source des poussières de silice et stockage ventilé.',
+                                handoverNote: 'Maintenir les bouchons d’obturation sur les gaines VMC jusqu’à la mise en service.',
+                                tasks: [
+                                    { text: 'Outillage électroportatif avec aspiration intégrée obligatoire', done: true },
+                                    { text: 'Protection des gaines VMC stockées contre la poussière', done: true },
+                                    { text: 'Quart d’heure sécurité acoustique et ergonomie avec sous-traitants', done: false }
+                                ]
+                            },
+                            mobilite: {
+                                status: 'Validé',
+                                objective: 'Organiser le covoiturage des équipes et respecter les créneaux de livraison.',
+                                handoverNote: 'Taux de covoiturage équipes T&P mesuré à 68% ce mois-ci.',
+                                tasks: [
+                                    { text: 'Navette équipe mise en place depuis le parking de délestage', done: true },
+                                    { text: 'Zéro livraison poids lourd aux heures d’entrée des écoles', done: true }
+                                ]
+                            }
+                        }
+                    },
+                    {
+                        name: 'Contrôles SQEO',
+                        status: "Point d'attention",
+                        progress: 15,
+                        owner: 'Claire V. (Coordinatrice SQEO)',
+                        dates: '01/10/2026 — 05/12/2026',
+                        handoverIn: 'Dossier de chantier en cours : bons béton CEM III, registres déchets et rapports de pose VMC.',
+                        handoverOut: 'Certificats Blower-Door, analyses qualité d’air intérieur et rapport de conformité environnementale pour la Réception.',
+                        commitments: {
+                            energie: {
+                                status: 'En cours',
+                                objective: 'Réaliser les tests d’étanchéité à l’air (Blower-Door) et thermographie infrarouge.',
+                                handoverNote: 'Vérifier le résultat n50 ≤ 0,6 h⁻¹ avant validation PEB finale.',
+                                tasks: [
+                                    { text: 'Pré-test Blower-Door sur appartement témoin (résultat 0,48 h⁻¹)', done: true },
+                                    { text: 'Campagne de mesures sur les 42 logements', done: false }
+                                ]
+                            },
+                            ressources: {
+                                status: 'Vigilance',
+                                objective: 'Auditer la conformité des bordereaux de déchets (taux valorisation > 85%) et certificats réemploi.',
+                                handoverNote: 'Relancer le sous-traitant parachèvement pour les certificats FDES manquants.',
+                                tasks: [
+                                    { text: 'Audit intermédiaire des registres déchets (87% valorisés)', done: true },
+                                    { text: 'Collecte complète des attestations de réemploi', done: false }
+                                ]
+                            },
+                            eau: {
+                                status: 'À venir',
+                                objective: 'Tester l’étanchéité des citernes pluviales et le bon fonctionnement des noues.',
+                                handoverNote: 'Contrôler la séparation stricte réseaux eaux usées / eaux pluviales.',
+                                tasks: [
+                                    { text: 'Test fumigène / colorant sur réseau séparatif', done: false },
+                                    { text: 'Validation du débit de fuite régulé des noues', done: false }
+                                ]
+                            },
+                            sol: {
+                                status: 'À venir',
+                                objective: 'Contrôler l’absence de compaction des espaces verts et la conformité des plantations.',
+                                handoverNote: 'Vérifier la reprise végétale avant levée des clôtures.',
+                                tasks: [
+                                    { text: 'Inspection phytosanitaire post-chantier des arbres conservés', done: false },
+                                    { text: 'Vérification épaisseur terre végétale (min 30 cm)', done: false }
+                                ]
+                            },
+                            sante: {
+                                status: 'À venir',
+                                objective: 'Mesurer les débits VMC double flux, l’isolation acoustique et la qualité de l’air intérieur.',
+                                handoverNote: 'Joindre les rapports acoustiques au dossier d’intervention ultérieure (DIU).',
+                                tasks: [
+                                    { text: 'Mesures acoustiques normalisées entre logements mitoyens', done: false },
+                                    { text: 'Équilibrage et mesure des débits aux bouches VMC', done: false }
+                                ]
+                            },
+                            mobilite: {
+                                status: 'À venir',
+                                objective: 'Contrôler l’accessibilité PMR et la conformité électrique des bornes IRVE.',
+                                handoverNote: 'Attestation organisme agréé (Vinçotte/BTV) requise pour les bornes.',
+                                tasks: [
+                                    { text: 'Test de charge des bornes électriques collectives', done: false },
+                                    { text: 'Vérification largeur de giration local vélos', done: false }
+                                ]
+                            }
+                        }
+                    },
+                    {
+                        name: 'Réception',
+                        status: 'À venir',
+                        progress: 0,
+                        owner: 'Julien R. & Marc D.',
+                        dates: '06/12/2026 — 22/12/2026',
+                        handoverIn: 'Rapports SQEO validés, certificats PEB provisoires et levée des réserves techniques.',
+                        handoverOut: 'Procès-verbaux de réception provisoire signés et Dossier d’Intervention Ultérieure (DIU) complet pour la Livraison.',
+                        commitments: {
+                            energie: { status: 'À venir', objective: 'Validation des certificats PEB finaux et paramétrage des régulations PAC.', handoverNote: 'Transmettre les courbes de chauffe optimisées.', tasks: [{ text: 'Réception technique chaufferie PAC collective', done: false }] },
+                            ressources: { status: 'À venir', objective: 'Clôture du bilan matière et remise du passeport matériaux du bâtiment.', handoverNote: 'Intégrer le passeport circularité dans le DIU.', tasks: [{ text: 'Compilation du passeport matériaux', done: false }] },
+                            eau: { status: 'À venir', objective: 'Mise en service des filtres eau de pluie et relevé des compteurs divisionnaires.', handoverNote: 'Vérifier l’étiquetage "Eau non potable" sur tous les points d’usage.', tasks: [{ text: 'Contrôle signalétique réseaux eau de pluie', done: false }] },
+                            sol: { status: 'À venir', objective: 'Réception des aménagements paysagers, noues et nichoirs biodiversité.', handoverNote: 'Remettre le plan de gestion écologique au syndic.', tasks: [{ text: 'Réception des plantations indigènes', done: false }] },
+                            sante: { status: 'À venir', objective: 'Validation finale du confort thermique, acoustique et renouvellement d’air.', handoverNote: 'Filtres VMC neufs installés juste avant réception.', tasks: [{ text: 'Remplacement des filtres de chantier VMC par filtres neufs', done: false }] },
+                            mobilite: { status: 'À venir', objective: 'Réception des accès doux, marquages vélos et contrôle d’accès parking.', handoverNote: 'Badges accès local vélo encodés.', tasks: [{ text: 'Réception signalétique mobilité douce', done: false }] }
+                        }
+                    },
+                    {
+                        name: 'Livraison',
+                        status: 'À venir',
+                        progress: 0,
+                        owner: 'Julien R. & Élodie B.',
+                        dates: '04/01/2027 — 25/01/2027',
+                        handoverIn: 'PV de réception provisoire et DIU complet.',
+                        handoverOut: 'Remise des clés aux acquéreurs avec livret d’accueil éco-gestes et transfert du dossier au service SAV.',
+                        commitments: {
+                            energie: { status: 'À venir', objective: 'Former les acquéreurs et le syndic au pilotage des thermostats et du suivi conso.', handoverNote: 'Organiser la session de prise en main technique.', tasks: [{ text: 'Remise du guide d’utilisation Q-ZEN aux habitants', done: false }] },
+                            ressources: { status: 'À venir', objective: 'Présenter les filières de tri et les matériaux durables intégrés au logement.', handoverNote: 'Indiquer les références exactes des peintures/matériaux pour entretien.', tasks: [{ text: 'Remise des fiches entretien matériaux durables', done: false }] },
+                            eau: { status: 'À venir', objective: 'Expliquer le fonctionnement de la citerne pluviale et l’entretien des filtres.', handoverNote: 'Sensibiliser à l’usage de produits biodégradables.', tasks: [{ text: 'Notice entretien filtration eau de pluie remise', done: false }] },
+                            sol: { status: 'À venir', objective: 'Sensibiliser la copropriété à la gestion différenciée (zéro phyto, fauche tardive).', handoverNote: 'Transmettre le calendrier d’entretien écologique des espaces verts.', tasks: [{ text: 'Charte gestion écologique remise au syndic', done: false }] },
+                            sante: { status: 'À venir', objective: 'Expliquer l’entretien des bouches VMC et la gestion de la ventilation naturelle.', handoverNote: 'Calendrier de changement des filtres VMC communiqué.', tasks: [{ text: 'Démonstration nettoyage bouches VMC lors de la remise des clés', done: false }] },
+                            mobilite: { status: 'À venir', objective: 'Remettre le pack mobilité locale (horaires transports, accès local vélo, bornes).', handoverNote: 'Activer les badges de recharge IRVE.', tasks: [{ text: 'Distribution du guide mobilité douce du quartier', done: false }] }
+                        }
+                    },
+                    {
+                        name: 'SAV et usage',
+                        status: 'À venir',
+                        progress: 0,
+                        owner: 'Élodie B. (Responsable SAV)',
+                        dates: 'À partir du 26/01/2027 (Suivi 2 ans)',
+                        handoverIn: 'Retours de livraison, fiches techniques équipements et carnet d’entretien.',
+                        handoverOut: 'Bilan de performance réelle après 1 an d’exploitation (retour d’expérience pour les futurs projets Thomas & Piron).',
+                        commitments: {
+                            energie: { status: 'À venir', objective: 'Suivre les consommations réelles à 6 et 12 mois et ajuster la régulation PAC.', handoverNote: 'Comparer conso réelle vs calcul PEB initial.', tasks: [{ text: 'Audit énergétique de confort hiver 1', done: false }] },
+                            ressources: { status: 'À venir', objective: 'Assurer les interventions SAV en privilégiant la réparation et les pièces d’origine.', handoverNote: 'Zéro remplacement inutile lors des visites de parfait achèvement.', tasks: [{ text: 'Suivi interventions SAV éco-responsables', done: false }] },
+                            eau: { status: 'À venir', objective: 'Vérifier l’absence de fuites et le bon comportement des noues après 1 an.', handoverNote: 'Contrôler l’encrassement des grilles d’avaloirs.', tasks: [{ text: 'Visite contrôle hydraulique à 12 mois', done: false }] },
+                            sol: { status: 'À venir', objective: 'Contrôler la reprise des plantations à 1 an et le respect du zéro pesticide.', handoverNote: 'Bilan biodiversité à 1 an avec le syndic.', tasks: [{ text: 'Contrôle reprise végétale garantie 1 an', done: false }] },
+                            sante: { status: 'À venir', objective: 'Enquête de satisfaction confort thermique, acoustique et qualité d’air auprès des occupants.', handoverNote: 'Capitaliser les retours habitants pour le bureau d’études.', tasks: [{ text: 'Enquête satisfaction habitants à 6 mois', done: false }] },
+                            mobilite: { status: 'À venir', objective: 'Évaluer le taux d’occupation des locaux vélos et l’usage des bornes de recharge.', handoverNote: 'Ajuster les besoins en bornes supplémentaires si nécessaire.', tasks: [{ text: 'Bilan d’usage mobilité copropriété', done: false }] }
+                        }
+                    }
+                ],
+                feed: [
+                    {
+                        id: 101,
+                        stage: 'Chantier',
+                        commitment: 'Eau',
+                        type: 'Point de vigilance',
+                        author: 'Marc D.',
+                        role: 'Conducteur de travaux',
+                        time: 'Il y a 25 min',
+                        message: 'Suite aux fortes averses de cette nuit, le bassin de décantation provisoire atteint 80% de sa capacité. Curage programmé demain matin à 7h30 avant tout nouveau pompage de fouilles.',
+                        unread: true
+                    },
+                    {
+                        id: 102,
+                        stage: 'Contrôles SQEO',
+                        commitment: 'Ressources',
+                        type: 'Passation d\'étape',
+                        author: 'Claire V.',
+                        role: 'Coordinatrice SQEO',
+                        time: 'Il y a 2 heures',
+                        message: 'Préparation du relais Chantier -> SQEO : il nous manque encore 3 fiches FDES du sous-traitant cloisons sèches pour valider la traçabilité matériaux. Merci de les joindre avant vendredi.',
+                        unread: true
+                    },
+                    {
+                        id: 103,
+                        stage: 'Chantier',
+                        commitment: 'Énergie et climat',
+                        type: 'Avancement validé',
+                        author: 'Marc D.',
+                        role: 'Conducteur de travaux',
+                        time: 'Hier à 16:40',
+                        message: 'Coulage de la dalle R+2 Bâtiment B terminé avec béton bas carbone CEM III/B (centrale de Nivelles). Les 14 bons de livraison sont numérisés dans le dossier.',
+                        unread: true
+                    },
+                    {
+                        id: 104,
+                        stage: 'Chantier',
+                        commitment: 'Mobilité',
+                        type: 'Avancement validé',
+                        author: 'Julien R.',
+                        role: 'Chef de projet',
+                        time: 'Hier à 11:15',
+                        message: 'Très bon retour de la commune : aucune nuisance signalée grâce au respect strict des créneaux de livraison hors heures scolaires.',
+                        unread: false
+                    }
+                ]
+            },
+            {
+                id: 'tp-horizon-namur',
+                name: 'Résidence Horizon - Namur',
+                ref: 'TP-2026-112',
+                location: 'Namur • 28 appartements & commerces',
+                activeStageIndex: 2, // Étape 3 : Devis et achats
+                stages: [
+                    {
+                        name: 'Stratégies et permis',
+                        status: 'Terminée',
+                        progress: 100,
+                        owner: 'Julien R. (Chef de projet)',
+                        dates: '10/10/2025 — 12/01/2026',
+                        handoverIn: 'Friche urbaine proche gare de Namur.',
+                        handoverOut: 'Permis obtenu avec toiture biosolaire et réemploi des briques de façade existantes.',
+                        commitments: {
+                            energie: { status: 'Validé', objective: 'Objectif E-peil ≤ 28 et toiture biosolaire.', handoverNote: 'Intégrer 110 panneaux PV.', tasks: [{ text: 'Note PEB initiale validée', done: true }] },
+                            ressources: { status: 'Validé', objective: 'Réemploi de 100% des briques saines de l’ancien bâtiment.', handoverNote: 'Stockage palette sur parcelle voisine.', tasks: [{ text: 'Inventaire réemploi validé', done: true }] },
+                            eau: { status: 'Validé', objective: 'Toiture stockante et citerne 20.000L.', handoverNote: 'Calcul rétention validé.', tasks: [{ text: 'Accord service eaux Namur', done: true }] },
+                            sol: { status: 'Validé', objective: 'Création d’un cœur d’îlot pleine terre de 450 m².', handoverNote: 'Démolition complète de la dalle béton existante.', tasks: [{ text: 'Plan masse pleine terre validé', done: true }] },
+                            sante: { status: 'Validé', objective: 'Isolation acoustique renforcée côté voie ferrée.', handoverNote: 'Vitrage acoustique 44 dB exigé.', tasks: [{ text: 'Étude acoustique ferroviaire validée', done: true }] },
+                            mobilite: { status: 'Validé', objective: 'Ratio parking réduit (0,6 place/logement) grâce à la proximité gare.', handoverNote: 'Local vélo cargo de 65 m².', tasks: [{ text: 'Dérogation parking validée', done: true }] }
+                        }
+                    },
+                    {
+                        name: 'Études',
+                        status: 'Terminée',
+                        progress: 100,
+                        owner: 'Sophie L. (Bureau d\'études)',
+                        dates: '13/01/2026 — 28/02/2026',
+                        handoverIn: 'Permis purgé et étude acoustique.',
+                        handoverOut: 'Plans d’exécution transmis aux Achats avec variantes bois-béton.',
+                        commitments: {
+                            energie: { status: 'Validé', objective: 'Façades ossature bois préfabriquées en atelier Thomas & Piron.', handoverNote: 'Isolation laine de bois 24 cm.', tasks: [{ text: 'Plans atelier ossature bois validés', done: true }] },
+                            ressources: { status: 'Validé', objective: 'Préfabrication hors-site pour réduire les déchets de 40%.', handoverNote: 'Calepinage optimisé.', tasks: [{ text: 'Métrés préfabrication terminés', done: true }] },
+                            eau: { status: 'Validé', objective: 'Réseau double alimentation eau de pluie.', handoverNote: 'Schéma hydraulique validé.', tasks: [{ text: 'Plans plomberie validés', done: true }] },
+                            sol: { status: 'Validé', objective: 'Dépollution légère ponctuelle intégrée au lot terrassement.', handoverNote: 'Plan d’assainissement approuvé.', tasks: [{ text: 'Étude de sol orientée validée', done: true }] },
+                            sante: { status: 'Validé', objective: 'Boîtes à ressorts acoustiques sous dalles.', handoverNote: 'Prescrire appuis antivibratiles.', tasks: [{ text: 'Note calcul vibratoire validée', done: true }] },
+                            mobilite: { status: 'Validé', objective: 'Accès chantier en milieu urbain dense étudié.', handoverNote: 'Aire de déchargement dédiée.', tasks: [{ text: 'PIC urbain validé', done: true }] }
+                        }
+                    },
+                    {
+                        name: 'Devis et achats',
+                        status: 'En cours',
+                        progress: 70,
+                        owner: 'Thomas M. (Acheteur Matériaux)',
+                        dates: '01/03/2026 — 15/04/2026',
+                        handoverIn: 'Métrés préfabrication bois et prescriptions acoustiques.',
+                        handoverOut: 'Finaliser le choix du fournisseur d’appuis antivibratiles et verrouiller le planning de livraison atelier bois.',
+                        commitments: {
+                            energie: { status: 'Validé', objective: 'Approvisionnement bois certifié PEFC Wallonie pour l’atelier.', handoverNote: 'Bois scié à moins de 45 km.', tasks: [{ text: 'Commande bois PEFC validée', done: true }] },
+                            ressources: { status: 'Validé', objective: 'Contrat de nettoyage et palettisation des briques de réemploi.', handoverNote: '8.500 briques prêtes à poser.', tasks: [{ text: 'Prestation nettoyage briques signée', done: true }] },
+                            eau: { status: 'En cours', objective: 'Consultation fournisseurs complexe toiture rétentive.', handoverNote: 'Comparatif 2 offres en cours.', tasks: [{ text: 'Analyse technique complexes végétalisés', done: false }] },
+                            sol: { status: 'Validé', objective: 'Sélection centre de traitement agréé pour terres légèrement impactées.', handoverNote: 'Traçabilité Walterre verrouillée.', tasks: [{ text: 'Contrat évacuation sélective signé', done: true }] },
+                            sante: { status: 'Vigilance', objective: 'Délai d’approvisionnement sur les vitrages acoustiques 44 dB.', handoverNote: 'Sécuriser la commande cette semaine pour ne pas décaler le clos-couvert.', tasks: [{ text: 'Validation planning usine vitrages', done: false }] },
+                            mobilite: { status: 'Validé', objective: 'Transport des murs ossature bois en convoi groupé nocturne.', handoverNote: 'Autorisations voirie en cours.', tasks: [{ text: 'Accord transporteur convoi groupé', done: true }] }
+                        }
+                    },
+                    {
+                        name: 'Chantier',
+                        status: 'À venir',
+                        progress: 0,
+                        owner: 'Marc D. (Conducteur de travaux)',
+                        dates: '16/04/2026 — 18/12/2026',
+                        handoverIn: 'Commandes matériaux et planning préfabrication.',
+                        handoverOut: 'Dossier d’exécution complet pour SQEO.',
+                        commitments: {
+                            energie: { status: 'À venir', objective: 'Montage rapide des façades bois préfabriquées.', handoverNote: 'Contrôler jonctions étanchéité.', tasks: [{ text: 'Pose murs ossature bois', done: false }] },
+                            ressources: { status: 'À venir', objective: 'Mise en œuvre des briques de réemploi en rez-de-chaussée.', handoverNote: 'Mortier à la chaux requis.', tasks: [{ text: 'Maçonnerie briques réemploi', done: false }] },
+                            eau: { status: 'À venir', objective: 'Pose toiture stockante et citerne.', handoverNote: 'Test étanchéité avant végétalisation.', tasks: [{ text: 'Étanchéité toiture stockante', done: false }] },
+                            sol: { status: 'À venir', objective: 'Excavation sélective et création cœur d’îlot.', handoverNote: 'Apport terre végétale certifiée.', tasks: [{ text: 'Terrassement sélectif', done: false }] },
+                            sante: { status: 'À venir', objective: 'Pose des appuis antivibratiles et vitrages 44 dB.', handoverNote: 'Contrôle rigoureux des joints.', tasks: [{ text: 'Pose vitrages acoustiques', done: false }] },
+                            mobilite: { status: 'À venir', objective: 'Respect stricte logistique urbaine Namur.', handoverNote: 'Zéro stockage sur voirie.', tasks: [{ text: 'Mise en place base vie compacte', done: false }] }
+                        }
+                    },
+                    {
+                        name: 'Contrôles SQEO',
+                        status: 'À venir',
+                        progress: 0,
+                        owner: 'Claire V. (Coordinatrice SQEO)',
+                        dates: '01/11/2026 — 10/01/2027',
+                        handoverIn: 'Fiches techniques et autocontrôles chantier.',
+                        handoverOut: 'Rapports acoustiques et Blower-Door pour réception.',
+                        commitments: {
+                            energie: { status: 'À venir', objective: 'Test Blower-Door sur enveloppe bois.', handoverNote: 'Cible n50 ≤ 0,5 h⁻¹.', tasks: [{ text: 'Test étanchéité à l’air', done: false }] },
+                            ressources: { status: 'À venir', objective: 'Bilan déchets préfabrication vs chantier.', handoverNote: 'Taux valorisation > 90%.', tasks: [{ text: 'Bilan matière final', done: false }] },
+                            eau: { status: 'À venir', objective: 'Contrôle rétention toiture.', handoverNote: 'Vérifier limiteurs de débit.', tasks: [{ text: 'Test hydraulique toiture', done: false }] },
+                            sol: { status: 'À venir', objective: 'Certificat de clôture assainissement sol.', handoverNote: 'Archiver au DIU.', tasks: [{ text: 'Attestation sol validée', done: false }] },
+                            sante: { status: 'À venir', objective: 'Mesures acoustiques façade côté voie ferrée.', handoverNote: 'Conformité NBN S 01-400-1.', tasks: [{ text: 'Mesure isolement acoustique', done: false }] },
+                            mobilite: { status: 'À venir', objective: 'Conformité accès local vélo cargo.', handoverNote: 'Rampe pente < 12%.', tasks: [{ text: 'Contrôle pente rampe vélos', done: false }] }
+                        }
+                    },
+                    { name: 'Réception', status: 'À venir', progress: 0, owner: 'Julien R.', dates: '11/01/2027 — 25/01/2027', handoverIn: 'Rapports SQEO.', handoverOut: 'PV réception.', commitments: { energie: { status: 'À venir', objective: 'Certificats PEB.', handoverNote: 'DIU.', tasks: [] }, ressources: { status: 'À venir', objective: 'Passeport matériaux.', handoverNote: 'DIU.', tasks: [] }, eau: { status: 'À venir', objective: 'Mise en service citerne.', handoverNote: 'DIU.', tasks: [] }, sol: { status: 'À venir', objective: 'Réception cœur d’îlot.', handoverNote: 'Syndic.', tasks: [] }, sante: { status: 'À venir', objective: 'Filtres VMC neufs.', handoverNote: 'Habitants.', tasks: [] }, mobilite: { status: 'À venir', objective: 'Badges local vélo.', handoverNote: 'Habitants.', tasks: [] } } },
+                    { name: 'Livraison', status: 'À venir', progress: 0, owner: 'Élodie B.', dates: '01/02/2027 — 15/02/2027', handoverIn: 'PV réception.', handoverOut: 'Dossier SAV.', commitments: { energie: { status: 'À venir', objective: 'Formation habitants.', handoverNote: 'Guide.', tasks: [] }, ressources: { status: 'À venir', objective: 'Fiches entretien.', handoverNote: 'Guide.', tasks: [] }, eau: { status: 'À venir', objective: 'Notice toiture rétentive.', handoverNote: 'Syndic.', tasks: [] }, sol: { status: 'À venir', objective: 'Charte zéro phyto.', handoverNote: 'Syndic.', tasks: [] }, sante: { status: 'À venir', objective: 'Notice VMC.', handoverNote: 'Guide.', tasks: [] }, mobilite: { status: 'À venir', objective: 'Pack mobilité gare.', handoverNote: 'Guide.', tasks: [] } } },
+                    { name: 'SAV et usage', status: 'À venir', progress: 0, owner: 'Élodie B.', dates: 'À partir du 16/02/2027', handoverIn: 'Livraison.', handoverOut: 'REX 1 an.', commitments: { energie: { status: 'À venir', objective: 'Suivi conso 1 an.', handoverNote: 'REX.', tasks: [] }, ressources: { status: 'À venir', objective: 'Réparation durable.', handoverNote: 'REX.', tasks: [] }, eau: { status: 'À venir', objective: 'Contrôle noues/toiture.', handoverNote: 'REX.', tasks: [] }, sol: { status: 'À venir', objective: 'Suivi végétation.', handoverNote: 'REX.', tasks: [] }, sante: { status: 'À venir', objective: 'Enquête acoustique.', handoverNote: 'REX.', tasks: [] }, mobilite: { status: 'À venir', objective: 'Bilan local vélo.', handoverNote: 'REX.', tasks: [] } } }
+                ],
+                feed: [
+                    {
+                        id: 201,
+                        stage: 'Devis et achats',
+                        commitment: 'Santé et bien-être',
+                        type: 'Point de vigilance',
+                        author: 'Thomas M.',
+                        role: 'Acheteur Matériaux',
+                        time: 'Il y a 1 heure',
+                        message: 'Le verrier annonce 9 semaines de délai sur les vitrages acoustiques 44 dB. Je bloque la commande dès réception de la validation finale des dimensions châssis par le BE.',
+                        unread: true
+                    },
+                    {
+                        id: 202,
+                        stage: 'Devis et achats',
+                        commitment: 'Ressources',
+                        type: 'Avancement validé',
+                        author: 'Thomas M.',
+                        role: 'Acheteur Matériaux',
+                        time: 'Hier à 15:10',
+                        message: 'Les 8.500 briques de réemploi nettoyées sont palettisées et sécurisées. Accord conclu avec le conducteur pour livraison cadencée par tranches de 2.000 unités.',
+                        unread: false
+                    }
+                ]
+            }
+        ];
+
+        /**
+         * État courant de l'application
+         */
+        let state = {
+            currentProjectIndex: 0,
+            selectedStageIndex: 3,
+            commitmentFilter: 'ALL',
+            feedFilter: 'ALL',
+            matrixOpen: false
+        };
+
+        /**
+         * Initialisation au chargement du DOM
+         */
+        document.addEventListener('DOMContentLoaded', () => {
+            initSelectors();
+            selectProject(0);
+            bindEvents();
+        });
+
+        /**
+         * Initialise les listes déroulantes (projets, étapes dans le formulaire)
+         */
+        function initSelectors() {
+            const projectSel = document.getElementById('project-selector');
+            projectSel.innerHTML = PROJECTS_DATA.map((p, idx) =>
+                `<option value="${idx}" class="bg-slate-800">${p.name}</option>`
+            ).join('');
+
+            const postStageSel = document.getElementById('post-stage-select');
+            postStageSel.innerHTML = STAGES_LIST.map((stageName, idx) =>
+                `<option value="${stageName}">${idx + 1}. ${stageName}</option>`
+            ).join('');
+        }
+
+        /**
+         * Sélectionne un chantier et met à jour toute l'interface
+         */
+        function selectProject(index) {
+            state.currentProjectIndex = index;
+            const project = PROJECTS_DATA[index];
+            state.selectedStageIndex = project.activeStageIndex;
+            renderAll();
+        }
+
+        /**
+         * Rendu global de l'interface
+         */
+        function renderAll() {
+            const project = PROJECTS_DATA[state.currentProjectIndex];
+            
+            // Mise à jour Fiche Projet & KPIs
+            document.getElementById('project-title-display').textContent = project.name;
+            document.getElementById('project-ref-display').textContent = project.ref;
+            document.getElementById('project-meta-display').innerHTML = `
+                <i data-lucide="map-pin" class="w-3.5 h-3.5 text-slate-400"></i>
+                <span>${project.location}</span>
+            `;
+
+            updateKPIs(project);
+            renderNotifications(project);
+            renderStepper(project);
+            renderStageDetail(project);
+            renderFeed(project);
+            if (state.matrixOpen) {
+                renderMatrix(project);
+            }
+
+            // Synchronise le sélecteur d'étape du formulaire de publication
+            document.getElementById('post-stage-select').value = project.stages[state.selectedStageIndex].name;
+
+            // Rafraîchit les icônes Lucide
+            lucide.createIcons();
+        }
+
+        /**
+         * Calcul et affichage des KPIs de synthèse
+         */
+        function updateKPIs(project) {
+            // Avancement global = moyenne des 8 étapes
+            const totalProgress = project.stages.reduce((acc, s) => acc + s.progress, 0);
+            const avgProgress = Math.round(totalProgress / project.stages.length);
+            document.getElementById('kpi-global-progress').textContent = `${avgProgress}%`;
+            document.getElementById('kpi-global-bar').style.width = `${avgProgress}%`;
+            
+            const activeStage = project.stages[project.activeStageIndex];
+            document.getElementById('kpi-current-stage-label').textContent = `Phase active : ${activeStage.name}`;
+
+            // Respect des 6 engagements sur l'ensemble du projet (hors étapes "À venir" non démarrées ou sur l'ensemble des 48 jalons)
+            let validatedCount = 0;
+            let activeMilestones = 0;
+            let vigilanceCount = 0;
+
+            project.stages.forEach(stage => {
+                COMMITMENTS_META.forEach(c => {
+                    const st = stage.commitments[c.id].status;
+                    if (st !== 'À venir') {
+                        activeMilestones++;
+                        if (st === 'Validé') validatedCount++;
+                    }
+                    if (st === 'Vigilance') vigilanceCount++;
+                });
+            });
+
+            const rate = activeMilestones > 0 ? Math.round((validatedCount / activeMilestones) * 100) : 100;
+            document.getElementById('kpi-commitments-rate').textContent = `${rate}%`;
+            document.getElementById('kpi-commitments-detail').textContent = `${validatedCount}/${activeMilestones} jalons actifs validés`;
+            document.getElementById('kpi-commitments-bar').style.width = `${rate}%`;
+
+            // Badge vigilances
+            const badge = document.getElementById('kpi-alerts-badge');
+            if (vigilanceCount > 0) {
+                badge.textContent = `${vigilanceCount} point${vigilanceCount > 1 ? 's' : ''} actif${vigilanceCount > 1 ? 's' : ''}`;
+                badge.className = 'px-2.5 py-0.5 rounded-full text-xs font-bold bg-amber-100 text-amber-800 border border-amber-200';
+            } else {
+                badge.textContent = 'Aucune alerte';
+                badge.className = 'px-2.5 py-0.5 rounded-full text-xs font-bold bg-emerald-100 text-tp-green border border-emerald-200';
+            }
+        }
+
+        /**
+         * Rendu du centre de notifications (cloche + dropdown)
+         */
+        function renderNotifications(project) {
+            const unreadItems = project.feed.filter(f => f.unread);
+            const badge = document.getElementById('notif-badge');
+            const dropdownCount = document.getElementById('notif-dropdown-count');
+            const list = document.getElementById('notif-list');
+
+            if (unreadItems.length > 0) {
+                badge.textContent = unreadItems.length;
+                badge.classList.remove('hidden');
+                dropdownCount.textContent = `${unreadItems.length} non lue${unreadItems.length > 1 ? 's' : ''}`;
+            } else {
+                badge.classList.add('hidden');
+                dropdownCount.textContent = 'Tout est lu';
+            }
+
+            if (project.feed.length === 0) {
+                list.innerHTML = `<div class="p-6 text-center text-xs text-slate-400">Aucune notification récente.</div>`;
+                return;
+            }
+
+            list.innerHTML = project.feed.slice(0, 6).map(item => {
+                const isAlert = item.type === 'Point de vigilance';
+                const dotColor = isAlert ? 'bg-amber-500' : (item.type === 'Passation d\'étape' ? 'bg-sky-500' : 'bg-tp-green');
+                return `
+                    <div class="p-3.5 hover:bg-slate-50 transition-colors cursor-pointer ${item.unread ? 'bg-emerald-50/30' : ''}" onclick="jumpToStageByName('${item.stage}', ${item.id})">
+                        <div class="flex items-start gap-2.5">
+                            <span class="w-2 h-2 rounded-full ${dotColor} mt-1.5 shrink-0"></span>
+                            <div class="flex-1 min-w-0">
+                                <div class="flex items-center justify-between gap-2">
+                                    <span class="text-[11px] font-bold text-slate-800 truncate">${item.stage} • ${item.commitment}</span>
+                                    <span class="text-[10px] text-slate-400 shrink-0">${item.time}</span>
+                                </div>
+                                <p class="text-xs text-slate-600 mt-0.5 line-clamp-2">${item.message}</p>
+                                <span class="text-[10px] font-medium text-slate-400 mt-1 block">${item.author} (${item.role})</span>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        /**
+         * Rendu de la frise chronologique des 8 Étapes
+         */
+        function renderStepper(project) {
+            const container = document.getElementById('stages-stepper');
+            container.innerHTML = project.stages.map((stage, idx) => {
+                const isSelected = idx === state.selectedStageIndex;
+                
+                // Calcul du nombre d'engagements validés sur les 6
+                let validCount = 0;
+                let hasVigilance = false;
+                COMMITMENTS_META.forEach(c => {
+                    const s = stage.commitments[c.id].status;
+                    if (s === 'Validé') validCount++;
+                    if (s === 'Vigilance') hasVigilance = true;
+                });
+
+                // Styles selon statut
+                let statusDot = 'bg-slate-300';
+                let statusText = 'text-slate-500';
+                let barColor = 'bg-slate-300';
+
+                if (stage.status === 'Terminée') {
+                    statusDot = 'bg-tp-green';
+                    statusText = 'text-tp-green';
+                    barColor = 'bg-tp-green';
+                } else if (stage.status === 'En cours') {
+                    statusDot = 'bg-sky-600';
+                    statusText = 'text-sky-700';
+                    barColor = 'bg-sky-600';
+                } else if (stage.status === "Point d'attention" || hasVigilance) {
+                    statusDot = 'bg-amber-500';
+                    statusText = 'text-amber-700';
+                    barColor = 'bg-amber-500';
+                }
+
+                const cardStyle = isSelected
+                    ? 'border-tp-slate ring-2 ring-tp-slate/15 bg-slate-50/90 shadow-md'
+                    : 'border-slate-200 bg-white hover:border-slate-300 hover:bg-slate-50/50';
+
+                return `
+                    <button onclick="selectStage(${idx})" class="text-left p-3.5 rounded-xl border transition-all flex flex-col justify-between ${cardStyle} relative group">
+                        <div>
+                            <div class="flex items-center justify-between gap-1 mb-1.5">
+                                <span class="text-[11px] font-extrabold ${isSelected ? 'text-tp-slate' : 'text-slate-400'}">0${idx + 1}</span>
+                                <span class="inline-flex items-center gap-1 text-[10px] font-bold ${statusText}">
+                                    <span class="w-2 h-2 rounded-full ${statusDot}"></span>
+                                    ${stage.status}
+                                </span>
+                            </div>
+                            <h3 class="text-xs font-bold text-slate-900 leading-snug line-clamp-2 min-h-[2rem]">
+                                ${stage.name}
+                            </h3>
+                        </div>
+
+                        <div class="mt-3 pt-2 border-t border-slate-100 w-full">
+                            <div class="flex items-center justify-between text-[11px] mb-1">
+                                <span class="font-semibold text-slate-600">${stage.progress}%</span>
+                                <span class="px-1.5 py-0.5 rounded bg-slate-100 text-slate-700 font-bold text-[10px]" title="Engagements validés sur cette étape">
+                                    ${validCount}/6 eng.
+                                </span>
+                            </div>
+                            <div class="w-full bg-slate-100 rounded-full h-1.5 overflow-hidden">
+                                <div class="${barColor} h-1.5 rounded-full transition-all" style="width: ${stage.progress}%"></div>
+                            </div>
+                        </div>
+                    </button>
+                `;
+            }).join('');
+        }
+
+        /**
+         * Rendu de la vue détaillée de l'étape sélectionnée + ses 6 engagements
+         */
+        function renderStageDetail(project) {
+            const idx = state.selectedStageIndex;
+            const stage = project.stages[idx];
+
+            document.getElementById('stage-number-badge').textContent = `ÉTAPE ${idx + 1} / 8`;
+            document.getElementById('stage-title').textContent = stage.name;
+            document.getElementById('stage-owner').textContent = stage.owner;
+            document.getElementById('stage-dates').textContent = stage.dates;
+
+            // Pill statut
+            const pill = document.getElementById('stage-status-pill');
+            pill.textContent = stage.status;
+            if (stage.status === 'Terminée') {
+                pill.className = 'px-3 py-1 rounded-full text-xs font-bold bg-emerald-100 text-tp-green border border-emerald-200';
+            } else if (stage.status === 'En cours') {
+                pill.className = 'px-3 py-1 rounded-full text-xs font-bold bg-sky-100 text-sky-800 border border-sky-200';
+            } else if (stage.status === "Point d'attention") {
+                pill.className = 'px-3 py-1 rounded-full text-xs font-bold bg-amber-100 text-amber-800 border border-amber-200';
+            } else {
+                pill.className = 'px-3 py-1 rounded-full text-xs font-bold bg-slate-100 text-slate-600 border border-slate-200';
+            }
+
+            // Contrôles modifiables
+            document.getElementById('stage-status-select').value = stage.status;
+            document.getElementById('stage-progress-slider').value = stage.progress;
+            document.getElementById('stage-progress-text').textContent = `${stage.progress}%`;
+
+            // Relais d'étape (Passation)
+            document.getElementById('prev-stage-name').textContent = idx > 0 ? project.stages[idx - 1].name : 'Initialisation Programme';
+            document.getElementById('next-stage-name').textContent = idx < 7 ? project.stages[idx + 1].name : 'Exploitation Durable';
+            document.getElementById('stage-handover-in').textContent = stage.handoverIn;
+            document.getElementById('stage-handover-out').textContent = stage.handoverOut;
+
+            // Cartes des 6 Engagements
+            const grid = document.getElementById('commitments-grid');
+            const filteredCommitments = COMMITMENTS_META.filter(c => {
+                const st = stage.commitments[c.id].status;
+                if (state.commitmentFilter === 'VIGILANCE') return st === 'Vigilance' || st === 'En cours';
+                if (state.commitmentFilter === 'VALIDATED') return st === 'Validé';
+                return true;
+            });
+
+            if (filteredCommitments.length === 0) {
+                grid.innerHTML = `
+                    <div class="col-span-full bg-white rounded-2xl p-8 text-center border border-slate-200 text-xs text-slate-500">
+                        Aucun engagement ne correspond à ce filtre pour l'étape <strong>${stage.name}</strong>.
+                    </div>
+                `;
+                return;
+            }
+
+            grid.innerHTML = filteredCommitments.map(c => {
+                const data = stage.commitments[c.id];
+                
+                // Bordure et badge selon statut de l'engagement
+                let borderClass = 'border-slate-200/90';
+                let selectStyle = 'bg-slate-50 text-slate-700 border-slate-200';
+                if (data.status === 'Validé') {
+                    borderClass = 'border-emerald-200';
+                    selectStyle = 'bg-emerald-50 text-tp-green border-emerald-300';
+                } else if (data.status === 'Vigilance') {
+                    borderClass = 'border-amber-300 ring-1 ring-amber-200';
+                    selectStyle = 'bg-amber-50 text-amber-800 border-amber-300';
+                } else if (data.status === 'En cours') {
+                    borderClass = 'border-sky-200';
+                    selectStyle = 'bg-sky-50 text-sky-800 border-sky-200';
+                }
+
+                const tasksHtml = data.tasks && data.tasks.length > 0
+                    ? data.tasks.map((t, tIdx) => `
+                        <label class="flex items-start gap-2.5 p-2 rounded-lg hover:bg-slate-50 cursor-pointer transition-colors">
+                            <input type="checkbox" ${t.done ? 'checked' : ''} onchange="toggleCommitmentTask('${c.id}', ${tIdx})" class="mt-0.5 w-4 h-4 rounded text-tp-green focus:ring-tp-green border-slate-300 cursor-pointer shrink-0">
+                            <span class="text-xs ${t.done ? 'line-through text-slate-400' : 'text-slate-700 font-medium'} leading-snug">${t.text}</span>
+                        </label>
+                    `).join('')
+                    : `<p class="text-[11px] italic text-slate-400 px-2 py-1">Actions opérationnelles détaillées activées au démarrage de l'étape.</p>`;
+
+                return `
+                    <div class="bg-white rounded-2xl p-5 border ${borderClass} shadow-sm card-hover flex flex-col justify-between">
+                        <div>
+                            <!-- En-tête de la carte Engagement -->
+                            <div class="flex items-start justify-between gap-2 pb-3 border-b border-slate-100">
+                                <div class="flex items-center gap-2.5">
+                                    <div class="w-9 h-9 rounded-xl ${c.iconBg} flex items-center justify-center shrink-0">
+                                        <i data-lucide="${c.icon}" class="w-4 h-4"></i>
+                                    </div>
+                                    <div>
+                                        <h4 class="text-sm font-extrabold text-slate-900">${c.name}</h4>
+                                        <span class="text-[10px] font-semibold text-slate-400 uppercase tracking-wider">Engagement obligatoire</span>
+                                    </div>
+                                </div>
+
+                                <!-- Sélecteur rapide de statut -->
+                                <select onchange="updateCommitmentStatus('${c.id}', this.value)" class="rounded-lg border px-2 py-1 text-[11px] font-bold focus:outline-none cursor-pointer ${selectStyle}">
+                                    <option value="Validé" ${data.status === 'Validé' ? 'selected' : ''}>✓ Validé</option>
+                                    <option value="En cours" ${data.status === 'En cours' ? 'selected' : ''}>↻ En cours</option>
+                                    <option value="Vigilance" ${data.status === 'Vigilance' ? 'selected' : ''}>⚠ Vigilance</option>
+                                    <option value="À venir" ${data.status === 'À venir' ? 'selected' : ''}>• À venir</option>
+                                </select>
+                            </div>
+
+                            <!-- Objectif précis sur l'étape -->
+                            <div class="mt-3">
+                                <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400">Objectif sur l'étape</span>
+                                <p class="text-xs font-semibold text-slate-800 mt-0.5 leading-relaxed">
+                                    ${data.objective}
+                                </p>
+                            </div>
+
+                            <!-- Checklist d'actions concrètes -->
+                            <div class="mt-3 space-y-1">
+                                <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400 block mb-1">Points de contrôle & Actions</span>
+                                ${tasksHtml}
+                            </div>
+                        </div>
+
+                        <!-- Consigne de transmission (À ne pas perdre pour la suite) + Bouton Alerte -->
+                        <div class="mt-4 pt-3 border-t border-slate-100 space-y-2.5">
+                            <div class="bg-slate-50 rounded-xl p-2.5 border border-slate-200/70">
+                                <div class="flex items-center gap-1.5 text-[10px] font-bold text-tp-slate uppercase">
+                                    <i data-lucide="bookmark-check" class="w-3.5 h-3.5 text-tp-green"></i>
+                                    <span>À ne pas perdre pour la suite :</span>
+                                </div>
+                                <p class="text-[11px] text-slate-600 mt-0.5 leading-snug">${data.handoverNote}</p>
+                            </div>
+
+                            <div class="flex justify-end">
+                                <button onclick="openQuickNoteModal('${c.name}')" class="inline-flex items-center gap-1.5 text-[11px] font-semibold text-slate-600 hover:text-tp-green transition-colors py-1 px-2 rounded-lg hover:bg-emerald-50">
+                                    <i data-lucide="message-square-plus" class="w-3.5 h-3.5"></i>
+                                    <span>Ajouter une note / alerter l'équipe</span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        /**
+         * Rendu du fil de coordination interne
+         */
+        function renderFeed(project) {
+            const container = document.getElementById('coordination-feed');
+            const currentStageName = project.stages[state.selectedStageIndex].name;
+
+            const items = state.feedFilter === 'CURRENT'
+                ? project.feed.filter(f => f.stage === currentStageName)
+                : project.feed;
+
+            if (items.length === 0) {
+                container.innerHTML = `<p class="text-xs text-slate-400 text-center py-6">Aucune publication enregistrée pour cette étape.</p>`;
+                return;
+            }
+
+            container.innerHTML = items.map(item => {
+                let badgeClass = 'bg-emerald-50 text-tp-green border-emerald-200';
+                let iconName = 'check-circle-2';
+                if (item.type === 'Point de vigilance') {
+                    badgeClass = 'bg-amber-50 text-amber-800 border-amber-200';
+                    iconName = 'alert-triangle';
+                } else if (item.type === "Passation d'étape") {
+                    badgeClass = 'bg-sky-50 text-sky-800 border-sky-200';
+                    iconName = 'arrow-right-left';
+                }
+
+                return `
+                    <div class="p-3.5 rounded-xl bg-slate-50/80 border border-slate-200/80 space-y-2 hover:bg-white transition-colors">
+                        <div class="flex items-center justify-between gap-2">
+                            <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[10px] font-bold border ${badgeClass}">
+                                <i data-lucide="${iconName}" class="w-3 h-3"></i>
+                                ${item.type}
+                            </span>
+                            <span class="text-[10px] text-slate-400 font-medium">${item.time}</span>
+                        </div>
+
+                        <div class="flex flex-wrap items-center gap-1.5">
+                            <span class="px-2 py-0.5 rounded bg-tp-slate text-white text-[10px] font-semibold">${item.stage}</span>
+                            <span class="px-2 py-0.5 rounded bg-white border border-slate-200 text-slate-700 text-[10px] font-semibold">${item.commitment}</span>
+                        </div>
+
+                        <p class="text-xs text-slate-700 leading-relaxed">
+                            ${item.message}
+                        </p>
+
+                        <div class="pt-1 flex items-center justify-between text-[11px] text-slate-500 border-t border-slate-200/50">
+                            <span class="font-semibold text-slate-700">${item.author}</span>
+                            <span>${item.role}</span>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        /**
+         * Rendu de la Vue Transversale (Matrice 8 étapes x 6 engagements)
+         */
+        function renderMatrix(project) {
+            const thead = document.getElementById('matrix-table-head');
+            const tbody = document.getElementById('matrix-table-body');
+
+            thead.innerHTML = `
+                <th class="p-3.5 bg-slate-100 border-r border-slate-200 w-48 sticky left-0 z-10">Engagements T&P</th>
+                ${project.stages.map((s, idx) => `
+                    <th class="p-3 text-center border-r border-slate-200 min-w-[120px] cursor-pointer hover:bg-slate-100" onclick="selectStage(${idx})">
+                        <div class="text-[10px] text-slate-400 font-bold">ÉTAPE ${idx + 1}</div>
+                        <div class="text-xs font-extrabold text-slate-800 mt-0.5">${s.name}</div>
+                    </th>
+                `).join('')}
+            `;
+
+            tbody.innerHTML = COMMITMENTS_META.map(c => {
+                const cells = project.stages.map((stage, sIdx) => {
+                    const item = stage.commitments[c.id];
+                    let pill = 'bg-slate-100 text-slate-500 border-slate-200';
+                    let label = 'À venir';
+                    if (item.status === 'Validé') {
+                        pill = 'bg-emerald-100 text-tp-green border-emerald-300';
+                        label = '✓ Validé';
+                    } else if (item.status === 'En cours') {
+                        pill = 'bg-sky-100 text-sky-800 border-sky-300';
+                        label = '↻ En cours';
+                    } else if (item.status === 'Vigilance') {
+                        pill = 'bg-amber-100 text-amber-800 border-amber-300';
+                        label = '⚠ Vigilance';
+                    }
+
+                    return `
+                        <td onclick="selectStage(${sIdx})" class="p-2.5 text-center border-r border-slate-200 cursor-pointer hover:bg-slate-50 transition-colors" title="${item.objective}">
+                            <span class="inline-block px-2.5 py-1 rounded-lg border text-[11px] font-bold ${pill}">
+                                ${label}
+                            </span>
+                            <p class="text-[10px] text-slate-500 mt-1 line-clamp-1">${item.handoverNote}</p>
+                        </td>
+                    `;
+                }).join('');
+
+                return `
+                    <tr>
+                        <td class="p-3.5 font-bold text-slate-800 bg-slate-50/90 border-r border-slate-200 sticky left-0 z-10">
+                            <div class="flex items-center gap-2">
+                                <span class="w-6 h-6 rounded-lg ${c.iconBg} flex items-center justify-center shrink-0">
+                                    <i data-lucide="${c.icon}" class="w-3.5 h-3.5"></i>
+                                </span>
+                                <span>${c.name}</span>
+                            </div>
+                        </td>
+                        ${cells}
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        /**
+         * Actions interactives
+         */
+        function selectStage(idx) {
+            state.selectedStageIndex = idx;
+            renderAll();
+        }
+
+        function jumpToStageByName(stageName, notifId) {
+            const project = PROJECTS_DATA[state.currentProjectIndex];
+            const idx = project.stages.findIndex(s => s.name === stageName);
+            const notif = project.feed.find(f => f.id === notifId);
+            if (notif) notif.unread = false;
+            document.getElementById('notif-dropdown').classList.add('hidden');
+            if (idx !== -1) {
+                selectStage(idx);
+            } else {
+                renderAll();
+            }
+        }
+
+        function toggleCommitmentTask(commitmentId, taskIdx) {
+            const project = PROJECTS_DATA[state.currentProjectIndex];
+            const stage = project.stages[state.selectedStageIndex];
+            const commitment = stage.commitments[commitmentId];
+            commitment.tasks[taskIdx].done = !commitment.tasks[taskIdx].done;
+
+            // Si toutes les tâches sont cochées, propose automatiquement le passage à "Validé"
+            const allDone = commitment.tasks.every(t => t.done);
+            if (allDone && commitment.status !== 'Validé') {
+                commitment.status = 'Validé';
+                const cMeta = COMMITMENTS_META.find(c => c.id === commitmentId);
+                pushFeedNotification(
+                    stage.name,
+                    cMeta.name,
+                    'Avancement validé',
+                    `Toutes les actions de contrôle pour l'engagement "${cMeta.name}" sur l'étape "${stage.name}" ont été validées.`,
+                    true
+                );
+            }
+            renderAll();
+        }
+
+        function updateCommitmentStatus(commitmentId, newStatus) {
+            const project = PROJECTS_DATA[state.currentProjectIndex];
+            const stage = project.stages[state.selectedStageIndex];
+            stage.commitments[commitmentId].status = newStatus;
+
+            const cMeta = COMMITMENTS_META.find(c => c.id === commitmentId);
+            const notifType = newStatus === 'Vigilance' ? 'Point de vigilance' : 'Avancement validé';
+            pushFeedNotification(
+                stage.name,
+                cMeta.name,
+                notifType,
+                `Statut de l'engagement "${cMeta.name}" mis à jour en [${newStatus}] sur l'étape "${stage.name}".`,
+                true
+            );
+            renderAll();
+        }
+
+        function openQuickNoteModal(commitmentName) {
+            document.getElementById('modal-commitment-name').value = commitmentName;
+            document.getElementById('modal-title').textContent = `Alerte / Note : ${commitmentName}`;
+            document.getElementById('modal-note-text').value = '';
+            document.getElementById('quick-note-modal').classList.remove('hidden');
+        }
+
+        function closeQuickNoteModal() {
+            document.getElementById('quick-note-modal').classList.add('hidden');
+        }
+
+        /**
+         * Ajoute une entrée au fil de coordination, met à jour la cloche et affiche un toast
+         */
+        function pushFeedNotification(stageName, commitmentName, type, message, notifyAll) {
+            const project = PROJECTS_DATA[state.currentProjectIndex];
+            const userRaw = document.getElementById('user-selector').value;
+            const [author, role] = userRaw.split(' - ');
+
+            project.feed.unshift({
+                id: Date.now(),
+                stage: stageName,
+                commitment: commitmentName,
+                type: type,
+                author: author || 'Équipe T&P',
+                role: role || 'Chantier',
+                time: "À l'instant",
+                message: message,
+                unread: notifyAll
+            });
+
+            showToast(
+                notifyAll ? `Notification envoyée à toute l'équipe (${stageName})` : 'Entrée ajoutée au journal interne',
+                message,
+                type === 'Point de vigilance' ? 'amber' : 'green'
+            );
+        }
+
+        /**
+         * Affiche un toast de confirmation élégant
+         */
+        function showToast(title, body, variant = 'green') {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            const borderColor = variant === 'amber' ? 'border-amber-500' : 'border-tp-green';
+            const iconColor = variant === 'amber' ? 'text-amber-500' : 'text-tp-green';
+
+            toast.className = `pointer-events-auto bg-white rounded-2xl shadow-xl border-l-4 ${borderColor} p-4 flex items-start gap-3 toast-enter border border-slate-200`;
+            toast.innerHTML = `
+                <i data-lucide="bell-ring" class="w-5 h-5 ${iconColor} shrink-0 mt-0.5"></i>
+                <div class="flex-1 min-w-0">
+                    <p class="text-xs font-extrabold text-slate-900">${title}</p>
+                    <p class="text-xs text-slate-600 mt-0.5 line-clamp-2">${body}</p>
+                </div>
+            `;
+            container.appendChild(toast);
+            lucide.createIcons();
+
+            setTimeout(() => {
+                toast.style.opacity = '0';
+                toast.style.transform = 'translateX(20px)';
+                toast.style.transition = 'all 0.3s ease';
+                setTimeout(() => toast.remove(), 300);
+            }, 4500);
+        }
+
+        /**
+         * Liaison des événements DOM
+         */
+        function bindEvents() {
+            // Changement de chantier
+            document.getElementById('project-selector').addEventListener('change', (e) => {
+                selectProject(parseInt(e.target.value, 10));
+                showToast('Chantier chargé', `Vous consultez désormais : ${PROJECTS_DATA[state.currentProjectIndex].name}`);
+            });
+
+            // Dropdown notifications
+            const bellBtn = document.getElementById('notif-bell-btn');
+            const dropdown = document.getElementById('notif-dropdown');
+            bellBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                dropdown.classList.toggle('hidden');
+            });
+            document.addEventListener('click', (e) => {
+                if (!dropdown.contains(e.target) && !bellBtn.contains(e.target)) {
+                    dropdown.classList.add('hidden');
+                }
+            });
+
+            // Tout marquer comme lu
+            document.getElementById('mark-all-read-btn').addEventListener('click', () => {
+                const project = PROJECTS_DATA[state.currentProjectIndex];
+                project.feed.forEach(f => f.unread = false);
+                renderNotifications(project);
+            });
+
+            // Bascule Vue Transversale
+            const matrixSection = document.getElementById('transversal-matrix-section');
+            const toggleBtnText = document.getElementById('toggle-view-text');
+            document.getElementById('toggle-view-btn').addEventListener('click', () => {
+                state.matrixOpen = !state.matrixOpen;
+                if (state.matrixOpen) {
+                    matrixSection.classList.remove('hidden');
+                    toggleBtnText.textContent = 'Masquer la Vue Transversale';
+                    renderMatrix(PROJECTS_DATA[state.currentProjectIndex]);
+                    lucide.createIcons();
+                } else {
+                    matrixSection.classList.add('hidden');
+                    toggleBtnText.textContent = 'Ouvrir la Vue Transversale (8×6)';
+                }
+            });
+            document.getElementById('close-matrix-btn').addEventListener('click', () => {
+                state.matrixOpen = false;
+                matrixSection.classList.add('hidden');
+                toggleBtnText.textContent = 'Ouvrir la Vue Transversale (8×6)';
+            });
+
+            // Modification du statut et avancement de l'étape active
+            document.getElementById('stage-status-select').addEventListener('change', (e) => {
+                const project = PROJECTS_DATA[state.currentProjectIndex];
+                const stage = project.stages[state.selectedStageIndex];
+                stage.status = e.target.value;
+                if (stage.status === 'Terminée') stage.progress = 100;
+                pushFeedNotification(
+                    stage.name,
+                    'Général',
+                    stage.status === "Point d'attention" ? 'Point de vigilance' : 'Avancement validé',
+                    `Le statut de l'étape "${stage.name}" est passé à [${stage.status}].`,
+                    true
+                );
+                renderAll();
+            });
+
+            document.getElementById('stage-progress-slider').addEventListener('input', (e) => {
+                const val = parseInt(e.target.value, 10);
+                document.getElementById('stage-progress-text').textContent = `${val}%`;
+            });
+            document.getElementById('stage-progress-slider').addEventListener('change', (e) => {
+                const project = PROJECTS_DATA[state.currentProjectIndex];
+                const stage = project.stages[state.selectedStageIndex];
+                stage.progress = parseInt(e.target.value, 10);
+                if (stage.progress === 100 && stage.status !== 'Terminée') {
+                    stage.status = 'Terminée';
+                }
+                renderAll();
+            });
+
+            // Filtre des engagements
+            document.getElementById('commitment-filter').addEventListener('change', (e) => {
+                state.commitmentFilter = e.target.value;
+                renderStageDetail(PROJECTS_DATA[state.currentProjectIndex]);
+                lucide.createIcons();
+            });
+
+            // Filtre du fil de coordination
+            document.getElementById('feed-filter-stage').addEventListener('change', (e) => {
+                state.feedFilter = e.target.value;
+                renderFeed(PROJECTS_DATA[state.currentProjectIndex]);
+                lucide.createIcons();
+            });
+
+            // Soumission du formulaire principal de coordination
+            document.getElementById('feed-post-form').addEventListener('submit', (e) => {
+                e.preventDefault();
+                const stageName = document.getElementById('post-stage-select').value;
+                const commitmentName = document.getElementById('post-commitment-select').value;
+                const type = document.querySelector('input[name="postType"]:checked').value;
+                const message = document.getElementById('post-message').value.trim();
+                const notifyAll = document.getElementById('post-notify-all').checked;
+
+                if (!message) return;
+
+                pushFeedNotification(stageName, commitmentName, type, message, notifyAll);
+                document.getElementById('post-message').value = '';
+                renderAll();
+            });
+
+            // Modale note rapide sur un engagement
+            document.getElementById('close-modal-btn').addEventListener('click', closeQuickNoteModal);
+            document.getElementById('cancel-modal-btn').addEventListener('click', closeQuickNoteModal);
+            document.getElementById('quick-note-form').addEventListener('submit', (e) => {
+                e.preventDefault();
+                const project = PROJECTS_DATA[state.currentProjectIndex];
+                const stage = project.stages[state.selectedStageIndex];
+                const commitmentName = document.getElementById('modal-commitment-name').value;
+                const alertType = document.getElementById('modal-alert-type').value;
+                const text = document.getElementById('modal-note-text').value.trim();
+
+                if (!text) return;
+
+                // Si alerte vigilance, met à jour automatiquement l'engagement concerné
+                if (alertType === 'Point de vigilance') {
+                    const cMeta = COMMITMENTS_META.find(c => c.name === commitmentName);
+                    if (cMeta) stage.commitments[cMeta.id].status = 'Vigilance';
+                }
+
+                pushFeedNotification(stage.name, commitmentName, alertType, text, true);
+                closeQuickNoteModal();
+                renderAll();
+            });
+        }
+    </script>
+</body>
+</html>

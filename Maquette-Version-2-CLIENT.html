@@ -1,0 +1,1336 @@
+<!DOCTYPE html>
+<html lang="fr" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Thomas & Piron — Les Terrasses de la Woluwe | Votre futur logement neuf</title>
+    <!-- Google Fonts : Montserrat & Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Montserrat:wght@600;700;800&display=swap" rel="stylesheet">
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        display: ['Montserrat', 'sans-serif'],
+                    },
+                    colors: {
+                        tp: {
+                            navy: '#1B2E4B',      // Bleu marine profond Thomas & Piron
+                            slate: '#263F66',     // Bleu secondaire
+                            red: '#D8232A',       // Rouge signature Thomas & Piron
+                            redDark: '#B3191F',   // Rouge hover
+                            pearl: '#F8F9FA',     // Fond clair épuré
+                            sage: '#2E7D5B',      // Vert nature engagements
+                            sageLight: '#ECFDF5', // Fond vert doux
+                        }
+                    },
+                    boxShadow: {
+                        'soft': '0 6px 24px -4px rgba(27, 46, 75, 0.07)',
+                        'soft-hover': '0 14px 32px -4px rgba(27, 46, 75, 0.13)',
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            background-color: #FFFFFF;
+            color: #1B2E4B;
+            -webkit-font-smoothing: antialiased;
+        }
+        .pillar-card {
+            transition: transform 0.22s ease, box-shadow 0.22s ease, border-color 0.22s ease;
+        }
+        .pillar-card:hover {
+            transform: translateY(-3px);
+        }
+        @keyframes pulseGlow {
+            0%, 100% { transform: scale(1); opacity: 0.4; }
+            50% { transform: scale(1.12); opacity: 0.15; }
+        }
+        .chat-pulse {
+            animation: pulseGlow 2.4s infinite ease-in-out;
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col">
+
+    <!-- 1. BARRE DE NAVIGATION ÉPURÉE -->
+    <header class="sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-slate-200/80">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between gap-4">
+            <!-- Logo Thomas & Piron -->
+            <a href="#" class="flex items-center gap-3 shrink-0">
+                <div class="w-10 h-10 bg-tp-navy rounded-xl flex items-center justify-center relative overflow-hidden shadow-xs">
+                    <div class="w-5 h-5 border-2 border-white transform rotate-45 translate-x-0.5"></div>
+                    <div class="w-2.5 h-2.5 bg-tp-red absolute bottom-1.5 right-1.5 rounded-xs"></div>
+                </div>
+                <div class="flex flex-col">
+                    <span class="font-display font-extrabold text-lg sm:text-xl tracking-tight text-tp-navy leading-none">
+                        THOMAS <span class="text-tp-red">&amp;</span> PIRON
+                    </span>
+                    <span class="text-[10px] font-semibold tracking-widest uppercase text-slate-500 mt-1">
+                        Construisons votre avenir
+                    </span>
+                </div>
+            </a>
+
+            <!-- Liens simples -->
+            <nav class="hidden lg:flex items-center gap-8 text-sm font-medium text-slate-600">
+                <a href="#le-projet" class="hover:text-tp-navy transition-colors">Le Projet</a>
+                <a href="#vos-avantages" class="hover:text-tp-navy transition-colors">Vos Avantages</a>
+                <a href="#engagements" class="hover:text-tp-navy transition-colors">Nos 6 Engagements</a>
+                <a href="#les-etapes" class="hover:text-tp-navy transition-colors">Les Étapes</a>
+                <a href="#contact" class="hover:text-tp-navy transition-colors">Contact</a>
+            </nav>
+
+            <!-- Boutons d'action -->
+            <div class="flex items-center gap-2.5">
+                <button onclick="toggleDemoDrawer()"
+                    class="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-medium border border-slate-200 bg-tp-pearl text-slate-600 hover:text-tp-navy hover:bg-slate-100 transition-colors cursor-pointer"
+                    title="Personnaliser le nom du projet en direct">
+                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"></path>
+                    </svg>
+                    <span class="hidden sm:inline">Mode Démo</span>
+                </button>
+
+                <button onclick="openCallbackModal('Être rappelé gratuitement')"
+                    class="inline-flex items-center gap-2 px-4 sm:px-5 py-2.5 rounded-xl text-xs sm:text-sm font-semibold bg-tp-red text-white hover:bg-tp-redDark transition-colors shadow-xs cursor-pointer">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"></path>
+                    </svg>
+                    <span>Être rappelé</span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <main class="flex-1">
+
+        <!-- 2. HERO SECTION PROMOTIONNELLE ET RASSURANTE -->
+        <section id="le-projet" class="bg-tp-pearl border-b border-slate-200/80 py-10 sm:py-16">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-12 items-center">
+
+                    <!-- Texte vendeur et accessible -->
+                    <div class="lg:col-span-7 space-y-6">
+                        <div class="flex flex-wrap items-center gap-2.5">
+                            <span class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-tp-navy text-white text-xs font-semibold">
+                                <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+                                Appartements neufs • <span id="displayCity">Woluwe-Saint-Lambert</span>
+                            </span>
+                            <span class="inline-flex items-center px-3.5 py-1.5 rounded-full bg-white border border-slate-200 text-xs font-semibold text-tp-navy">
+                                À partir de <strong id="displayPrice" class="text-tp-red ml-1">285.000 €</strong>
+                            </span>
+                        </div>
+
+                        <div>
+                            <p class="text-xs sm:text-sm font-bold uppercase tracking-wider text-tp-sage mb-2" id="displayProjectName">
+                                Résidence « Les Terrasses de la Woluwe »
+                            </p>
+                            <h1 class="font-display font-extrabold text-3xl sm:text-4xl lg:text-[42px] text-tp-navy tracking-tight leading-[1.15]">
+                                Achetez sur plan en toute confiance : votre futur chez-vous, plus économique et plus vert.
+                            </h1>
+                            <p class="mt-4 text-slate-600 text-base sm:text-lg leading-relaxed max-w-2xl">
+                                Offrez-vous le confort d'un appartement neuf lumineux avec terrasse, conçu pour réduire vos factures dès le premier jour et construit sous vos yeux selon nos <strong class="text-tp-navy font-semibold">6 engagements durables</strong>.
+                            </p>
+                        </div>
+
+                        <!-- 3 Promesses simples en badges -->
+                        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                            <div class="bg-white p-3.5 rounded-2xl border border-slate-200/90 shadow-2xs flex items-center gap-3">
+                                <div class="w-9 h-9 rounded-xl bg-tp-sageLight text-tp-sage flex items-center justify-center shrink-0">
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+                                    </svg>
+                                </div>
+                                <span class="text-xs sm:text-sm font-bold text-tp-navy leading-snug">Factures d'énergie réduites</span>
+                            </div>
+
+                            <div class="bg-white p-3.5 rounded-2xl border border-slate-200/90 shadow-2xs flex items-center gap-3">
+                                <div class="w-9 h-9 rounded-xl bg-blue-50 text-tp-navy flex items-center justify-center shrink-0">
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path>
+                                    </svg>
+                                </div>
+                                <span class="text-xs sm:text-sm font-bold text-tp-navy leading-snug">Paiement 100 % sécurisé</span>
+                            </div>
+
+                            <div class="bg-white p-3.5 rounded-2xl border border-slate-200/90 shadow-2xs flex items-center gap-3">
+                                <div class="w-9 h-9 rounded-xl bg-red-50 text-tp-red flex items-center justify-center shrink-0">
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
+                                    </svg>
+                                </div>
+                                <span class="text-xs sm:text-sm font-bold text-tp-navy leading-snug">Suivi transparent en direct</span>
+                            </div>
+                        </div>
+
+                        <!-- Barre d'avancement globale claire -->
+                        <div class="bg-white p-5 rounded-2xl border border-slate-200/90 shadow-soft">
+                            <div class="flex flex-wrap items-center justify-between gap-2 mb-2.5">
+                                <span class="text-sm font-bold text-tp-navy">
+                                    Construction en cours : <span id="displayProgressText" class="text-tp-sage">65 % réalisés</span> — Emménagement prévu : <span id="displayDelivery" class="underline decoration-tp-red/50 underline-offset-4">Automne 2027</span>
+                                </span>
+                            </div>
+                            <div class="w-full h-3 bg-slate-100 rounded-full overflow-hidden p-0.5 border border-slate-200/70">
+                                <div id="displayProgressBar" class="h-full bg-gradient-to-r from-tp-navy to-tp-sage rounded-full transition-all duration-500" style="width: 65%;"></div>
+                            </div>
+                        </div>
+
+                        <!-- CTAs Hero -->
+                        <div class="flex flex-wrap items-center gap-3 pt-1">
+                            <a href="#contact"
+                                class="px-6 py-3.5 rounded-xl text-sm font-bold bg-tp-red text-white hover:bg-tp-redDark transition-all shadow-xs">
+                                Découvrir les appartements
+                            </a>
+                            <button onclick="openChatWithPrompt('Bonjour ! J\'aimerais en savoir plus sur la résidence Les Terrasses de la Woluwe.')"
+                                class="px-6 py-3.5 rounded-xl text-sm font-bold bg-white text-tp-navy border border-slate-300 hover:bg-slate-50 transition-all cursor-pointer inline-flex items-center gap-2">
+                                <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
+                                Poser une question
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Visuel architectural lumineux SVG -->
+                    <div class="lg:col-span-5">
+                        <div class="bg-white rounded-3xl border border-slate-200/90 shadow-soft p-5 sm:p-6">
+                            <div class="rounded-2xl bg-gradient-to-b from-sky-50 via-white to-emerald-50/50 border border-slate-200/70 p-4 overflow-hidden">
+                                <svg viewBox="0 0 420 290" class="w-full h-auto" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <!-- Soleil chaleureux & rayons doux -->
+                                    <circle cx="355" cy="48" r="28" fill="#FEF3C7"/>
+                                    <circle cx="355" cy="48" r="15" fill="#FDE68A"/>
+                                    <circle cx="95" cy="52" r="18" fill="#FFFFFF" opacity="0.9"/>
+                                    <circle cx="112" cy="55" r="14" fill="#FFFFFF" opacity="0.9"/>
+
+                                    <!-- Pelouse & jardin partagé -->
+                                    <rect x="14" y="232" width="392" height="14" rx="7" fill="#DCFCE7"/>
+                                    <line x1="14" y1="232" x2="406" y2="232" stroke="#86EFAC" stroke-width="2"/>
+
+                                    <!-- Bâtiment principal contemporain -->
+                                    <rect x="68" y="88" width="166" height="144" rx="4" fill="#FFFFFF" stroke="#1B2E4B" stroke-width="2"/>
+                                    <!-- Toiture végétalisée & panneaux solaires -->
+                                    <rect x="64" y="81" width="174" height="7" rx="2" fill="#1B2E4B"/>
+                                    <path d="M72 81 C82 72, 94 72, 104 81 C114 71, 126 71, 136 81 C146 72, 158 72, 168 81" stroke="#2E7D5B" stroke-width="3" stroke-linecap="round"/>
+                                    <polygon points="178,81 196,67 226,67 210,81" fill="#263F66" stroke="#1B2E4B" stroke-width="1.2"/>
+
+                                    <!-- Baies vitrées lumineuses Étage 2 -->
+                                    <rect x="84" y="102" width="56" height="40" rx="2" fill="#E0F2FE" stroke="#1B2E4B" stroke-width="1.4"/>
+                                    <line x1="112" y1="102" x2="112" y2="142" stroke="#1B2E4B" stroke-width="1"/>
+                                    <rect x="156" y="102" width="60" height="40" rx="2" fill="#E0F2FE" stroke="#1B2E4B" stroke-width="1.4"/>
+                                    <line x1="186" y1="102" x2="186" y2="142" stroke="#1B2E4B" stroke-width="1"/>
+
+                                    <!-- Balcon filant végétalisé -->
+                                    <rect x="76" y="136" width="150" height="11" rx="2" fill="#BAE6FD" fill-opacity="0.55" stroke="#1B2E4B" stroke-width="1.2"/>
+                                    <circle cx="92" cy="134" r="5" fill="#2E7D5B"/>
+                                    <circle cx="101" cy="135" r="4" fill="#3B966E"/>
+                                    <circle cx="204" cy="134" r="5" fill="#2E7D5B"/>
+                                    <circle cx="213" cy="135" r="4" fill="#3B966E"/>
+
+                                    <!-- Rez-de-jardin & Entrée -->
+                                    <rect x="84" y="164" width="72" height="68" rx="2" fill="#E0F2FE" stroke="#1B2E4B" stroke-width="1.4"/>
+                                    <line x1="120" y1="164" x2="120" y2="232" stroke="#1B2E4B" stroke-width="1"/>
+                                    <rect x="174" y="172" width="34" height="60" rx="2" fill="#1B2E4B"/>
+                                    <rect x="167" y="172" width="4" height="60" rx="1" fill="#D8232A"/>
+
+                                    <!-- Aile droite chaleureuse -->
+                                    <rect x="234" y="118" width="118" height="114" rx="4" fill="#F8F9FA" stroke="#1B2E4B" stroke-width="2"/>
+                                    <rect x="232" y="111" width="122" height="7" rx="2" fill="#1B2E4B"/>
+                                    <rect x="256" y="136" width="74" height="68" rx="2" fill="#E0F2FE" stroke="#1B2E4B" stroke-width="1.4"/>
+                                    <line x1="293" y1="136" x2="293" y2="204" stroke="#1B2E4B" stroke-width="1"/>
+                                    <!-- Balcon terrasse droite -->
+                                    <rect x="248" y="196" width="90" height="11" rx="2" fill="#BAE6FD" fill-opacity="0.55" stroke="#1B2E4B" stroke-width="1.2"/>
+                                    <circle cx="262" cy="194" r="5" fill="#2E7D5B"/>
+                                    <circle cx="324" cy="194" r="5" fill="#2E7D5B"/>
+
+                                    <!-- Arbres & Nature -->
+                                    <circle cx="42" cy="204" r="22" fill="#2E7D5B"/>
+                                    <circle cx="56" cy="213" r="14" fill="#3B966E"/>
+                                    <line x1="42" y1="214" x2="42" y2="232" stroke="#1B2E4B" stroke-width="2.2"/>
+
+                                    <circle cx="376" cy="200" r="24" fill="#2E7D5B"/>
+                                    <circle cx="360" cy="211" r="15" fill="#3B966E"/>
+                                    <line x1="376" y1="212" x2="376" y2="232" stroke="#1B2E4B" stroke-width="2.2"/>
+
+                                    <!-- Pastilles pédagogiques claires -->
+                                    <rect x="52" y="256" width="146" height="24" rx="12" fill="#ECFDF5" stroke="#2E7D5B" stroke-width="1.2"/>
+                                    <text x="125" y="271" text-anchor="middle" fill="#2E7D5B" font-size="9.5" font-family="Inter, sans-serif" font-weight="700">Isolation &amp; Panneaux Solaires</text>
+
+                                    <rect x="212" y="256" width="156" height="24" rx="12" fill="#EFF6FF" stroke="#1B2E4B" stroke-width="1.2"/>
+                                    <text x="290" y="271" text-anchor="middle" fill="#1B2E4B" font-size="9.5" font-family="Inter, sans-serif" font-weight="700">Jardins Partagés &amp; Terrasses</text>
+                                </svg>
+                            </div>
+
+                            <div class="mt-4 flex items-center justify-between gap-3 px-1">
+                                <div class="text-xs sm:text-sm">
+                                    <span class="font-bold text-tp-navy block">Du studio lumineux au 3 chambres</span>
+                                    <span class="text-slate-500">Avec terrasse privative, cave et parking vélo sécurisé</span>
+                                </div>
+                                <span class="px-3 py-1.5 rounded-xl bg-tp-sageLight text-tp-sage text-xs font-bold shrink-0">
+                                    Derniers lots
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </section>
+
+        <!-- 3. SECTION "POURQUOI ACHETER CE PROJET AVEC THOMAS & PIRON ?" -->
+        <section id="vos-avantages" class="py-14 sm:py-20 bg-white border-b border-slate-200/80">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="text-center max-w-3xl mx-auto mb-12">
+                    <span class="text-xs font-bold uppercase tracking-widest text-tp-red block mb-2">
+                        Vos Avantages Acquéreur
+                    </span>
+                    <h2 class="font-display font-bold text-2xl sm:text-3xl lg:text-4xl text-tp-navy tracking-tight">
+                        Pourquoi acheter ce projet avec Thomas &amp; Piron ?
+                    </h2>
+                    <p class="text-slate-600 text-base mt-3 leading-relaxed">
+                        Acheter un logement en cours de construction n'a jamais été aussi simple. Voici ce que vous gagnez concrètement en choisissant un constructeur reconnu.
+                    </p>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 lg:gap-8">
+                    <!-- Carte 1 : Économies au quotidien -->
+                    <div class="bg-tp-pearl rounded-3xl p-7 border border-slate-200/90 flex flex-col justify-between">
+                        <div>
+                            <div class="w-12 h-12 rounded-2xl bg-tp-sage text-white flex items-center justify-center mb-5 shadow-xs">
+                                <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                </svg>
+                            </div>
+                            <h3 class="font-display font-bold text-xl text-tp-navy">Économies au quotidien</h3>
+                            <p class="text-slate-600 text-sm sm:text-base mt-3 leading-relaxed">
+                                Grâce à une isolation renforcée, au triple vitrage et à un chauffage moderne, vous consommez beaucoup moins d'énergie qu'un logement ancien.
+                            </p>
+                        </div>
+                        <div class="mt-6 pt-4 border-t border-slate-200/90 space-y-1.5 text-xs sm:text-sm">
+                            <p class="text-slate-400">Logement ancien : factures élevées &amp; travaux</p>
+                            <p class="font-bold text-tp-sage">✓ Votre logement neuf : jusqu'à 3x moins de chauffage</p>
+                        </div>
+                    </div>
+
+                    <!-- Carte 2 : Sérénité totale -->
+                    <div class="bg-tp-pearl rounded-3xl p-7 border border-slate-200/90 flex flex-col justify-between">
+                        <div>
+                            <div class="w-12 h-12 rounded-2xl bg-tp-navy text-white flex items-center justify-center mb-5 shadow-xs">
+                                <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path>
+                                </svg>
+                            </div>
+                            <h3 class="font-display font-bold text-xl text-tp-navy">Sérénité totale</h3>
+                            <p class="text-slate-600 text-sm sm:text-base mt-3 leading-relaxed">
+                                Votre prix est fixé dès la signature et vous ne payez qu'au fur et à mesure de l'avancement réel des travaux, après vérification de nos experts.
+                            </p>
+                        </div>
+                        <div class="mt-6 pt-4 border-t border-slate-200/90 space-y-1.5 text-xs sm:text-sm">
+                            <p class="text-slate-400">Achat classique : mauvaises surprises possibles</p>
+                            <p class="font-bold text-tp-sage">✓ Prix garanti &amp; paiement protégé étape par étape</p>
+                        </div>
+                    </div>
+
+                    <!-- Carte 3 : Valeur durable -->
+                    <div class="bg-tp-pearl rounded-3xl p-7 border border-slate-200/90 flex flex-col justify-between">
+                        <div>
+                            <div class="w-12 h-12 rounded-2xl bg-tp-red text-white flex items-center justify-center mb-5 shadow-xs">
+                                <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path>
+                                </svg>
+                            </div>
+                            <h3 class="font-display font-bold text-xl text-tp-navy">Valeur durable</h3>
+                            <p class="text-slate-600 text-sm sm:text-base mt-3 leading-relaxed">
+                                Un appartement moderne, sain et prêt pour les mobilités de demain garde toute sa valeur si vous souhaitez le revendre ou le louer plus tard.
+                            </p>
+                        </div>
+                        <div class="mt-6 pt-4 border-t border-slate-200/90 space-y-1.5 text-xs sm:text-sm">
+                            <p class="text-slate-400">Bien énergivore : perte de valeur dans le temps</p>
+                            <p class="font-bold text-tp-sage">✓ Un investissement sûr et recherché pour l'avenir</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 4. NOS 6 ENGAGEMENTS CONCRETS POUR VOTRE CONFORT -->
+        <section id="engagements" class="py-14 sm:py-20 bg-white">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+
+                <div class="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-10">
+                    <div>
+                        <span class="text-xs font-bold uppercase tracking-widest text-tp-sage block mb-2">
+                            Confort &amp; Qualité de Vie
+                        </span>
+                        <h2 class="font-display font-bold text-2xl sm:text-3xl lg:text-4xl text-tp-navy tracking-tight">
+                            Nos 6 engagements concrets pour votre confort
+                        </h2>
+                        <p class="text-slate-600 text-sm sm:text-base mt-2 max-w-2xl">
+                            Cliquez sur un engagement pour voir immédiatement comment nous le mettons en pratique pendant la construction de votre logement.
+                        </p>
+                    </div>
+
+                    <div id="resetFilterBox" class="hidden shrink-0">
+                        <button onclick="filterByCommitment(null)"
+                            class="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-bold bg-tp-navy text-white hover:bg-tp-slate transition-colors cursor-pointer">
+                            <span>✕ Afficher tous les engagements</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Grille des 6 cartes -->
+                <div id="commitmentsGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <!-- Généré par JS -->
+                </div>
+
+            </div>
+        </section>
+
+        <!-- 5. COMMENT VOTRE LOGEMENT PREND VIE : NOS 6 ÉTAPES TRANSPARENTES -->
+        <section id="les-etapes" class="py-14 sm:py-20 bg-tp-pearl border-y border-slate-200/80">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+
+                <div class="max-w-3xl mb-10">
+                    <span class="text-xs font-bold uppercase tracking-widest text-tp-navy block mb-2">
+                        Transparence à chaque étape
+                    </span>
+                    <h2 class="font-display font-bold text-2xl sm:text-3xl lg:text-4xl text-tp-navy tracking-tight">
+                        Comment votre logement prend vie : nos 6 étapes transparentes
+                    </h2>
+                    <p class="text-slate-600 text-sm sm:text-base mt-2.5">
+                        De la première esquisse jusqu'à votre emménagement, nos engagements sont vérifiés à chaque étape clé.
+                    </p>
+                </div>
+
+                <!-- Bandeau de filtre actif -->
+                <div id="filterBanner" class="hidden mb-8 bg-tp-navy text-white rounded-2xl p-4 sm:p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4 shadow-soft">
+                    <div class="flex items-center gap-3">
+                        <span class="px-3 py-1 rounded-full bg-tp-sage text-white text-xs font-bold">Filtre actif</span>
+                        <p class="text-sm">
+                            Vous consultez les étapes où s'applique l'engagement : <strong id="filterBannerName" class="underline decoration-emerald-400 underline-offset-4">Énergie &amp; Climat</strong>
+                        </p>
+                    </div>
+                    <button onclick="filterByCommitment(null)" class="text-xs font-bold bg-white/15 hover:bg-white/25 px-4 py-2 rounded-xl transition-colors self-start sm:self-center cursor-pointer">
+                        Tout afficher
+                    </button>
+                </div>
+
+                <!-- Grille des 6 étapes -->
+                <div id="stepsGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <!-- Généré par JS -->
+                </div>
+
+            </div>
+        </section>
+
+        <!-- 6. SIMULATEUR SIMPLE D'ÉCONOMIES -->
+        <section class="py-14 sm:py-20 bg-white">
+            <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="bg-tp-navy rounded-3xl p-7 sm:p-12 text-white shadow-soft-hover">
+                    <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
+
+                        <div class="lg:col-span-7 space-y-5">
+                            <span class="inline-block px-3 py-1 rounded-full bg-white/10 text-emerald-300 text-xs font-bold uppercase tracking-wider">
+                                Simulateur Express
+                            </span>
+                            <h2 class="font-display font-bold text-2xl sm:text-3xl tracking-tight">
+                                Combien allez-vous économiser chaque année ?
+                            </h2>
+                            <p class="text-slate-300 text-sm sm:text-base leading-relaxed">
+                                Choisissez la taille de votre futur appartement pour estimer vos économies moyennes sur vos factures d'énergie par rapport à un logement ancien.
+                            </p>
+
+                            <!-- Choix rapide de la taille du bien -->
+                            <div class="flex flex-wrap gap-2.5 pt-1" id="sizeSelector">
+                                <button type="button" onclick="selectApartmentSize('studio')" data-size="studio"
+                                    class="size-btn px-4 py-3 rounded-xl text-xs sm:text-sm font-bold border transition-all cursor-pointer">
+                                    Studio / 1 ch.
+                                </button>
+                                <button type="button" onclick="selectApartmentSize('2ch')" data-size="2ch"
+                                    class="size-btn px-4 py-3 rounded-xl text-xs sm:text-sm font-bold border transition-all cursor-pointer">
+                                    2 chambres
+                                </button>
+                                <button type="button" onclick="selectApartmentSize('3ch')" data-size="3ch"
+                                    class="size-btn px-4 py-3 rounded-xl text-xs sm:text-sm font-bold border transition-all cursor-pointer">
+                                    3 chambres
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Résultat visuel clair -->
+                        <div class="lg:col-span-5">
+                            <div class="bg-white/10 border border-white/15 rounded-2xl p-6 text-center space-y-2">
+                                <span class="text-xs uppercase tracking-wider text-slate-300 font-semibold block">
+                                    Économie estimée par an
+                                </span>
+                                <div id="simAnnualSavings" class="font-display font-extrabold text-4xl sm:text-5xl text-emerald-400">
+                                    1.850 € / an
+                                </div>
+                                <p id="simDetails" class="text-xs sm:text-sm text-slate-200 pt-1">
+                                    Soit environ <strong>155 € d'économie chaque mois</strong> pour un appartement 2 chambres lumineux.
+                                </p>
+                                <div class="pt-4">
+                                    <a href="#contact" class="inline-block w-full py-3 px-4 rounded-xl bg-tp-red hover:bg-tp-redDark text-white text-xs sm:text-sm font-bold transition-colors">
+                                        Recevoir les plans de ce type de bien
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 7. APPEL À L'ACTION FINAL & FORMULAIRE SIMPLE -->
+        <section id="contact" class="py-14 sm:py-20 bg-tp-pearl border-t border-slate-200/80">
+            <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="bg-white rounded-3xl border border-slate-200/90 shadow-soft p-7 sm:p-12">
+                    <div class="text-center max-w-2xl mx-auto mb-8">
+                        <span class="text-xs font-bold uppercase tracking-widest text-tp-red block mb-2">
+                            Sans engagement
+                        </span>
+                        <h2 class="font-display font-bold text-2xl sm:text-3xl text-tp-navy tracking-tight">
+                            Recevoir la brochure et les plans
+                        </h2>
+                        <p class="text-slate-600 text-sm sm:text-base mt-2">
+                            Laissez-nous vos coordonnées pour télécharger immédiatement la brochure complète, les prix détaillés et les plans des appartements disponibles.
+                        </p>
+                    </div>
+
+                    <form id="brochureForm" onsubmit="handleBrochureSubmit(event)" class="space-y-4">
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-xs font-bold text-tp-navy mb-1.5">Votre prénom et nom *</label>
+                                <input type="text" required placeholder="Ex : Marie Laurent"
+                                    class="w-full px-4 py-3 text-sm rounded-xl border border-slate-300 focus:outline-none focus:border-tp-navy">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-tp-navy mb-1.5">Votre téléphone *</label>
+                                <input type="tel" required placeholder="Ex : 0470 12 34 56"
+                                    class="w-full px-4 py-3 text-sm rounded-xl border border-slate-300 focus:outline-none focus:border-tp-navy">
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-xs font-bold text-tp-navy mb-1.5">Votre adresse e-mail *</label>
+                                <input type="email" required placeholder="marie.laurent@email.be"
+                                    class="w-full px-4 py-3 text-sm rounded-xl border border-slate-300 focus:outline-none focus:border-tp-navy">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-tp-navy mb-1.5">Appartement recherché</label>
+                                <select class="w-full px-4 py-3 text-sm rounded-xl border border-slate-300 focus:outline-none focus:border-tp-navy bg-white">
+                                    <option>Studio / 1 chambre</option>
+                                    <option selected>Appartement 2 chambres</option>
+                                    <option>Appartement 3 chambres</option>
+                                    <option>Je souhaite être conseillé(e)</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="pt-2 text-center">
+                            <button type="submit"
+                                class="w-full sm:w-auto px-8 py-4 rounded-xl text-sm font-bold bg-tp-red text-white hover:bg-tp-redDark transition-colors shadow-xs cursor-pointer">
+                                Recevoir la brochure et les plans gratuitement
+                            </button>
+                            <p class="text-xs text-slate-400 mt-3">
+                                ✓ Envoi immédiat • ✓ Un conseiller dédié à votre écoute si vous le souhaitez
+                            </p>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- FOOTER SOBRE -->
+    <footer class="bg-tp-navy text-slate-300 py-8 border-t border-slate-800">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-4">
+            <div class="flex items-center gap-3">
+                <div class="w-7 h-7 bg-white/10 rounded-lg flex items-center justify-center">
+                    <div class="w-3.5 h-3.5 border border-white transform rotate-45"></div>
+                </div>
+                <span class="font-display font-bold text-sm text-white">
+                    THOMAS <span class="text-tp-red">&amp;</span> PIRON
+                </span>
+            </div>
+            <p class="text-xs text-slate-400 text-center sm:text-right">
+                Habitat durable, confort quotidien et accompagnement transparent • Tous droits réservés
+            </p>
+        </div>
+    </footer>
+
+    <!-- 8. WIDGET CHAT AGENT IA FICTIF (EN BAS À DROITE) -->
+    <div class="fixed bottom-5 right-5 z-50 flex flex-col items-end">
+        <!-- Fenêtre de discussion IA (fermée par défaut) -->
+        <div id="aiChatWindow" class="hidden mb-3 w-[340px] sm:w-[390px] max-w-[calc(100vw-2.5rem)] bg-white rounded-3xl shadow-2xl border border-slate-200 overflow-hidden flex flex-col">
+            <!-- En-tête du Chat -->
+            <div class="bg-tp-navy text-white px-5 py-4 flex items-center justify-between">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-2xl bg-white/10 border border-white/15 flex items-center justify-center relative">
+                        <svg class="w-5 h-5 text-emerald-300" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"></path>
+                        </svg>
+                        <span class="w-2.5 h-2.5 rounded-full bg-emerald-400 border-2 border-tp-navy absolute -bottom-0.5 -right-0.5"></span>
+                    </div>
+                    <div>
+                        <h3 class="font-display font-bold text-sm leading-tight">Assistant Projet IA</h3>
+                        <span class="text-[11px] text-emerald-300 font-medium flex items-center gap-1.5 mt-0.5">
+                            En ligne • Réponse instantanée
+                        </span>
+                    </div>
+                </div>
+                <button onclick="toggleAiChat()" class="p-1.5 rounded-xl bg-white/10 hover:bg-white/20 text-white transition-colors cursor-pointer" title="Fermer le chat">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"></path>
+                    </svg>
+                </button>
+            </div>
+
+            <!-- Fil de messages -->
+            <div id="aiChatMessages" class="p-4 h-72 overflow-y-auto space-y-3 bg-tp-pearl/70 text-xs sm:text-sm">
+                <!-- Message d'accueil automatique -->
+                <div class="flex items-start gap-2.5">
+                    <div class="w-7 h-7 rounded-full bg-tp-navy text-white flex items-center justify-center text-[10px] font-bold shrink-0 mt-0.5">
+                        IA
+                    </div>
+                    <div class="bg-white border border-slate-200/90 rounded-2xl rounded-tl-xs p-3.5 text-slate-700 shadow-2xs leading-relaxed">
+                        Bonjour ! Je suis l'assistant virtuel <strong>Thomas &amp; Piron</strong>. Je connais tout sur la résidence <strong>Les Terrasses de la Woluwe</strong> et nos 6 engagements. Comment puis-je vous aider ?
+                    </div>
+                </div>
+            </div>
+
+            <!-- 3 Questions rapides cliquables -->
+            <div class="px-4 py-2.5 bg-white border-t border-slate-100">
+                <span class="block text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-1.5">Questions fréquentes :</span>
+                <div class="flex flex-wrap gap-1.5">
+                    <button type="button" onclick="sendQuickQuestion('Combien vais-je économiser sur mes factures ?')"
+                        class="text-left text-[11px] font-medium px-2.5 py-1.5 rounded-xl bg-tp-pearl hover:bg-slate-200/70 text-tp-navy border border-slate-200 transition-colors cursor-pointer">
+                        💡 Combien vais-je économiser sur mes factures ?
+                    </button>
+                    <button type="button" onclick="sendQuickQuestion('Comment suis-je protégé en achetant sur plan ?')"
+                        class="text-left text-[11px] font-medium px-2.5 py-1.5 rounded-xl bg-tp-pearl hover:bg-slate-200/70 text-tp-navy border border-slate-200 transition-colors cursor-pointer">
+                        🛡️ Comment suis-je protégé en achetant sur plan ?
+                    </button>
+                    <button type="button" onclick="sendQuickQuestion('Quand puis-je emménager ?')"
+                        class="text-left text-[11px] font-medium px-2.5 py-1.5 rounded-xl bg-tp-pearl hover:bg-slate-200/70 text-tp-navy border border-slate-200 transition-colors cursor-pointer">
+                        🔑 Quand puis-je emménager ?
+                    </button>
+                </div>
+            </div>
+
+            <!-- Champ de saisie libre -->
+            <form onsubmit="handleChatFormSubmit(event)" class="p-3 bg-white border-t border-slate-200 flex items-center gap-2">
+                <input type="text" id="aiChatInput" placeholder="Posez votre question ici..."
+                    class="flex-1 px-3.5 py-2.5 text-xs sm:text-sm rounded-xl bg-tp-pearl border border-slate-200 focus:outline-none focus:border-tp-navy">
+                <button type="submit"
+                    class="p-2.5 rounded-xl bg-tp-red hover:bg-tp-redDark text-white transition-colors shrink-0 cursor-pointer" title="Envoyer">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"></path>
+                    </svg>
+                </button>
+            </form>
+        </div>
+
+        <!-- Bouton flottant d'ouverture du Chat IA -->
+        <button onclick="toggleAiChat()"
+            class="group relative inline-flex items-center gap-3 px-5 py-3.5 rounded-full bg-tp-navy hover:bg-tp-slate text-white shadow-xl border border-white/15 transition-all cursor-pointer">
+            <span class="relative flex h-3 w-3">
+                <span class="chat-pulse absolute inline-flex h-full w-full rounded-full bg-emerald-400"></span>
+                <span class="relative inline-flex rounded-full h-3 w-3 bg-emerald-400"></span>
+            </span>
+            <span class="text-xs sm:text-sm font-bold tracking-tight">Assistant Projet IA — Une question ?</span>
+            <div class="w-7 h-7 rounded-full bg-tp-red flex items-center justify-center">
+                <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"></path>
+                </svg>
+            </div>
+        </button>
+    </div>
+
+    <!-- MODALE DÉTAIL D'UNE ÉTAPE ("VOIR L'AVANCEMENT") -->
+    <div id="stepDetailModal" class="hidden fixed inset-0 z-50 bg-tp-navy/60 backdrop-blur-xs flex items-center justify-center p-4">
+        <div class="bg-white rounded-3xl border border-slate-200 shadow-2xl max-w-lg w-full overflow-hidden">
+            <div class="px-6 py-5 bg-tp-navy text-white flex items-center justify-between">
+                <div>
+                    <span id="modalStepBadge" class="text-[11px] font-bold uppercase tracking-wider text-emerald-300 block">Étape 3 • En cours</span>
+                    <h3 id="modalStepTitle" class="font-display font-bold text-lg mt-0.5">Construction sur chantier</h3>
+                </div>
+                <button onclick="closeStepModal()" class="p-1.5 rounded-xl bg-white/10 hover:bg-white/20 text-white cursor-pointer">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"></path>
+                    </svg>
+                </button>
+            </div>
+
+            <div class="p-6 space-y-4">
+                <!-- Illustration visuelle simple de l'avancement -->
+                <div class="rounded-2xl bg-tp-pearl border border-slate-200/80 p-4 flex items-center gap-4">
+                    <div class="w-14 h-14 rounded-2xl bg-tp-sageLight text-tp-sage flex items-center justify-center shrink-0">
+                        <svg class="w-7 h-7" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        </svg>
+                    </div>
+                    <div>
+                        <span class="text-xs font-bold uppercase tracking-wider text-slate-400">Suivi qualité Thomas &amp; Piron</span>
+                        <p id="modalStepProgressNote" class="text-sm font-bold text-tp-navy mt-0.5">Contrôles effectués et validés sur site</p>
+                    </div>
+                </div>
+
+                <div>
+                    <h4 class="text-xs font-bold uppercase tracking-wider text-slate-400 mb-1">En quoi consiste cette étape ?</h4>
+                    <p id="modalStepSummary" class="text-sm text-slate-700 leading-relaxed"></p>
+                </div>
+
+                <div class="bg-tp-sageLight/80 border border-emerald-200 rounded-2xl p-4">
+                    <h4 class="text-xs font-bold uppercase tracking-wider text-tp-sage mb-1">Ce que cela vous garantit :</h4>
+                    <p id="modalStepGuarantee" class="text-sm font-semibold text-tp-navy leading-relaxed"></p>
+                </div>
+
+                <div class="pt-2 flex justify-end gap-2.5">
+                    <button onclick="closeStepModal()" class="px-5 py-2.5 rounded-xl text-xs font-bold bg-tp-navy text-white hover:bg-tp-slate cursor-pointer">
+                        Fermer
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODALE "ÊTRE RAPPELÉ" -->
+    <div id="callbackModal" class="hidden fixed inset-0 z-50 bg-tp-navy/60 backdrop-blur-xs flex items-center justify-center p-4">
+        <div class="bg-white rounded-3xl border border-slate-200 shadow-2xl max-w-md w-full overflow-hidden">
+            <div class="px-6 py-5 bg-tp-navy text-white flex items-center justify-between">
+                <div>
+                    <span class="text-[10px] font-bold uppercase tracking-widest text-emerald-300 block">Thomas &amp; Piron</span>
+                    <h3 id="callbackModalTitle" class="font-display font-bold text-lg mt-0.5">Être rappelé gratuitement</h3>
+                </div>
+                <button onclick="closeCallbackModal()" class="p-1.5 rounded-xl bg-white/10 hover:bg-white/20 text-white cursor-pointer">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"></path>
+                    </svg>
+                </button>
+            </div>
+            <form onsubmit="handleCallbackSubmit(event)" class="p-6 space-y-4">
+                <p class="text-xs sm:text-sm text-slate-600">
+                    Un conseiller spécialisé sur <strong>Les Terrasses de la Woluwe</strong> vous rappelle au créneau qui vous arrange.
+                </p>
+                <div>
+                    <label class="block text-xs font-bold text-tp-navy mb-1">Votre nom *</label>
+                    <input type="text" required placeholder="Votre nom complet"
+                        class="w-full px-3.5 py-2.5 text-sm rounded-xl border border-slate-300 focus:outline-none focus:border-tp-navy">
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-tp-navy mb-1">Votre numéro de téléphone *</label>
+                    <input type="tel" required placeholder="0470 00 00 00"
+                        class="w-full px-3.5 py-2.5 text-sm rounded-xl border border-slate-300 focus:outline-none focus:border-tp-navy">
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-tp-navy mb-1">Moment souhaité</label>
+                    <select class="w-full px-3.5 py-2.5 text-sm rounded-xl border border-slate-300 focus:outline-none focus:border-tp-navy bg-white">
+                        <option>Dès que possible</option>
+                        <option>En matinée (9h - 12h)</option>
+                        <option>L'après-midi (14h - 18h)</option>
+                    </select>
+                </div>
+                <div class="pt-2 flex justify-end gap-2">
+                    <button type="button" onclick="closeCallbackModal()" class="px-4 py-2.5 text-xs font-semibold text-slate-600 hover:bg-slate-100 rounded-xl cursor-pointer">
+                        Annuler
+                    </button>
+                    <button type="submit" class="px-5 py-2.5 text-xs font-bold bg-tp-red text-white hover:bg-tp-redDark rounded-xl cursor-pointer">
+                        Demander mon rappel
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- TIROIR DISCRET "MODE DÉMO" POUR PERSONNALISATION EN DIRECT -->
+    <div id="demoOverlay" onclick="toggleDemoDrawer()" class="hidden fixed inset-0 z-50 bg-tp-navy/40 backdrop-blur-xs"></div>
+    <aside id="demoDrawer" class="fixed top-0 right-0 z-50 h-full w-full max-w-sm bg-white shadow-2xl border-l border-slate-200 transform translate-x-full transition-transform duration-300 flex flex-col">
+        <div class="px-6 py-5 bg-tp-navy text-white flex items-center justify-between">
+            <div>
+                <span class="text-[10px] font-bold uppercase tracking-widest text-emerald-300 block">Personnalisation rapide</span>
+                <h3 class="font-display font-bold text-base">Mode Démo Présentation</h3>
+            </div>
+            <button onclick="toggleDemoDrawer()" class="p-1.5 rounded-xl bg-white/10 hover:bg-white/20 text-white cursor-pointer">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"></path>
+                </svg>
+            </button>
+        </div>
+        <div class="p-6 space-y-4 flex-1 overflow-y-auto">
+            <div>
+                <label class="block text-xs font-bold text-slate-500 mb-1">Nom de la résidence</label>
+                <input type="text" id="demoNameInput" value="Résidence « Les Terrasses de la Woluwe »" oninput="updateDemoValues()"
+                    class="w-full px-3.5 py-2.5 text-sm rounded-xl border border-slate-300">
+            </div>
+            <div>
+                <label class="block text-xs font-bold text-slate-500 mb-1">Commune / Ville</label>
+                <input type="text" id="demoCityInput" value="Woluwe-Saint-Lambert" oninput="updateDemoValues()"
+                    class="w-full px-3.5 py-2.5 text-sm rounded-xl border border-slate-300">
+            </div>
+            <div>
+                <label class="block text-xs font-bold text-slate-500 mb-1">Prix d'appel</label>
+                <input type="text" id="demoPriceInput" value="285.000 €" oninput="updateDemoValues()"
+                    class="w-full px-3.5 py-2.5 text-sm rounded-xl border border-slate-300">
+            </div>
+            <div>
+                <label class="block text-xs font-bold text-slate-500 mb-1">Emménagement prévu</label>
+                <input type="text" id="demoDeliveryInput" value="Automne 2027" oninput="updateDemoValues()"
+                    class="w-full px-3.5 py-2.5 text-sm rounded-xl border border-slate-300">
+            </div>
+            <div>
+                <label class="block text-xs font-bold text-slate-500 mb-1">Avancement global (<span id="demoPctLabel">65</span>%)</label>
+                <input type="range" id="demoPctInput" min="10" max="100" value="65" oninput="updateDemoValues()"
+                    class="w-full accent-tp-red cursor-pointer">
+            </div>
+        </div>
+        <div class="p-5 bg-tp-pearl border-t border-slate-200 flex justify-end">
+            <button onclick="toggleDemoDrawer()" class="px-5 py-2.5 rounded-xl text-xs font-bold bg-tp-navy text-white cursor-pointer">
+                Terminer
+            </button>
+        </div>
+    </aside>
+
+    <!-- TOAST DE NOTIFICATION -->
+    <div id="toastBox" class="fixed bottom-20 left-5 z-50 transform translate-y-16 opacity-0 transition-all duration-300 pointer-events-none">
+        <div class="bg-tp-navy text-white px-4 py-3 rounded-2xl shadow-lg border border-slate-700 flex items-center gap-2.5 text-xs sm:text-sm font-medium">
+            <span class="w-2.5 h-2.5 rounded-full bg-emerald-400"></span>
+            <span id="toastText">Demande envoyée !</span>
+        </div>
+    </div>
+
+    <!-- JAVASCRIPT -->
+    <script>
+        // 1. LES 6 ENGAGEMENTS CONCRETS GRAND PUBLIC
+        const COMMITMENTS = [
+            {
+                id: 'energie',
+                title: 'Énergie & Climat',
+                headline: 'Des factures allégées toute l\'année',
+                description: 'Une isolation très performante, du triple vitrage et des panneaux solaires pour garder la chaleur en hiver et la fraîcheur en été.',
+                badgeStyle: 'bg-amber-50 text-amber-800 border-amber-200',
+                iconStyle: 'bg-amber-50 text-amber-600',
+                icon: `<svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>`
+            },
+            {
+                id: 'ressources',
+                title: 'Ressources',
+                headline: 'Des matériaux sains et durables',
+                description: 'Des matériaux choisis pour leur solidité et leur provenance responsable : votre logement est construit pour durer sans gros travaux.',
+                badgeStyle: 'bg-red-50 text-tp-red border-red-200',
+                iconStyle: 'bg-red-50 text-tp-red',
+                icon: `<svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>`
+            },
+            {
+                id: 'eau',
+                title: 'Eau',
+                headline: 'Une gestion intelligente de l\'eau',
+                description: 'Récupération de l\'eau de pluie pour l\'arrosage des jardins partagés et certains usages sanitaires afin de réduire vos charges communes.',
+                badgeStyle: 'bg-sky-50 text-sky-800 border-sky-200',
+                iconStyle: 'bg-sky-50 text-sky-600',
+                icon: `<svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"></path></svg>`
+            },
+            {
+                id: 'sol',
+                title: 'Sol & Nature',
+                headline: 'Un cadre de vie verdoyant',
+                description: 'Des espaces verts préservés, des plantations locales et de vrais jardins au pied de la résidence pour respirer au quotidien.',
+                badgeStyle: 'bg-emerald-50 text-tp-sage border-emerald-200',
+                iconStyle: 'bg-emerald-50 text-tp-sage',
+                icon: `<svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"></path></svg>`
+            },
+            {
+                id: 'sante',
+                title: 'Santé & Bien-être',
+                headline: 'Un air pur et un calme absolu',
+                description: 'Une ventilation qui renouvelle l\'air en continu, des peintures sans substances nocives et une excellente isolation contre le bruit.',
+                badgeStyle: 'bg-teal-50 text-teal-800 border-teal-200',
+                iconStyle: 'bg-teal-50 text-teal-600',
+                icon: `<svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path></svg>`
+            },
+            {
+                id: 'mobilite',
+                title: 'Mobilité',
+                headline: 'Tout est accessible facilement',
+                description: 'Parkings pré-équipés pour bornes électriques, grand local vélos sécurisé de plain-pied et accès rapide aux transports en commun.',
+                badgeStyle: 'bg-indigo-50 text-indigo-800 border-indigo-200',
+                iconStyle: 'bg-indigo-50 text-indigo-600',
+                icon: `<svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>`
+            }
+        ];
+
+        // 2. LES 6 ÉTAPES TRANSPARENTES VULGARISÉES
+        const STEPS = [
+            {
+                number: 1,
+                title: 'Conception & Études',
+                status: 'Terminé',
+                statusType: 'done',
+                tagline: 'On imagine un logement lumineux et économe',
+                whatWeDo: 'Nos architectes orientent l\'immeuble pour profiter au maximum de la lumière naturelle et préserver les espaces verts autour de la résidence.',
+                whatItChangesForYou: 'Un appartement baigné de soleil toute l\'année et moins besoin d\'allumer le chauffage ou la lumière.',
+                commitments: ['energie', 'sol', 'sante'],
+                modalNote: 'Plans validés et permis d\'urbanisme obtenu',
+                modalGuarantee: 'Votre futur appartement bénéficie d\'une exposition étudiée et d\'une conception moderne sans perte d\'espace.'
+            },
+            {
+                number: 2,
+                title: 'Choix des matériaux & Achats',
+                status: 'Terminé',
+                statusType: 'done',
+                tagline: 'On sélectionne des matériaux durables et responsables',
+                whatWeDo: 'Nous commandons à l\'avance des isolants performants, des fenêtres haute qualité et des matériaux sains auprès de partenaires de confiance.',
+                whatItChangesForYou: 'Votre prix d\'achat est bloqué sans mauvaise surprise et votre logement est construit avec des matériaux qui durent.',
+                commitments: ['ressources', 'sante', 'eau'],
+                modalNote: '100 % des matériaux principaux commandés',
+                modalGuarantee: 'Aucune hausse de prix des matériaux ne peut impacter le montant convenu lors de votre réservation.'
+            },
+            {
+                number: 3,
+                title: 'Construction sur chantier',
+                status: 'En cours - 65%',
+                statusType: 'active',
+                tagline: 'Votre immeuble sort de terre dans le respect de l\'environnement',
+                whatWeDo: 'Nos équipes montent la structure, posent l\'isolation et trient les déchets du chantier tout en protégeant la nature environnante.',
+                whatItChangesForYou: 'Vous pouvez suivre l\'évolution réelle des travaux et visualiser concrètement votre futur quartier prendre forme.',
+                commitments: ['eau', 'sol', 'ressources'],
+                modalNote: 'Gros œuvre terminé • Isolation et façades en cours (65 %)',
+                modalGuarantee: 'Vous ne payez vos tranches qu\'au fur et à mesure de l\'avancement réel constaté sur le chantier.'
+            },
+            {
+                number: 4,
+                title: 'Contrôle Qualité & Sécurité',
+                status: 'En cours',
+                statusType: 'active',
+                tagline: 'Nos experts vérifient chaque détail avant de continuer',
+                whatWeDo: 'Avant de fermer les murs et plafonds, nos inspecteurs internes testent l\'étanchéité, l\'isolation contre le bruit et la bonne ventilation.',
+                whatItChangesForYou: 'La certitude d\'emménager dans un logement parfaitement isolé, silencieux et sans défaut caché.',
+                commitments: ['sante', 'energie', 'ressources'],
+                modalNote: 'Contrôles intermédiaires en cours par nos équipes qualité',
+                modalGuarantee: 'Chaque étape technique est validée par écrit avant le démarrage des finitions intérieures.'
+            },
+            {
+                number: 5,
+                title: 'Remise des clés & Réception',
+                status: 'À venir',
+                statusType: 'upcoming',
+                tagline: 'Vous visitez et validez votre logement prêt à vivre',
+                whatWeDo: 'Nous faisons le tour complet de votre appartement ensemble, réglons votre chauffage et vous remettons un guide simple d\'utilisation.',
+                whatItChangesForYou: 'Vous posez vos valises sereinement dans un appartement neuf, propre et personnalisé selon vos choix.',
+                commitments: ['sante', 'energie', 'mobilite'],
+                modalNote: 'Prévue à l\'Automne 2027',
+                modalGuarantee: 'Vous inspectez chaque pièce avec votre gestionnaire lors de la remise des clés.'
+            },
+            {
+                number: 6,
+                title: 'Accompagnement après emménagement',
+                status: 'À venir',
+                statusType: 'upcoming',
+                tagline: 'Nous restons à vos côtés même après votre installation',
+                whatWeDo: 'Notre service client dédié répond à vos questions, assure les garanties constructeur et vérifie le bon fonctionnement de vos équipements.',
+                whatItChangesForYou: 'La tranquillité d\'esprit pendant des années avec un interlocuteur unique Thomas & Piron.',
+                commitments: ['energie', 'eau', 'mobilite'],
+                modalNote: 'Garantie constructeur & suivi dédié inclus',
+                modalGuarantee: 'Un espace client et une équipe après-vente dédiée restent disponibles après votre emménagement.'
+            }
+        ];
+
+        // 3. DONNÉES DU SIMULATEUR SIMPLE
+        const SIZE_ESTIMATES = {
+            studio: {
+                annual: '1.350 € / an',
+                details: 'Soit environ <strong>112 € d\'économie chaque mois</strong> pour un studio ou 1 chambre lumineux.'
+            },
+            '2ch': {
+                annual: '1.850 € / an',
+                details: 'Soit environ <strong>155 € d\'économie chaque mois</strong> pour un appartement 2 chambres lumineux.'
+            },
+            '3ch': {
+                annual: '2.400 € / an',
+                details: 'Soit environ <strong>200 € d\'économie chaque mois</strong> pour un grand appartement familial 3 chambres.'
+            }
+        };
+
+        // 4. RÉPONSES DE L'ASSISTANT IA FICTIF
+        const AI_PRESET_ANSWERS = {
+            "Combien vais-je économiser sur mes factures ?": "Grâce à notre isolation renforcée, au triple vitrage et aux panneaux solaires, vous économisez en moyenne entre <strong>1.350 € et 2.400 € par an</strong> sur vos factures d'énergie par rapport à un appartement ancien ! Vous pouvez tester votre taille de logement juste au-dessus dans notre simulateur.",
+            "Comment suis-je protégé en achetant sur plan ?": "Votre achat est <strong>100 % encadré et sécurisé</strong> : votre prix est bloqué dès la signature, vous ne payez qu'au fur et à mesure de l'avancement réel des travaux et nos experts contrôlent chaque étape avant la remise des clés.",
+            "Quand puis-je emménager ?": "Les travaux avancent très bien (<strong>65 % déjà réalisés</strong>) ! L'emménagement est prévu pour l'<strong>Automne 2027</strong>. Réserver dès maintenant vous permet encore de choisir vos finitions intérieures (cuisine, carrelage, parquet)."
+        };
+
+        let selectedCommitmentId = null;
+
+        document.addEventListener('DOMContentLoaded', () => {
+            renderCommitments();
+            renderSteps();
+            selectApartmentSize('2ch');
+        });
+
+        // RENDU DES 6 ENGAGEMENTS
+        function renderCommitments() {
+            const grid = document.getElementById('commitmentsGrid');
+            grid.innerHTML = '';
+
+            COMMITMENTS.forEach((item) => {
+                const isSelected = selectedCommitmentId === item.id;
+                const card = document.createElement('button');
+                card.type = 'button';
+                card.onclick = () => filterByCommitment(isSelected ? null : item.id);
+                card.className = `pillar-card text-left rounded-3xl p-6 border flex flex-col justify-between cursor-pointer ${
+                    isSelected
+                        ? 'bg-tp-navy text-white border-tp-navy shadow-soft-hover ring-2 ring-tp-navy/20'
+                        : 'bg-white text-tp-navy border-slate-200/90 hover:border-slate-300 shadow-soft hover:shadow-soft-hover'
+                }`;
+
+                card.innerHTML = `
+                    <div>
+                        <div class="flex items-center justify-between gap-3 mb-4">
+                            <div class="w-12 h-12 rounded-2xl flex items-center justify-center ${
+                                isSelected ? 'bg-white/15 text-white' : item.iconStyle
+                            }">
+                                ${item.icon}
+                            </div>
+                            <span class="text-[11px] font-bold px-3 py-1 rounded-full ${
+                                isSelected ? 'bg-tp-sage text-white' : 'bg-tp-pearl text-slate-600'
+                            }">
+                                ${item.title}
+                            </span>
+                        </div>
+
+                        <h3 class="font-display font-bold text-lg sm:text-xl ${isSelected ? 'text-white' : 'text-tp-navy'}">
+                            « ${item.headline} »
+                        </h3>
+
+                        <p class="mt-2.5 text-sm leading-relaxed ${isSelected ? 'text-slate-200' : 'text-slate-600'}">
+                            ${item.description}
+                        </p>
+                    </div>
+
+                    <div class="mt-5 pt-4 border-t ${isSelected ? 'border-white/15' : 'border-slate-100'} flex items-center justify-between text-xs font-bold">
+                        <span class="${isSelected ? 'text-emerald-300' : 'text-tp-sage'}">
+                            ${isSelected ? '✓ Étapes filtrées ci-dessous' : 'Voir comment nous l\'appliquons'}
+                        </span>
+                        <span class="${isSelected ? 'text-white' : 'text-slate-400'}">→</span>
+                    </div>
+                `;
+
+                grid.appendChild(card);
+            });
+        }
+
+        function filterByCommitment(id) {
+            selectedCommitmentId = id;
+            renderCommitments();
+            renderSteps();
+
+            const resetBox = document.getElementById('resetFilterBox');
+            const banner = document.getElementById('filterBanner');
+
+            if (id) {
+                const found = COMMITMENTS.find(c => c.id === id);
+                resetBox.classList.remove('hidden');
+                banner.classList.remove('hidden');
+                document.getElementById('filterBannerName').textContent = found.title;
+                document.getElementById('les-etapes').scrollIntoView({ behavior: 'smooth', block: 'start' });
+            } else {
+                resetBox.classList.add('hidden');
+                banner.classList.add('hidden');
+            }
+        }
+
+        // RENDU DES 6 ÉTAPES TRANSPARENTES
+        function renderSteps() {
+            const grid = document.getElementById('stepsGrid');
+            grid.innerHTML = '';
+
+            STEPS.forEach((step) => {
+                const matchesFilter = !selectedCommitmentId || step.commitments.includes(selectedCommitmentId);
+
+                let badgeClass = 'bg-slate-100 text-slate-600';
+                let dotClass = 'bg-slate-400';
+                if (step.statusType === 'done') {
+                    badgeClass = 'bg-emerald-50 text-tp-sage border border-emerald-200';
+                    dotClass = 'bg-tp-sage';
+                } else if (step.statusType === 'active') {
+                    badgeClass = 'bg-amber-50 text-amber-800 border border-amber-200';
+                    dotClass = 'bg-amber-500 animate-pulse';
+                }
+
+                const badgesHtml = step.commitments.map(cId => {
+                    const c = COMMITMENTS.find(item => item.id === cId);
+                    const isHighlighted = selectedCommitmentId === cId;
+                    return `
+                        <span class="inline-flex items-center px-2.5 py-1 rounded-lg text-[11px] font-bold border ${
+                            isHighlighted ? 'bg-tp-navy text-white border-tp-navy' : c.badgeStyle
+                        }">
+                            ${c.title}
+                        </span>
+                    `;
+                }).join('');
+
+                const card = document.createElement('div');
+                card.className = `bg-white rounded-3xl p-6 border ${
+                    step.statusType === 'active' ? 'border-tp-navy/35 ring-2 ring-tp-navy/5' : 'border-slate-200/90'
+                } shadow-soft flex flex-col justify-between transition-opacity duration-200 ${
+                    matchesFilter ? 'opacity-100' : 'opacity-40'
+                }`;
+
+                card.innerHTML = `
+                    <div>
+                        <!-- Haut de carte : Numéro + Statut -->
+                        <div class="flex items-center justify-between gap-2 mb-4">
+                            <span class="w-8 h-8 rounded-xl bg-tp-navy text-white font-display font-bold text-xs flex items-center justify-center">
+                                0${step.number}
+                            </span>
+                            <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold ${badgeClass}">
+                                <span class="w-2 h-2 rounded-full ${dotClass}"></span>
+                                ${step.status}
+                            </span>
+                        </div>
+
+                        <h3 class="font-display font-bold text-lg text-tp-navy">
+                            ${step.title}
+                        </h3>
+                        <p class="text-xs font-semibold text-tp-sage mt-1">
+                            « ${step.tagline} »
+                        </p>
+
+                        <!-- Badges engagements -->
+                        <div class="flex flex-wrap gap-1.5 mt-3.5">
+                            ${badgesHtml}
+                        </div>
+
+                        <!-- Ce que nous faisons -->
+                        <div class="mt-4 pt-4 border-t border-slate-100 space-y-3 text-xs sm:text-sm">
+                            <div>
+                                <span class="font-bold text-tp-navy block text-xs uppercase tracking-wider mb-0.5">Ce que nous faisons :</span>
+                                <p class="text-slate-600 leading-relaxed">${step.whatWeDo}</p>
+                            </div>
+                            <div class="bg-tp-sageLight/80 border border-emerald-200/80 rounded-2xl p-3">
+                                <span class="font-bold text-tp-sage block text-xs uppercase tracking-wider mb-0.5">Ce que ça change pour vous :</span>
+                                <p class="text-tp-navy font-medium leading-relaxed">${step.whatItChangesForYou}</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mt-5 pt-3 border-t border-slate-100">
+                        <button type="button" onclick="openStepModal(${step.number})"
+                            class="w-full py-2.5 px-4 rounded-xl text-xs font-bold bg-tp-pearl hover:bg-slate-200/70 text-tp-navy transition-colors cursor-pointer">
+                            Voir l'avancement
+                        </button>
+                    </div>
+                `;
+
+                grid.appendChild(card);
+            });
+        }
+
+        // SIMULATEUR SIMPLE
+        function selectApartmentSize(sizeKey) {
+            const data = SIZE_ESTIMATES[sizeKey];
+            if (!data) return;
+
+            document.querySelectorAll('.size-btn').forEach(btn => {
+                const active = btn.getAttribute('data-size') === sizeKey;
+                btn.className = active
+                    ? 'size-btn px-4 py-3 rounded-xl text-xs sm:text-sm font-bold border transition-all cursor-pointer bg-white text-tp-navy border-white shadow-xs'
+                    : 'size-btn px-4 py-3 rounded-xl text-xs sm:text-sm font-bold border transition-all cursor-pointer bg-white/10 text-white border-white/20 hover:bg-white/20';
+            });
+
+            document.getElementById('simAnnualSavings').textContent = data.annual;
+            document.getElementById('simDetails').innerHTML = data.details;
+        }
+
+        // MODALE ÉTAPE
+        function openStepModal(stepNum) {
+            const step = STEPS.find(s => s.number === stepNum);
+            if (!step) return;
+
+            document.getElementById('modalStepBadge').textContent = `Étape 0${step.number} • ${step.status}`;
+            document.getElementById('modalStepTitle').textContent = step.title;
+            document.getElementById('modalStepProgressNote').textContent = step.modalNote;
+            document.getElementById('modalStepSummary').textContent = step.whatWeDo;
+            document.getElementById('modalStepGuarantee').textContent = step.modalGuarantee;
+            document.getElementById('stepDetailModal').classList.remove('hidden');
+        }
+
+        function closeStepModal() {
+            document.getElementById('stepDetailModal').classList.add('hidden');
+        }
+
+        // WIDGET CHAT ASSISTANT IA FICTIF
+        function toggleAiChat() {
+            const win = document.getElementById('aiChatWindow');
+            win.classList.toggle('hidden');
+            if (!win.classList.contains('hidden')) {
+                document.getElementById('aiChatInput').focus();
+            }
+        }
+
+        function openChatWithPrompt(questionText) {
+            const win = document.getElementById('aiChatWindow');
+            win.classList.remove('hidden');
+            sendQuickQuestion(questionText);
+        }
+
+        function sendQuickQuestion(question) {
+            appendUserMessage(question);
+            const reply = AI_PRESET_ANSWERS[question]
+                || "Avec plaisir ! La résidence <strong>Les Terrasses de la Woluwe</strong> propose des appartements lumineux de 1 à 3 chambres avec terrasse et espaces verts partagés. Souhaitez-vous que je vous mette en relation avec un conseiller pour recevoir les plans ?";
+            simulateAiReply(reply);
+        }
+
+        function handleChatFormSubmit(e) {
+            e.preventDefault();
+            const input = document.getElementById('aiChatInput');
+            const text = input.value.trim();
+            if (!text) return;
+
+            input.value = '';
+            appendUserMessage(text);
+
+            const genericReply = "Merci pour votre question ! Chaque logement de la résidence est conçu pour votre confort et votre sérénité (factures réduites, paiement sécurisé étape par étape et suivi transparent). Souhaitez-vous <strong>réserver une visite</strong> ou <strong>être rappelé gratuitement</strong> par un conseiller dédié ?";
+            simulateAiReply(genericReply, true);
+        }
+
+        function appendUserMessage(text) {
+            const container = document.getElementById('aiChatMessages');
+            const msgDiv = document.createElement('div');
+            msgDiv.className = 'flex justify-end';
+            msgDiv.innerHTML = `
+                <div class="bg-tp-navy text-white rounded-2xl rounded-tr-xs px-3.5 py-2.5 max-w-[82%] shadow-2xs leading-relaxed">
+                    ${escapeHtml(text)}
+                </div>
+            `;
+            container.appendChild(msgDiv);
+            container.scrollTop = container.scrollHeight;
+        }
+
+        function simulateAiReply(htmlContent, includeCta = false) {
+            const container = document.getElementById('aiChatMessages');
+
+            // Indicateur de frappe bref
+            const typingId = 'typing-' + Date.now();
+            const typingDiv = document.createElement('div');
+            typingDiv.id = typingId;
+            typingDiv.className = 'flex items-start gap-2.5';
+            typingDiv.innerHTML = `
+                <div class="w-7 h-7 rounded-full bg-tp-navy text-white flex items-center justify-center text-[10px] font-bold shrink-0 mt-0.5">IA</div>
+                <div class="bg-white border border-slate-200/90 rounded-2xl rounded-tl-xs px-3.5 py-2.5 text-slate-400 text-xs">
+                    L'assistant rédige une réponse...
+                </div>
+            `;
+            container.appendChild(typingDiv);
+            container.scrollTop = container.scrollHeight;
+
+            setTimeout(() => {
+                const el = document.getElementById(typingId);
+                if (el) el.remove();
+
+                const replyDiv = document.createElement('div');
+                replyDiv.className = 'flex items-start gap-2.5';
+                replyDiv.innerHTML = `
+                    <div class="w-7 h-7 rounded-full bg-tp-navy text-white flex items-center justify-center text-[10px] font-bold shrink-0 mt-0.5">IA</div>
+                    <div class="bg-white border border-slate-200/90 rounded-2xl rounded-tl-xs p-3.5 text-slate-700 shadow-2xs leading-relaxed space-y-2.5 max-w-[85%]">
+                        <p>${htmlContent}</p>
+                        ${includeCta ? `
+                            <div class="pt-1 flex flex-wrap gap-1.5">
+                                <button type="button" onclick="openCallbackModal('Parler à un conseiller')"
+                                    class="px-3 py-1.5 rounded-lg bg-tp-red text-white text-[11px] font-bold hover:bg-tp-redDark transition-colors cursor-pointer">
+                                    Être rappelé par un conseiller
+                                </button>
+                                <a href="#contact" onclick="toggleAiChat()"
+                                    class="px-3 py-1.5 rounded-lg bg-tp-pearl text-tp-navy border border-slate-200 text-[11px] font-bold hover:bg-slate-100 transition-colors">
+                                    Voir les plans
+                                </a>
+                            </div>
+                        ` : ''}
+                    </div>
+                `;
+                container.appendChild(replyDiv);
+                container.scrollTop = container.scrollHeight;
+            }, 450);
+        }
+
+        function escapeHtml(str) {
+            const div = document.createElement('div');
+            div.textContent = str;
+            return div.innerHTML;
+        }
+
+        // MODALE RAPPEL & FORMULAIRE BROCHURE
+        function openCallbackModal(title) {
+            if (title) document.getElementById('callbackModalTitle').textContent = title;
+            document.getElementById('callbackModal').classList.remove('hidden');
+        }
+
+        function closeCallbackModal() {
+            document.getElementById('callbackModal').classList.add('hidden');
+        }
+
+        function handleCallbackSubmit(e) {
+            e.preventDefault();
+            closeCallbackModal();
+            e.target.reset();
+            showToast('Merci ! Un conseiller Thomas & Piron vous rappelle très vite.');
+        }
+
+        function handleBrochureSubmit(e) {
+            e.preventDefault();
+            e.target.reset();
+            showToast('Brochure et plans envoyés ! Vérifiez votre boîte e-mail.');
+        }
+
+        // MODE DÉMO RAPIDE
+        function toggleDemoDrawer() {
+            const drawer = document.getElementById('demoDrawer');
+            const overlay = document.getElementById('demoOverlay');
+            const isClosed = drawer.classList.contains('translate-x-full');
+            if (isClosed) {
+                drawer.classList.remove('translate-x-full');
+                overlay.classList.remove('hidden');
+            } else {
+                drawer.classList.add('translate-x-full');
+                overlay.classList.add('hidden');
+            }
+        }
+
+        function updateDemoValues() {
+            const name = document.getElementById('demoNameInput').value;
+            const city = document.getElementById('demoCityInput').value;
+            const price = document.getElementById('demoPriceInput').value;
+            const delivery = document.getElementById('demoDeliveryInput').value;
+            const pct = document.getElementById('demoPctInput').value;
+
+            document.getElementById('displayProjectName').textContent = name;
+            document.getElementById('displayCity').textContent = city;
+            document.getElementById('displayPrice').textContent = price;
+            document.getElementById('displayDelivery').textContent = delivery;
+            document.getElementById('displayProgressText').textContent = pct + ' % réalisés';
+            document.getElementById('displayProgressBar').style.width = pct + '%';
+            document.getElementById('demoPctLabel').textContent = pct;
+        }
+
+        // TOAST
+        let toastTimeout;
+        function showToast(msg) {
+            const box = document.getElementById('toastBox');
+            document.getElementById('toastText').textContent = msg;
+            box.classList.remove('translate-y-16', 'opacity-0');
+            clearTimeout(toastTimeout);
+            toastTimeout = setTimeout(() => {
+                box.classList.add('translate-y-16', 'opacity-0');
+            }, 3500);
+        }
+    </script>
+</body>
+</html>
