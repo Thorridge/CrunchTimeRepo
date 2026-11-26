@@ -41,6 +41,48 @@
             color: #1B2E4B;
             -webkit-font-smoothing: antialiased;
         }
+
+        /* Animations façon assemblage LEGO / maquette modulaire */
+        @keyframes legoSnapIn {
+            0% {
+                opacity: 0;
+                transform: translateY(-48px) scale(0.95);
+            }
+            65% {
+                opacity: 1;
+                transform: translateY(4px) scale(1.01);
+            }
+            82% {
+                transform: translateY(-2px) scale(0.995);
+            }
+            100% {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        .lego-layer-enter {
+            animation: legoSnapIn 0.52s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+        }
+
+        .blueprint-grid {
+            background-color: #F4F8FC;
+            background-image:
+                linear-gradient(to right, rgba(27, 46, 75, 0.07) 1px, transparent 1px),
+                linear-gradient(to bottom, rgba(27, 46, 75, 0.07) 1px, transparent 1px);
+            background-size: 24px 24px;
+        }
+
+        .movable-wall-group {
+            cursor: grab;
+            transition: filter 0.15s ease;
+        }
+        .movable-wall-group:hover {
+            filter: drop-shadow(0 6px 10px rgba(217, 119, 6, 0.32));
+        }
+        .movable-wall-group:active {
+            cursor: grabbing;
+        }
     </style>
 </head>
 <body class="min-h-screen flex flex-col">
@@ -84,6 +126,9 @@
 
                 <div class="flex flex-col lg:flex-row lg:items-end justify-between gap-4">
                     <div class="max-w-2xl space-y-2">
+                        <span class="inline-block px-3 py-1 rounded-full bg-tp-sageLight text-tp-sage text-xs font-bold border border-emerald-200">
+                            Maquette démonstration • Maisons témoins
+                        </span>
                         <h1 class="font-display font-extrabold text-2xl sm:text-4xl text-tp-navy tracking-tight">
                             Choisissez une maison pour découvrir l'histoire de ses matériaux
                         </h1>
@@ -150,10 +195,152 @@
                                 Petites histoires de la maison, des travaux et de la rénovation
                             </h3>
                         </div>
+                        <span class="text-xs font-semibold text-tp-sage">
+                            Récits fictifs inspirés de nos chantiers
+                        </span>
                     </div>
 
                     <div id="houseStoriesGrid" class="grid grid-cols-1 md:grid-cols-3 gap-5">
                         <!-- Généré en JS -->
+                    </div>
+                </div>
+
+                <!-- NOUVELLE RUBRIQUE DÉDIÉE : MAQUETTE SCHÉMATIQUE & ASSEMBLAGE INTERACTIF -->
+                <div id="interactiveBlueprintSection" class="rounded-3xl bg-white border border-slate-200/90 shadow-soft p-6 sm:p-8 space-y-6">
+                    <div class="flex flex-col lg:flex-row lg:items-end justify-between gap-4 border-b border-slate-200/80 pb-5">
+                        <div class="space-y-1.5">
+                            <div class="flex flex-wrap items-center gap-2">
+                                <span class="px-3 py-1 rounded-full bg-tp-navy text-white text-xs font-bold">
+                                    Plan schématique 2,5D • Assemblage modulaire
+                                </span>
+                                <span id="blueprintHouseTag" class="px-3 py-1 rounded-full bg-tp-sageLight text-tp-sage text-xs font-bold border border-emerald-200">
+                                    Maison Les Érables
+                                </span>
+                            </div>
+                            <h3 class="font-display font-bold text-xl sm:text-2xl text-tp-navy pt-1">
+                                Explorez l'assemblage de la maison étape par étape &amp; modulez vos cloisons
+                            </h3>
+                            <p class="text-xs sm:text-sm text-slate-600 max-w-3xl">
+                                Passez d'une étape de construction à l'autre avec les flèches (façon briques emboîtables), lancez l'animation en boucle ou déplacez directement les <strong>murs intérieurs amovibles</strong> par glisser-déposer.
+                            </p>
+                        </div>
+
+                        <!-- Contrôles Lecture en boucle / Réinitialiser -->
+                        <div class="flex flex-wrap items-center gap-2.5 shrink-0">
+                            <button type="button" id="toggleAutoLoopBtn" onclick="toggleBlueprintLoop()"
+                                class="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-bold bg-tp-sage text-white hover:bg-emerald-700 transition-colors cursor-pointer shadow-2xs">
+                                <span id="loopBtnIcon">▶</span>
+                                <span id="loopBtnLabel">Lecture auto en boucle</span>
+                            </button>
+                            <button type="button" onclick="resetMovableWalls()"
+                                class="inline-flex items-center gap-1.5 px-3.5 py-2.5 rounded-xl text-xs font-bold border border-slate-200 bg-tp-pearl text-tp-navy hover:bg-slate-100 transition-colors cursor-pointer"
+                                title="Replacer les cloisons amovibles à leur position d'origine">
+                                <span>↺ Replacer les murs</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Barre d'étapes cliquables + Flèches Précédent / Suivant -->
+                    <div class="flex flex-col md:flex-row items-stretch md:items-center justify-between gap-3 bg-tp-pearl p-3.5 rounded-2xl border border-slate-200/80">
+                        <button type="button" id="prevStepBtn" onclick="changeAssemblyStep(-1)"
+                            class="inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl text-xs font-bold bg-white border border-slate-200 text-tp-navy hover:bg-slate-100 disabled:opacity-40 disabled:pointer-events-none transition-colors cursor-pointer">
+                            <span>← Étape précédente</span>
+                        </button>
+
+                        <div id="assemblyStepsPills" class="flex flex-wrap items-center justify-center gap-1.5 sm:gap-2">
+                            <!-- Pilules des 5 étapes générées en JS -->
+                        </div>
+
+                        <button type="button" id="nextStepBtn" onclick="changeAssemblyStep(1)"
+                            class="inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl text-xs font-bold bg-tp-navy text-white hover:bg-tp-slate disabled:opacity-40 disabled:pointer-events-none transition-colors cursor-pointer">
+                            <span>Étape suivante →</span>
+                        </button>
+                    </div>
+
+                    <!-- Zone principale : Canevas Plan Schématique Interactif + Fiche de l'étape & Légende -->
+                    <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-stretch">
+
+                        <!-- Plan schématique SVG interactif -->
+                        <div class="lg:col-span-8 rounded-2xl border border-slate-200 overflow-hidden blueprint-grid relative flex flex-col justify-between min-h-[380px] sm:min-h-[430px]">
+                            <!-- Bandeau supérieur du plan -->
+                            <div class="px-4 py-3 bg-white/90 backdrop-blur-xs border-b border-slate-200/80 flex flex-wrap items-center justify-between gap-2 text-xs">
+                                <span id="blueprintPlanTitle" class="font-display font-bold text-tp-navy">
+                                    Plan modulaire — Maison Les Érables (165 m²)
+                                </span>
+                                <span id="dragInstructionBadge" class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-amber-100 text-amber-900 border border-amber-200 font-bold text-[11px]">
+                                    ✋ Glissez-déposez les cloisons orange amovibles
+                                </span>
+                            </div>
+
+                            <!-- SVG Schématique -->
+                            <div class="flex-1 flex items-center justify-center p-3 sm:p-5 select-none">
+                                <svg id="houseSchematicSvg" viewBox="0 0 680 400" class="w-full max-w-[660px] h-auto overflow-visible touch-none" role="img" aria-label="Maquette schématique interactive de la maison">
+                                    <!-- Rendu dynamique par maison et par étape -->
+                                </svg>
+                            </div>
+
+                            <!-- Légende visuelle en bas du plan -->
+                            <div class="px-4 py-2.5 bg-white/90 backdrop-blur-xs border-t border-slate-200/80 flex flex-wrap items-center justify-between gap-3 text-[11px] font-semibold text-slate-600">
+                                <div class="flex flex-wrap items-center gap-3">
+                                    <span class="inline-flex items-center gap-1.5">
+                                        <span class="w-3 h-3 rounded-xs bg-[#1B2E4B] inline-block"></span> Murs porteurs
+                                    </span>
+                                    <span class="inline-flex items-center gap-1.5">
+                                        <span class="w-3 h-3 rounded-xs bg-amber-500 border border-dashed border-amber-800 inline-block"></span> Cloison amovible (Drag &amp; Drop)
+                                    </span>
+                                    <span class="inline-flex items-center gap-1.5">
+                                        <span class="w-3 h-3 rounded-xs bg-emerald-500 inline-block"></span> Châssis &amp; baies
+                                    </span>
+                                </div>
+                                <span id="movableWallCoords" class="font-mono text-[11px] text-tp-navy font-bold">
+                                    Cloison modulable prête
+                                </span>
+                            </div>
+                        </div>
+
+                        <!-- Panneau latéral explicatif de l'étape en cours -->
+                        <div class="lg:col-span-4 rounded-2xl bg-tp-pearl border border-slate-200/90 p-5 sm:p-6 flex flex-col justify-between space-y-5">
+                            <div class="space-y-4">
+                                <div class="flex items-center justify-between gap-2">
+                                    <span id="stepCounterBadge" class="px-3 py-1 rounded-full bg-tp-navy text-white text-xs font-extrabold">
+                                        Étape 3 / 5
+                                    </span>
+                                    <span id="stepModeStatus" class="text-xs font-bold text-tp-sage">
+                                        Mode manuel
+                                    </span>
+                                </div>
+
+                                <div>
+                                    <h4 id="stepDetailTitle" class="font-display font-bold text-lg sm:text-xl text-tp-navy">
+                                        3. Murs porteurs &amp; cloisons modulables
+                                    </h4>
+                                    <p id="stepDetailDesc" class="text-xs sm:text-sm text-slate-600 mt-2 leading-relaxed">
+                                        Les murs périphériques assurent l'inertie et l'isolation, tandis que les cloisons intérieures légères peuvent être déplacées pour agrandir le séjour ou créer un bureau.
+                                    </p>
+                                </div>
+
+                                <!-- Encart interactif cloisons amovibles -->
+                                <div class="p-4 rounded-xl bg-amber-50 border border-amber-200/90 space-y-1.5">
+                                    <span class="text-[11px] font-extrabold uppercase tracking-wider text-amber-900 block">
+                                        Testez la modularité intérieure
+                                    </span>
+                                    <p id="movableWallFeedback" class="text-xs text-amber-950 leading-relaxed">
+                                        Attrapez une cloison amovible (en orange) sur le plan et faites-la glisser pour reconfigurer l'espace de vie.
+                                    </p>
+                                </div>
+                            </div>
+
+                            <!-- Résumé des pièces de la maison sélectionnée -->
+                            <div class="pt-4 border-t border-slate-200 space-y-2">
+                                <span class="text-[11px] font-bold uppercase tracking-wider text-slate-400 block">
+                                    Configuration de cette maison
+                                </span>
+                                <div id="houseSpacesSummary" class="grid grid-cols-2 gap-2 text-xs">
+                                    <!-- Peuplé en JS -->
+                                </div>
+                            </div>
+                        </div>
+
                     </div>
                 </div>
 
@@ -250,7 +437,52 @@
                         title: 'Donner une suite à l’ancien',
                         text: 'Plutôt que d’envoyer en décharge des éléments sains issus d’un bâtiment voisin en reconversion, nous les avons triés et intégrés là où ils apportent le plus de caractère.'
                     }
-                ]
+                ],
+                blueprint: {
+                    outline: { x: 110, y: 70, w: 460, h: 250 },
+                    terrace: { x: 110, y: 320, w: 250, h: 42, label: 'Terrasse Sud & Érables' },
+                    floorColor: '#FDE68A',
+                    floorPattern: 'parquet',
+                    wallColor: '#1B2E4B',
+                    roofLabel: 'Toiture plate végétalisée & débords solaires',
+                    fixedWalls: [
+                        { x: 110, y: 185, w: 155, h: 10 },
+                        { x: 420, y: 70, w: 10, h: 120 }
+                    ],
+                    movableWalls: [
+                        {
+                            id: 'wall-erables-1',
+                            label: 'Cloison Séjour / Bureau',
+                            orientation: 'vertical',
+                            x: 310, y: 195, w: 12, h: 125,
+                            minX: 220, maxX: 430, minY: 195, maxY: 195
+                        },
+                        {
+                            id: 'wall-erables-2',
+                            label: 'Cloison Suite / Dressing',
+                            orientation: 'horizontal',
+                            x: 430, y: 150, w: 140, h: 12,
+                            minX: 430, maxX: 430, minY: 115, maxY: 220
+                        }
+                    ],
+                    windows: [
+                        { x: 165, y: 65, w: 110, h: 10, label: 'Baie triple vitrage' },
+                        { x: 155, y: 315, w: 160, h: 10, label: 'Baie coulissante terrasse' },
+                        { x: 565, y: 115, w: 10, h: 85, label: 'Châssis Est' }
+                    ],
+                    roomsLabels: [
+                        { x: 185, y: 130, name: 'Cuisine ouverte' },
+                        { x: 215, y: 260, name: 'Grand séjour' },
+                        { x: 385, y: 260, name: 'Bureau / Chambre 4' },
+                        { x: 495, y: 115, name: 'Suite parentale' }
+                    ],
+                    spacesSummary: [
+                        { label: 'Séjour + Cuisine', value: '58 m² modulables' },
+                        { label: 'Chambres', value: '4 (dont 1 RDC)' },
+                        { label: 'Cloisons mobiles', value: '2 parois acoustiques' },
+                        { label: 'Terrasse', value: '24 m² plein Sud' }
+                    ]
+                }
             },
             {
                 id: 'briqueterie',
@@ -306,7 +538,52 @@
                         title: 'Pensée pour évoluer sans lourds travaux',
                         text: 'Les gaines techniques et réservations ont été anticipées dès la conception pour faciliter d’éventuels aménagements futurs en toute simplicité.'
                     }
-                ]
+                ],
+                blueprint: {
+                    outline: { x: 135, y: 65, w: 410, h: 260 },
+                    terrace: { x: 345, y: 325, w: 200, h: 40, label: 'Jardin fleuri & terrasse' },
+                    floorColor: '#FED7AA',
+                    floorPattern: 'tiles',
+                    wallColor: '#991B1B',
+                    roofLabel: 'Toiture à deux versants en tuiles terre cuite & solaire',
+                    fixedWalls: [
+                        { x: 135, y: 190, w: 170, h: 10 },
+                        { x: 305, y: 65, w: 10, h: 90 }
+                    ],
+                    movableWalls: [
+                        {
+                            id: 'wall-brique-1',
+                            label: 'Cloison Cuisine / Salle à manger',
+                            orientation: 'vertical',
+                            x: 360, y: 65, w: 12, h: 125,
+                            minX: 325, maxX: 465, minY: 65, maxY: 65
+                        },
+                        {
+                            id: 'wall-brique-2',
+                            label: 'Cloison Salon / Coin lecture',
+                            orientation: 'horizontal',
+                            x: 135, y: 255, w: 165, h: 12,
+                            minX: 135, maxX: 135, minY: 215, maxY: 290
+                        }
+                    ],
+                    windows: [
+                        { x: 185, y: 60, w: 95, h: 10, label: 'Fenêtre façade' },
+                        { x: 365, y: 320, w: 145, h: 10, label: 'Grande baie jardin' },
+                        { x: 130, y: 105, w: 10, h: 70, label: 'Châssis latéral' }
+                    ],
+                    roomsLabels: [
+                        { x: 220, y: 125, name: 'Hall & Buanderie' },
+                        { x: 445, y: 125, name: 'Cuisine familiale' },
+                        { x: 220, y: 230, name: 'Coin lecture' },
+                        { x: 425, y: 260, name: 'Séjour traversant' }
+                    ],
+                    spacesSummary: [
+                        { label: 'Pièce de vie', value: '51 m² traversants' },
+                        { label: 'Chambres', value: '3 grandes chambres' },
+                        { label: 'Cloisons mobiles', value: '2 parois modulables' },
+                        { label: 'Performance', value: 'PEB A+ basse conso' }
+                    ]
+                }
             },
             {
                 id: 'verger',
@@ -362,7 +639,85 @@
                         title: 'Des choix durables qui gardent du sens',
                         text: 'En privilégiant des matériaux fiables et réparables plutôt que jetables, la maison offre un cadre de vie durable et rassurant pour les années à venir.'
                     }
-                ]
+                ],
+                blueprint: {
+                    outline: { x: 120, y: 75, w: 440, h: 240 },
+                    terrace: { x: 215, y: 315, w: 250, h: 45, label: 'Passerelle bois & Verger' },
+                    floorColor: '#FEF3C7',
+                    floorPattern: 'deck',
+                    wallColor: '#1E3A5F',
+                    roofLabel: 'Charpente bois ardennais & isolation biosourcée',
+                    fixedWalls: [
+                        { x: 275, y: 75, w: 10, h: 105 },
+                        { x: 405, y: 75, w: 10, h: 105 }
+                    ],
+                    movableWalls: [
+                        {
+                            id: 'wall-verger-1',
+                            label: 'Cloison Atelier / Salon',
+                            orientation: 'vertical',
+                            x: 260, y: 185, w: 12, h: 130,
+                            minX: 185, maxX: 375, minY: 185, maxY: 185
+                        },
+                        {
+                            id: 'wall-verger-2',
+                            label: 'Cloison Chambre / Salle d’eau',
+                            orientation: 'horizontal',
+                            x: 415, y: 145, w: 145, h: 12,
+                            minX: 415, maxX: 415, minY: 110, maxY: 195
+                        }
+                    ],
+                    windows: [
+                        { x: 155, y: 70, w: 90, h: 10, label: 'Châssis Nord' },
+                        { x: 245, y: 310, w: 190, h: 10, label: 'Baie panoramique verger' },
+                        { x: 555, y: 195, w: 10, h: 85, label: 'Ouverture jardin' }
+                    ],
+                    roomsLabels: [
+                        { x: 195, y: 125, name: 'Cuisine & Cellier' },
+                        { x: 190, y: 250, name: 'Atelier / Chambre 3' },
+                        { x: 395, y: 250, name: 'Séjour ouvert verger' },
+                        { x: 485, y: 115, name: 'Chambre principale' }
+                    ],
+                    spacesSummary: [
+                        { label: 'Séjour + Atelier', value: '49 m² reconfigurables' },
+                        { label: 'Chambres', value: '3 chambres lumineuses' },
+                        { label: 'Cloisons mobiles', value: '2 cloisons glissantes' },
+                        { label: 'Extérieur', value: 'Passerelle & verger' }
+                    ]
+                }
+            }
+        ];
+
+        const ASSEMBLY_STEPS = [
+            {
+                step: 1,
+                shortLabel: '1. Dalle & terrasse',
+                title: '1. Fondations, dalle isolée & terrasse',
+                desc: 'Tout commence par une base parfaitement plane et isolée, prolongée par la terrasse extérieure pour ancrer la maison sur son terrain.'
+            },
+            {
+                step: 2,
+                shortLabel: '2. Sols & revêtements',
+                title: '2. Pose des sols & zonage des pièces',
+                desc: 'Les lames de parquet revalorisé ou dalles de grès cérame viennent habiller la surface habitable selon l’usage de chaque pièce.'
+            },
+            {
+                step: 3,
+                shortLabel: '3. Murs & cloisons',
+                title: '3. Murs porteurs & cloisons amovibles',
+                desc: 'Les murs périphériques s’emboîtent sur la dalle. Astuce interactive : attrapez les cloisons orange sur le plan et faites-les glisser pour adapter les volumes !'
+            },
+            {
+                step: 4,
+                shortLabel: '4. Châssis & vitrages',
+                title: '4. Pose des châssis & baies vitrées',
+                desc: 'Les menuiseries haute performance s’insèrent dans les réservations pour apporter lumière naturelle, isolation acoustique et étanchéité.'
+            },
+            {
+                step: 5,
+                shortLabel: '5. Toiture & finition',
+                title: '5. Charpente, toiture & maison prête à vivre',
+                desc: 'La couverture vient coiffer l’ensemble et finaliser l’enveloppe thermique. Vous pouvez continuer à déplacer les cloisons intérieures à tout moment.'
             }
         ];
 
@@ -391,6 +746,24 @@
         };
 
         let selectedHouseId = HOUSES[0].id;
+        let currentAssemblyStep = 5; // Démarre assemblé pour permettre l'interaction immédiate
+        let isAutoLooping = false;
+        let autoLoopInterval = null;
+        let customWallPositions = {}; // Stocke les positions glissées par maison
+        let activeDragState = null;
+
+        function getHouseById(id) {
+            return HOUSES.find(h => h.id === id) || HOUSES[0];
+        }
+
+        function ensureCustomWallPositions(house) {
+            if (!customWallPositions[house.id]) {
+                customWallPositions[house.id] = {};
+                house.blueprint.movableWalls.forEach(w => {
+                    customWallPositions[house.id][w.id] = { x: w.x, y: w.y };
+                });
+            }
+        }
 
         function renderHouses() {
             const grid = document.getElementById('housesGrid');
@@ -432,7 +805,7 @@
         }
 
         function renderMaterials() {
-            const house = HOUSES.find(h => h.id === selectedHouseId) || HOUSES[0];
+            const house = getHouseById(selectedHouseId);
             document.getElementById('activeHouseTitle').textContent = `${house.name} (${house.rooms})`;
             document.getElementById('activeHouseBadges').innerHTML = `
                 <span class="px-3 py-1 rounded-full bg-tp-pearl text-tp-navy border border-slate-200">${house.plot}</span>
@@ -496,14 +869,323 @@
             }).join('');
         }
 
+        function renderInteractiveBlueprint(animateNewestLayer = false) {
+            const house = getHouseById(selectedHouseId);
+            ensureCustomWallPositions(house);
+            const bp = house.blueprint;
+            const stepInfo = ASSEMBLY_STEPS[currentAssemblyStep - 1];
+
+            // Mise à jour des textes & contrôles
+            document.getElementById('blueprintHouseTag').textContent = house.name;
+            document.getElementById('blueprintPlanTitle').textContent = `Plan modulaire — ${house.name} (${house.rooms})`;
+            document.getElementById('stepCounterBadge').textContent = `Étape ${currentAssemblyStep} / ${ASSEMBLY_STEPS.length}`;
+            document.getElementById('stepDetailTitle').textContent = stepInfo.title;
+            document.getElementById('stepDetailDesc').textContent = stepInfo.desc;
+            document.getElementById('stepModeStatus').textContent = isAutoLooping ? 'Lecture auto en boucle' : 'Mode manuel';
+
+            document.getElementById('prevStepBtn').disabled = !isAutoLooping && currentAssemblyStep <= 1;
+            document.getElementById('nextStepBtn').disabled = !isAutoLooping && currentAssemblyStep >= ASSEMBLY_STEPS.length;
+
+            // Pilules d'étapes
+            const pillsContainer = document.getElementById('assemblyStepsPills');
+            pillsContainer.innerHTML = ASSEMBLY_STEPS.map(s => {
+                const isCurrent = s.step === currentAssemblyStep;
+                const isDone = s.step < currentAssemblyStep;
+                return `
+                    <button type="button" onclick="goToAssemblyStep(${s.step})"
+                        class="px-2.5 py-1.5 rounded-xl text-[11px] font-bold border transition-all cursor-pointer ${
+                            isCurrent
+                                ? 'bg-tp-navy text-white border-tp-navy shadow-2xs'
+                                : isDone
+                                    ? 'bg-tp-sageLight text-tp-sage border-emerald-200 hover:bg-emerald-100'
+                                    : 'bg-white text-slate-500 border-slate-200 hover:text-tp-navy'
+                        }">
+                        ${s.shortLabel}
+                    </button>
+                `;
+            }).join('');
+
+            // Résumé des espaces
+            document.getElementById('houseSpacesSummary').innerHTML = bp.spacesSummary.map(item => `
+                <div class="p-2.5 rounded-xl bg-white border border-slate-200/80">
+                    <span class="text-[10px] font-semibold text-slate-400 block">${item.label}</span>
+                    <span class="font-bold text-tp-navy">${item.value}</span>
+                </div>
+            `).join('');
+
+            // Construction du SVG schématique façon assemblage modulaire
+            const { x, y, w, h } = bp.outline;
+            const svg = document.getElementById('houseSchematicSvg');
+
+            const animClass = (layerStep) => (animateNewestLayer && currentAssemblyStep === layerStep) ? 'lego-layer-enter' : '';
+
+            // Motifs de sols
+            let defsMarkup = `
+                <defs>
+                    <pattern id="parquetPattern" width="28" height="14" patternUnits="userSpaceOnUse">
+                        <rect width="28" height="14" fill="#FDE68A" />
+                        <path d="M0 7 H28 M14 0 V7 M28 7 V14" stroke="#D97706" stroke-opacity="0.28" stroke-width="1"/>
+                    </pattern>
+                    <pattern id="tilesPattern" width="24" height="24" patternUnits="userSpaceOnUse">
+                        <rect width="24" height="24" fill="#FFEDD5" />
+                        <path d="M24 0 H0 V24" fill="none" stroke="#C2410C" stroke-opacity="0.22" stroke-width="1"/>
+                    </pattern>
+                    <pattern id="deckPattern" width="16" height="16" patternUnits="userSpaceOnUse">
+                        <rect width="16" height="16" fill="#FEF3C7" />
+                        <path d="M0 8 H16" stroke="#B45309" stroke-opacity="0.28" stroke-width="1.2"/>
+                    </pattern>
+                </defs>
+            `;
+
+            const floorFill = bp.floorPattern === 'parquet'
+                ? 'url(#parquetPattern)'
+                : bp.floorPattern === 'tiles'
+                    ? 'url(#tilesPattern)'
+                    : 'url(#deckPattern)';
+
+            // Étape 1 : Dalle & terrasse (toujours visible dès étape 1)
+            const step1Markup = `
+                <g class="${animClass(1)}">
+                    <!-- Ombre portée façon maquette 2.5D -->
+                    <rect x="${x + 8}" y="${y + 10}" width="${w}" height="${h}" rx="10" fill="#CBD5E1" opacity="0.65" />
+                    <!-- Dalle de fondation -->
+                    <rect x="${x}" y="${y}" width="${w}" height="${h}" rx="10" fill="#E2E8F0" stroke="#64748B" stroke-width="2" />
+                    <!-- Terrasse -->
+                    <rect x="${bp.terrace.x}" y="${bp.terrace.y}" width="${bp.terrace.w}" height="${bp.terrace.h}" rx="6" fill="#DCFCE7" stroke="#2E7D5B" stroke-width="1.5" stroke-dasharray="5 3" />
+                    <text x="${bp.terrace.x + bp.terrace.w / 2}" y="${bp.terrace.y + 25}" text-anchor="middle" fill="#166534" font-size="11" font-weight="700" font-family="Inter, sans-serif">
+                        ${bp.terrace.label}
+                    </text>
+                    <!-- Tenons façon briques LEGO sur la dalle si étape 1 uniquement -->
+                    ${currentAssemblyStep === 1 ? renderLegoStuds(x + 24, y + 24, w - 48, h - 48) : ''}
+                </g>
+            `;
+
+            // Étape 2 : Sol & libellés de zones
+            const step2Markup = currentAssemblyStep >= 2 ? `
+                <g class="${animClass(2)}">
+                    <rect x="${x + 8}" y="${y + 8}" width="${w - 16}" height="${h - 16}" rx="6" fill="${floorFill}" stroke="#D97706" stroke-width="1.2" />
+                    ${bp.roomsLabels.map(r => `
+                        <g>
+                            <rect x="${r.x - 56}" y="${r.y - 12}" width="112" height="22" rx="11" fill="rgba(255,255,255,0.86)" stroke="#CBD5E1" stroke-width="1" />
+                            <text x="${r.x}" y="${r.y + 3}" text-anchor="middle" fill="#1B2E4B" font-size="10.5" font-weight="700" font-family="Inter, sans-serif">
+                                ${r.name}
+                            </text>
+                        </g>
+                    `).join('')}
+                </g>
+            ` : '';
+
+            // Étape 3 : Murs porteurs + Cloisons amovibles (Drag & Drop)
+            const step3Markup = currentAssemblyStep >= 3 ? `
+                <g class="${animClass(3)}">
+                    <!-- Murs périphériques porteurs -->
+                    <rect x="${x}" y="${y}" width="${w}" height="${h}" rx="8" fill="none" stroke="${bp.wallColor}" stroke-width="12" />
+                    <!-- Cloisons fixes intérieures -->
+                    ${bp.fixedWalls.map(fw => `
+                        <rect x="${fw.x}" y="${fw.y}" width="${fw.w}" height="${fw.h}" rx="3" fill="${bp.wallColor}" />
+                    `).join('')}
+
+                    <!-- Cloisons amovibles interactives (Drag & Drop) -->
+                    ${bp.movableWalls.map(mw => {
+                        const pos = customWallPositions[house.id][mw.id] || { x: mw.x, y: mw.y };
+                        const cx = pos.x + mw.w / 2;
+                        const cy = pos.y + mw.h / 2;
+                        return `
+                            <g class="movable-wall-group" data-wall-id="${mw.id}" onpointerdown="startWallDrag(event, '${mw.id}')">
+                                <!-- Zone de préhension élargie pour faciliter le glisser-déposer -->
+                                <rect x="${pos.x - 10}" y="${pos.y - 10}" width="${mw.w + 20}" height="${mw.h + 20}" fill="transparent" />
+                                <!-- Cloison amovible -->
+                                <rect x="${pos.x}" y="${pos.y}" width="${mw.w}" height="${mw.h}" rx="4" fill="#F59E0B" stroke="#92400E" stroke-width="2" stroke-dasharray="4 2" />
+                                <!-- Pastille poignée centrale -->
+                                <circle cx="${cx}" cy="${cy}" r="11" fill="#FFFFFF" stroke="#D97706" stroke-width="2" />
+                                <text x="${cx}" y="${cy + 3.5}" text-anchor="middle" fill="#B45309" font-size="11" font-weight="800" font-family="Inter, sans-serif">
+                                    ${mw.orientation === 'vertical' ? '↔' : '↕'}
+                                </text>
+                            </g>
+                        `;
+                    }).join('')}
+                </g>
+            ` : '';
+
+            // Étape 4 : Châssis & baies vitrées
+            const step4Markup = currentAssemblyStep >= 4 ? `
+                <g class="${animClass(4)}">
+                    ${bp.windows.map(win => `
+                        <g>
+                            <rect x="${win.x}" y="${win.y}" width="${win.w}" height="${win.h}" rx="3" fill="#10B981" stroke="#065F46" stroke-width="1.5" />
+                            <line x1="${win.x + 2}" y1="${win.y + win.h / 2}" x2="${win.x + win.w - 2}" y2="${win.y + win.h / 2}" stroke="#ECFDF5" stroke-width="1.5" />
+                        </g>
+                    `).join('')}
+                </g>
+            ` : '';
+
+            // Étape 5 : Structure de toiture légère translucide (laisse voir et manipuler l'intérieur)
+            const step5Markup = currentAssemblyStep >= 5 ? `
+                <g class="${animClass(5)}" style="pointer-events: none;">
+                    <rect x="${x - 8}" y="${y - 8}" width="${w + 16}" height="${h + 16}" rx="12" fill="rgba(27, 46, 75, 0.05)" stroke="#1B2E4B" stroke-width="2" stroke-dasharray="8 5" />
+                    <rect x="${x + w / 2 - 145}" y="${y - 22}" width="290" height="22" rx="11" fill="#1B2E4B" />
+                    <text x="${x + w / 2}" y="${y - 8}" text-anchor="middle" fill="#FFFFFF" font-size="10.5" font-weight="700" font-family="Inter, sans-serif">
+                        ${bp.roofLabel}
+                    </text>
+                </g>
+            ` : '';
+
+            svg.innerHTML = defsMarkup + step1Markup + step2Markup + step3Markup + step4Markup + step5Markup;
+        }
+
+        function renderLegoStuds(startX, startY, width, height) {
+            let studs = '';
+            for (let gx = startX; gx <= startX + width; gx += 46) {
+                for (let gy = startY; gy <= startY + height; gy += 46) {
+                    studs += `<circle cx="${gx}" cy="${gy}" r="6" fill="#CBD5E1" stroke="#94A3B8" stroke-width="1.2" />`;
+                }
+            }
+            return studs;
+        }
+
+        function changeAssemblyStep(delta) {
+            if (isAutoLooping) stopBlueprintLoop();
+            const next = Math.min(ASSEMBLY_STEPS.length, Math.max(1, currentAssemblyStep + delta));
+            if (next !== currentAssemblyStep) {
+                currentAssemblyStep = next;
+                renderInteractiveBlueprint(true);
+            }
+        }
+
+        function goToAssemblyStep(stepNum) {
+            if (isAutoLooping) stopBlueprintLoop();
+            currentAssemblyStep = stepNum;
+            renderInteractiveBlueprint(true);
+        }
+
+        function toggleBlueprintLoop() {
+            if (isAutoLooping) {
+                stopBlueprintLoop();
+            } else {
+                startBlueprintLoop();
+            }
+        }
+
+        function startBlueprintLoop() {
+            isAutoLooping = true;
+            document.getElementById('loopBtnIcon').textContent = '⏸';
+            document.getElementById('loopBtnLabel').textContent = 'Mettre en pause';
+            document.getElementById('toggleAutoLoopBtn').classList.replace('bg-tp-sage', 'bg-tp-red');
+            document.getElementById('toggleAutoLoopBtn').classList.replace('hover:bg-emerald-700', 'hover:bg-tp-redDark');
+
+            currentAssemblyStep = 1;
+            renderInteractiveBlueprint(true);
+
+            autoLoopInterval = setInterval(() => {
+                currentAssemblyStep = currentAssemblyStep >= ASSEMBLY_STEPS.length ? 1 : currentAssemblyStep + 1;
+                renderInteractiveBlueprint(true);
+            }, 1700);
+        }
+
+        function stopBlueprintLoop() {
+            isAutoLooping = false;
+            clearInterval(autoLoopInterval);
+            autoLoopInterval = null;
+            document.getElementById('loopBtnIcon').textContent = '▶';
+            document.getElementById('loopBtnLabel').textContent = 'Lecture auto en boucle';
+            document.getElementById('toggleAutoLoopBtn').classList.replace('bg-tp-red', 'bg-tp-sage');
+            document.getElementById('toggleAutoLoopBtn').classList.replace('hover:bg-tp-redDark', 'hover:bg-emerald-700');
+            renderInteractiveBlueprint(false);
+        }
+
+        function startWallDrag(event, wallId) {
+            event.preventDefault();
+            if (isAutoLooping) stopBlueprintLoop();
+
+            const house = getHouseById(selectedHouseId);
+            const wallDef = house.blueprint.movableWalls.find(w => w.id === wallId);
+            if (!wallDef) return;
+
+            const svg = document.getElementById('houseSchematicSvg');
+            const pt = getSvgPoint(svg, event.clientX, event.clientY);
+            const currentPos = customWallPositions[house.id][wallId];
+
+            activeDragState = {
+                houseId: house.id,
+                wallDef,
+                offsetX: pt.x - currentPos.x,
+                offsetY: pt.y - currentPos.y
+            };
+
+            window.addEventListener('pointermove', onWallDragMove);
+            window.addEventListener('pointerup', endWallDrag);
+        }
+
+        function onWallDragMove(event) {
+            if (!activeDragState) return;
+            const svg = document.getElementById('houseSchematicSvg');
+            const pt = getSvgPoint(svg, event.clientX, event.clientY);
+            const { houseId, wallDef, offsetX, offsetY } = activeDragState;
+
+            // Aimantation douce sur pas de 5px
+            let rawX = Math.round((pt.x - offsetX) / 5) * 5;
+            let rawY = Math.round((pt.y - offsetY) / 5) * 5;
+
+            const clampedX = Math.min(wallDef.maxX, Math.max(wallDef.minX, rawX));
+            const clampedY = Math.min(wallDef.maxY, Math.max(wallDef.minY, rawY));
+
+            customWallPositions[houseId][wallDef.id] = { x: clampedX, y: clampedY };
+
+            const deltaPx = wallDef.orientation === 'vertical'
+                ? clampedX - wallDef.x
+                : clampedY - wallDef.y;
+            const deltaMeters = (deltaPx / 35).toFixed(2);
+
+            document.getElementById('movableWallCoords').textContent =
+                `${wallDef.label} : ${deltaMeters >= 0 ? '+' : ''}${deltaMeters} m`;
+            document.getElementById('movableWallFeedback').textContent =
+                `Vous avez déplacé « ${wallDef.label} » (${deltaMeters >= 0 ? '+' : ''}${deltaMeters} m) : le volume des pièces adjacentes s'adapte sans toucher aux murs porteurs.`;
+
+            renderInteractiveBlueprint(false);
+        }
+
+        function endWallDrag() {
+            activeDragState = null;
+            window.removeEventListener('pointermove', onWallDragMove);
+            window.removeEventListener('pointerup', endWallDrag);
+        }
+
+        function getSvgPoint(svg, clientX, clientY) {
+            const rect = svg.getBoundingClientRect();
+            const scaleX = 680 / rect.width;
+            const scaleY = 400 / rect.height;
+            return {
+                x: (clientX - rect.left) * scaleX,
+                y: (clientY - rect.top) * scaleY
+            };
+        }
+
+        function resetMovableWalls() {
+            const house = getHouseById(selectedHouseId);
+            delete customWallPositions[house.id];
+            ensureCustomWallPositions(house);
+            document.getElementById('movableWallCoords').textContent = 'Cloisons replacées';
+            document.getElementById('movableWallFeedback').textContent =
+                'Les cloisons amovibles ont retrouvé leur configuration initiale. Glissez-les à nouveau pour tester un autre agencement.';
+            renderInteractiveBlueprint(false);
+        }
+
         function selectHouse(id) {
             selectedHouseId = id;
             renderHouses();
             renderMaterials();
+            if (!isAutoLooping) {
+                currentAssemblyStep = 5;
+            }
+            document.getElementById('movableWallCoords').textContent = 'Cloison modulable prête';
+            document.getElementById('movableWallFeedback').textContent =
+                'Attrapez une cloison amovible (en orange) sur le plan et faites-la glisser pour reconfigurer l\'espace de vie.';
+            renderInteractiveBlueprint(true);
         }
 
         renderHouses();
         renderMaterials();
+        renderInteractiveBlueprint(false);
     </script>
 </body>
 </html>
