@@ -42,18 +42,15 @@
             -webkit-font-smoothing: antialiased;
         }
 
-        /* Animations façon assemblage LEGO / maquette modulaire */
-        @keyframes legoSnapIn {
+        /* Transition fade + emboîtement LEGO à chaque changement d'étape */
+        @keyframes layerFadeTransition {
             0% {
                 opacity: 0;
-                transform: translateY(-48px) scale(0.95);
+                transform: translateY(-16px) scale(0.99);
             }
             65% {
-                opacity: 1;
-                transform: translateY(4px) scale(1.01);
-            }
-            82% {
-                transform: translateY(-2px) scale(0.995);
+                opacity: 0.92;
+                transform: translateY(2px) scale(1.002);
             }
             100% {
                 opacity: 1;
@@ -61,26 +58,26 @@
             }
         }
 
-        .lego-layer-enter {
-            animation: legoSnapIn 0.52s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+        .layer-step-fade {
+            animation: layerFadeTransition 0.55s cubic-bezier(0.22, 1, 0.36, 1) forwards;
         }
 
         .blueprint-grid {
             background-color: #F4F8FC;
             background-image:
-                linear-gradient(to right, rgba(27, 46, 75, 0.07) 1px, transparent 1px),
-                linear-gradient(to bottom, rgba(27, 46, 75, 0.07) 1px, transparent 1px);
+                linear-gradient(to right, rgba(27, 46, 75, 0.065) 1px, transparent 1px),
+                linear-gradient(to bottom, rgba(27, 46, 75, 0.065) 1px, transparent 1px);
             background-size: 24px 24px;
         }
 
-        .movable-wall-group {
+        .movable-wall-3d {
             cursor: grab;
             transition: filter 0.15s ease;
         }
-        .movable-wall-group:hover {
-            filter: drop-shadow(0 6px 10px rgba(217, 119, 6, 0.32));
+        .movable-wall-3d:hover {
+            filter: drop-shadow(0 6px 12px rgba(217, 119, 6, 0.42));
         }
-        .movable-wall-group:active {
+        .movable-wall-3d:active {
             cursor: grabbing;
         }
     </style>
@@ -205,142 +202,164 @@
                     </div>
                 </div>
 
-                <!-- NOUVELLE RUBRIQUE DÉDIÉE : MAQUETTE SCHÉMATIQUE & ASSEMBLAGE INTERACTIF -->
+                <!-- RUBRIQUE DÉDIÉE : MAQUETTE 3D ROTATIVE PLEINE LARGEUR -->
                 <div id="interactiveBlueprintSection" class="rounded-3xl bg-white border border-slate-200/90 shadow-soft p-6 sm:p-8 space-y-6">
                     <div class="flex flex-col lg:flex-row lg:items-end justify-between gap-4 border-b border-slate-200/80 pb-5">
                         <div class="space-y-1.5">
                             <div class="flex flex-wrap items-center gap-2">
                                 <span class="px-3 py-1 rounded-full bg-tp-navy text-white text-xs font-bold">
-                                    Plan schématique 2,5D • Assemblage modulaire
+                                    Maquette 3D Rotative • Transition fondu par couche
                                 </span>
                                 <span id="blueprintHouseTag" class="px-3 py-1 rounded-full bg-tp-sageLight text-tp-sage text-xs font-bold border border-emerald-200">
                                     Maison Les Érables
                                 </span>
+                                <span id="autoSpinBadge" class="px-3 py-1 rounded-full bg-sky-100 text-sky-900 text-xs font-bold border border-sky-200">
+                                    Rotation auto lente active
+                                </span>
                             </div>
                             <h3 class="font-display font-bold text-xl sm:text-2xl text-tp-navy pt-1">
-                                Explorez l'assemblage de la maison étape par étape &amp; modulez vos cloisons
+                                Construction progressive façon briques, boussole d'orientation &amp; cloisons intérieures ajustables
                             </h3>
-                            <p class="text-xs sm:text-sm text-slate-600 max-w-3xl">
-                                Passez d'une étape de construction à l'autre avec les flèches (façon briques emboîtables), lancez l'animation en boucle ou déplacez directement les <strong>murs intérieurs amovibles</strong> par glisser-déposer.
+                            <p class="text-xs sm:text-sm text-slate-600 max-w-4xl">
+                                Chaque couche s'anime en fondu à chaque changement d'étape. Seuls les murs extérieurs porteurs peuvent devenir transparents côté vue : tous les autres éléments restent pleins et visibles.
                             </p>
                         </div>
 
-                        <!-- Contrôles Lecture en boucle / Réinitialiser -->
+                        <!-- Contrôles Vidéo en boucle / Rotation auto / Replacer cloisons -->
                         <div class="flex flex-wrap items-center gap-2.5 shrink-0">
                             <button type="button" id="toggleAutoLoopBtn" onclick="toggleBlueprintLoop()"
-                                class="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-bold bg-tp-sage text-white hover:bg-emerald-700 transition-colors cursor-pointer shadow-2xs">
-                                <span id="loopBtnIcon">▶</span>
-                                <span id="loopBtnLabel">Lecture auto en boucle</span>
+                                class="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-bold bg-tp-red text-white hover:bg-tp-redDark transition-colors cursor-pointer shadow-2xs">
+                                <span id="loopBtnIcon">⏸</span>
+                                <span id="loopBtnLabel">Pause vidéo</span>
+                            </button>
+                            <button type="button" id="toggleAutoSpinBtn" onclick="toggleAutoSpin()"
+                                class="inline-flex items-center gap-1.5 px-3.5 py-2.5 rounded-xl text-xs font-bold border border-slate-200 bg-tp-pearl text-tp-navy hover:bg-slate-100 transition-colors cursor-pointer">
+                                <span id="spinBtnLabel">Stop rotation auto</span>
                             </button>
                             <button type="button" onclick="resetMovableWalls()"
-                                class="inline-flex items-center gap-1.5 px-3.5 py-2.5 rounded-xl text-xs font-bold border border-slate-200 bg-tp-pearl text-tp-navy hover:bg-slate-100 transition-colors cursor-pointer"
-                                title="Replacer les cloisons amovibles à leur position d'origine">
+                                class="inline-flex items-center gap-1.5 px-3.5 py-2.5 rounded-xl text-xs font-bold border border-slate-200 bg-tp-pearl text-tp-navy hover:bg-slate-100 transition-colors cursor-pointer">
                                 <span>↺ Replacer les murs</span>
                             </button>
                         </div>
                     </div>
 
                     <!-- Barre d'étapes cliquables + Flèches Précédent / Suivant -->
-                    <div class="flex flex-col md:flex-row items-stretch md:items-center justify-between gap-3 bg-tp-pearl p-3.5 rounded-2xl border border-slate-200/80">
+                    <div class="flex flex-col xl:flex-row items-stretch xl:items-center justify-between gap-3 bg-tp-pearl p-3.5 rounded-2xl border border-slate-200/80">
                         <button type="button" id="prevStepBtn" onclick="changeAssemblyStep(-1)"
-                            class="inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl text-xs font-bold bg-white border border-slate-200 text-tp-navy hover:bg-slate-100 disabled:opacity-40 disabled:pointer-events-none transition-colors cursor-pointer">
-                            <span>← Étape précédente</span>
+                            class="inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl text-xs font-bold bg-white border border-slate-200 text-tp-navy hover:bg-slate-100 disabled:opacity-40 disabled:pointer-events-none transition-colors cursor-pointer shrink-0">
+                            <span>← Couche précédente</span>
                         </button>
 
-                        <div id="assemblyStepsPills" class="flex flex-wrap items-center justify-center gap-1.5 sm:gap-2">
-                            <!-- Pilules des 5 étapes générées en JS -->
+                        <div id="assemblyStepsPills" class="flex flex-wrap items-center justify-center gap-1.5">
+                            <!-- 7 couches générées en JS -->
                         </div>
 
                         <button type="button" id="nextStepBtn" onclick="changeAssemblyStep(1)"
-                            class="inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl text-xs font-bold bg-tp-navy text-white hover:bg-tp-slate disabled:opacity-40 disabled:pointer-events-none transition-colors cursor-pointer">
-                            <span>Étape suivante →</span>
+                            class="inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl text-xs font-bold bg-tp-navy text-white hover:bg-tp-slate disabled:opacity-40 disabled:pointer-events-none transition-colors cursor-pointer shrink-0">
+                            <span>Couche suivante →</span>
                         </button>
                     </div>
 
-                    <!-- Zone principale : Canevas Plan Schématique Interactif + Fiche de l'étape & Légende -->
-                    <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-stretch">
+                    <!-- Barre de progression de superposition -->
+                    <div class="w-full h-2 rounded-full bg-slate-100 overflow-hidden border border-slate-200/70">
+                        <div id="stackProgressBar" class="h-full bg-gradient-to-r from-tp-navy via-tp-slate to-tp-sage transition-all duration-500 ease-out" style="width: 14%;"></div>
+                    </div>
 
-                        <!-- Plan schématique SVG interactif -->
-                        <div class="lg:col-span-8 rounded-2xl border border-slate-200 overflow-hidden blueprint-grid relative flex flex-col justify-between min-h-[380px] sm:min-h-[430px]">
-                            <!-- Bandeau supérieur du plan -->
-                            <div class="px-4 py-3 bg-white/90 backdrop-blur-xs border-b border-slate-200/80 flex flex-wrap items-center justify-between gap-2 text-xs">
-                                <span id="blueprintPlanTitle" class="font-display font-bold text-tp-navy">
-                                    Plan modulaire — Maison Les Érables (165 m²)
+                    <!-- Bandeau compact d'information sur la couche active -->
+                    <div class="rounded-2xl bg-tp-pearl border border-slate-200/90 px-5 py-4 flex flex-col lg:flex-row lg:items-center justify-between gap-3">
+                        <div class="space-y-1">
+                            <div class="flex flex-wrap items-center gap-2">
+                                <span id="stepCounterBadge" class="px-2.5 py-0.5 rounded-full bg-tp-navy text-white text-xs font-extrabold">
+                                    Couche 1 / 7
                                 </span>
-                                <span id="dragInstructionBadge" class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-amber-100 text-amber-900 border border-amber-200 font-bold text-[11px]">
-                                    ✋ Glissez-déposez les cloisons orange amovibles
+                                <h4 id="stepDetailTitle" class="font-display font-bold text-base sm:text-lg text-tp-navy">
+                                    1. Terrasse extérieure &amp; abords
+                                </h4>
+                            </div>
+                            <p id="stepDetailDesc" class="text-xs sm:text-sm text-slate-600 leading-relaxed">
+                                Première couche superposée : l'espace extérieur et la terrasse texturée se posent en continuité du jardin.
+                            </p>
+                        </div>
+                        <div id="movableWallFeedback" class="px-3.5 py-2.5 rounded-xl bg-amber-50 border border-amber-200/90 text-xs font-medium text-amber-950 lg:max-w-md shrink-0">
+                            Glissez n'importe quel mur intérieur orange pour ajuster les pièces, ou glissez le fond pour orienter la vue 3D.
+                        </div>
+                    </div>
+
+                    <!-- Scène 3D Pleine Largeur -->
+                    <div class="rounded-2xl border border-slate-200 overflow-hidden blueprint-grid relative flex flex-col justify-between min-h-[470px] sm:min-h-[530px]">
+                        <!-- Bandeau supérieur : Titre + Contrôles de rotation 3D -->
+                        <div class="px-4 py-3 bg-white/92 backdrop-blur-xs border-b border-slate-200/80 flex flex-wrap items-center justify-between gap-2 text-xs">
+                            <span id="blueprintPlanTitle" class="font-display font-bold text-tp-navy">
+                                Maquette 3D — Maison Les Érables (165 m²)
+                            </span>
+
+                            <div class="flex flex-wrap items-center gap-1.5">
+                                <button type="button" onclick="manualRotate3D(-24, 0)"
+                                    class="px-2.5 py-1 rounded-lg bg-tp-pearl hover:bg-slate-200/70 border border-slate-200 text-tp-navy font-bold cursor-pointer"
+                                    title="Pivoter à gauche">↺</button>
+                                <button type="button" onclick="manualSetCamera(36, 56)"
+                                    class="px-2.5 py-1 rounded-lg bg-tp-pearl hover:bg-slate-200/70 border border-slate-200 text-tp-navy font-semibold text-[11px] cursor-pointer">
+                                    3/4 Face
+                                </button>
+                                <button type="button" onclick="manualSetCamera(-36, 56)"
+                                    class="px-2.5 py-1 rounded-lg bg-tp-pearl hover:bg-slate-200/70 border border-slate-200 text-tp-navy font-semibold text-[11px] cursor-pointer">
+                                    3/4 Gauche
+                                </button>
+                                <button type="button" onclick="manualSetCamera(0, 74)"
+                                    class="px-2.5 py-1 rounded-lg bg-tp-pearl hover:bg-slate-200/70 border border-slate-200 text-tp-navy font-semibold text-[11px] cursor-pointer">
+                                    Plan haut
+                                </button>
+                                <button type="button" onclick="manualRotate3D(24, 0)"
+                                    class="px-2.5 py-1 rounded-lg bg-tp-pearl hover:bg-slate-200/70 border border-slate-200 text-tp-navy font-bold cursor-pointer"
+                                    title="Pivoter à droite">↻</button>
+                            </div>
+                        </div>
+
+                        <!-- Boussole orientée en temps réel avec la maison -->
+                        <div class="absolute top-16 right-4 z-10 bg-white/92 backdrop-blur-xs border border-slate-200/90 rounded-2xl p-2.5 shadow-soft flex flex-col items-center gap-1 pointer-events-none">
+                            <svg id="compassRoseSvg" viewBox="0 0 84 84" class="w-16 h-16 sm:w-20 sm:h-20" aria-label="Boussole d'orientation de la maison">
+                                <!-- Rendu dynamique de la boussole selon yawDeg -->
+                            </svg>
+                            <span id="compassFacingReadout" class="text-[10px] font-extrabold uppercase tracking-wider text-tp-navy">
+                                Terrasse : Sud (36°)
+                            </span>
+                        </div>
+
+                        <!-- Canevas SVG 3D rotatif pleine largeur -->
+                        <div id="scene3DViewport"
+                            onpointerdown="startScene3DRotation(event)"
+                            class="flex-1 flex items-center justify-center p-3 sm:p-6 select-none cursor-grab active:cursor-grabbing relative">
+                            <svg id="houseSchematicSvg" viewBox="0 0 880 480" class="w-full max-w-[840px] h-auto overflow-visible touch-none" role="img" aria-label="Maquette 3D rotative de la maison avec couches superposées">
+                                <!-- Rendu 3D généré en JS -->
+                            </svg>
+                        </div>
+
+                        <!-- Barre d'état inférieure : Textures & Surfaces + Angle + Position cloison -->
+                        <div class="px-4 py-2.5 bg-white/92 backdrop-blur-xs border-t border-slate-200/80 flex flex-wrap items-center justify-between gap-3 text-[11px] font-semibold text-slate-600">
+                            <div class="flex flex-wrap items-center gap-3.5">
+                                <span class="inline-flex items-center gap-1.5">
+                                    <span class="w-3 h-3 rounded-xs bg-amber-300 border border-amber-700 inline-block"></span> Sols texturés
+                                </span>
+                                <span class="inline-flex items-center gap-1.5">
+                                    <span class="w-3 h-3 rounded-xs bg-amber-500 border border-dashed border-amber-900 inline-block"></span> Murs intérieurs (pleins &amp; ajustables)
+                                </span>
+                                <span class="inline-flex items-center gap-1.5">
+                                    <span class="w-3 h-3 rounded-xs bg-[#1B2E4B]/50 border border-[#1B2E4B] inline-block"></span> Murs porteurs extérieurs (transparence côté vue)
+                                </span>
+                                <span class="inline-flex items-center gap-1.5">
+                                    <span class="w-3 h-3 rounded-xs bg-emerald-500 inline-block"></span> Châssis &amp; toiture
                                 </span>
                             </div>
-
-                            <!-- SVG Schématique -->
-                            <div class="flex-1 flex items-center justify-center p-3 sm:p-5 select-none">
-                                <svg id="houseSchematicSvg" viewBox="0 0 680 400" class="w-full max-w-[660px] h-auto overflow-visible touch-none" role="img" aria-label="Maquette schématique interactive de la maison">
-                                    <!-- Rendu dynamique par maison et par étape -->
-                                </svg>
-                            </div>
-
-                            <!-- Légende visuelle en bas du plan -->
-                            <div class="px-4 py-2.5 bg-white/90 backdrop-blur-xs border-t border-slate-200/80 flex flex-wrap items-center justify-between gap-3 text-[11px] font-semibold text-slate-600">
-                                <div class="flex flex-wrap items-center gap-3">
-                                    <span class="inline-flex items-center gap-1.5">
-                                        <span class="w-3 h-3 rounded-xs bg-[#1B2E4B] inline-block"></span> Murs porteurs
-                                    </span>
-                                    <span class="inline-flex items-center gap-1.5">
-                                        <span class="w-3 h-3 rounded-xs bg-amber-500 border border-dashed border-amber-800 inline-block"></span> Cloison amovible (Drag &amp; Drop)
-                                    </span>
-                                    <span class="inline-flex items-center gap-1.5">
-                                        <span class="w-3 h-3 rounded-xs bg-emerald-500 inline-block"></span> Châssis &amp; baies
-                                    </span>
-                                </div>
+                            <div class="flex flex-wrap items-center gap-3">
+                                <span id="cameraAngleReadout" class="font-mono text-[11px] text-tp-slate font-bold">
+                                    Rotation : 36° • Inclinaison : 56°
+                                </span>
+                                <span class="text-slate-300">|</span>
                                 <span id="movableWallCoords" class="font-mono text-[11px] text-tp-navy font-bold">
-                                    Cloison modulable prête
+                                    Tous les murs intérieurs sont ajustables
                                 </span>
                             </div>
                         </div>
-
-                        <!-- Panneau latéral explicatif de l'étape en cours -->
-                        <div class="lg:col-span-4 rounded-2xl bg-tp-pearl border border-slate-200/90 p-5 sm:p-6 flex flex-col justify-between space-y-5">
-                            <div class="space-y-4">
-                                <div class="flex items-center justify-between gap-2">
-                                    <span id="stepCounterBadge" class="px-3 py-1 rounded-full bg-tp-navy text-white text-xs font-extrabold">
-                                        Étape 3 / 5
-                                    </span>
-                                    <span id="stepModeStatus" class="text-xs font-bold text-tp-sage">
-                                        Mode manuel
-                                    </span>
-                                </div>
-
-                                <div>
-                                    <h4 id="stepDetailTitle" class="font-display font-bold text-lg sm:text-xl text-tp-navy">
-                                        3. Murs porteurs &amp; cloisons modulables
-                                    </h4>
-                                    <p id="stepDetailDesc" class="text-xs sm:text-sm text-slate-600 mt-2 leading-relaxed">
-                                        Les murs périphériques assurent l'inertie et l'isolation, tandis que les cloisons intérieures légères peuvent être déplacées pour agrandir le séjour ou créer un bureau.
-                                    </p>
-                                </div>
-
-                                <!-- Encart interactif cloisons amovibles -->
-                                <div class="p-4 rounded-xl bg-amber-50 border border-amber-200/90 space-y-1.5">
-                                    <span class="text-[11px] font-extrabold uppercase tracking-wider text-amber-900 block">
-                                        Testez la modularité intérieure
-                                    </span>
-                                    <p id="movableWallFeedback" class="text-xs text-amber-950 leading-relaxed">
-                                        Attrapez une cloison amovible (en orange) sur le plan et faites-la glisser pour reconfigurer l'espace de vie.
-                                    </p>
-                                </div>
-                            </div>
-
-                            <!-- Résumé des pièces de la maison sélectionnée -->
-                            <div class="pt-4 border-t border-slate-200 space-y-2">
-                                <span class="text-[11px] font-bold uppercase tracking-wider text-slate-400 block">
-                                    Configuration de cette maison
-                                </span>
-                                <div id="houseSpacesSummary" class="grid grid-cols-2 gap-2 text-xs">
-                                    <!-- Peuplé en JS -->
-                                </div>
-                            </div>
-                        </div>
-
                     </div>
                 </div>
 
@@ -439,48 +458,61 @@
                     }
                 ],
                 blueprint: {
-                    outline: { x: 110, y: 70, w: 460, h: 250 },
-                    terrace: { x: 110, y: 320, w: 250, h: 42, label: 'Terrasse Sud & Érables' },
-                    floorColor: '#FDE68A',
-                    floorPattern: 'parquet',
+                    halfW: 165,
+                    halfD: 118,
+                    wallHeight: 56,
+                    terraceOffsetZ: 136,
+                    terraceWidth: 175,
+                    terraceDepth: 46,
+                    terraceLabel: 'Terrasse Sud',
+                    floorPatternId: 'texParquet',
                     wallColor: '#1B2E4B',
-                    roofLabel: 'Toiture plate végétalisée & débords solaires',
-                    fixedWalls: [
-                        { x: 110, y: 185, w: 155, h: 10 },
-                        { x: 420, y: 70, w: 10, h: 120 }
-                    ],
-                    movableWalls: [
+                    wallSideColor: '#334E75',
+                    roofColor: '#263F66',
+                    roofPeakHeight: 34,
+                    roofLabel: 'Toiture plate végétalisée',
+                    interiorWalls: [
                         {
                             id: 'wall-erables-1',
-                            label: 'Cloison Séjour / Bureau',
-                            orientation: 'vertical',
-                            x: 310, y: 195, w: 12, h: 125,
-                            minX: 220, maxX: 430, minY: 195, maxY: 195
+                            label: 'Cloison Cuisine / Séjour',
+                            axis: 'z',
+                            pos: -12,
+                            spanStart: -158,
+                            spanEnd: -25,
+                            min: -85,
+                            max: 35
                         },
                         {
                             id: 'wall-erables-2',
+                            label: 'Cloison Séjour / Bureau',
+                            axis: 'x',
+                            pos: 28,
+                            spanStart: -12,
+                            spanEnd: 112,
+                            min: -95,
+                            max: 120
+                        },
+                        {
+                            id: 'wall-erables-3',
                             label: 'Cloison Suite / Dressing',
-                            orientation: 'horizontal',
-                            x: 430, y: 150, w: 140, h: 12,
-                            minX: 430, maxX: 430, minY: 115, maxY: 220
+                            axis: 'z',
+                            pos: -52,
+                            spanStart: 28,
+                            spanEnd: 158,
+                            min: -88,
+                            max: 55
                         }
                     ],
                     windows: [
-                        { x: 165, y: 65, w: 110, h: 10, label: 'Baie triple vitrage' },
-                        { x: 155, y: 315, w: 160, h: 10, label: 'Baie coulissante terrasse' },
-                        { x: 565, y: 115, w: 10, h: 85, label: 'Châssis Est' }
+                        { x1: -120, z1: -118, x2: -35, z2: -118 },
+                        { x1: -110, z1: 118, x2: 15, z2: 118 },
+                        { x1: 165, z1: -78, x2: 165, z2: 8 }
                     ],
                     roomsLabels: [
-                        { x: 185, y: 130, name: 'Cuisine ouverte' },
-                        { x: 215, y: 260, name: 'Grand séjour' },
-                        { x: 385, y: 260, name: 'Bureau / Chambre 4' },
-                        { x: 495, y: 115, name: 'Suite parentale' }
-                    ],
-                    spacesSummary: [
-                        { label: 'Séjour + Cuisine', value: '58 m² modulables' },
-                        { label: 'Chambres', value: '4 (dont 1 RDC)' },
-                        { label: 'Cloisons mobiles', value: '2 parois acoustiques' },
-                        { label: 'Terrasse', value: '24 m² plein Sud' }
+                        { x: -88, z: -66, name: 'Cuisine' },
+                        { x: -58, z: 55, name: 'Séjour' },
+                        { x: 92, z: 58, name: 'Bureau' },
+                        { x: 92, z: -85, name: 'Suite' }
                     ]
                 }
             },
@@ -540,48 +572,61 @@
                     }
                 ],
                 blueprint: {
-                    outline: { x: 135, y: 65, w: 410, h: 260 },
-                    terrace: { x: 345, y: 325, w: 200, h: 40, label: 'Jardin fleuri & terrasse' },
-                    floorColor: '#FED7AA',
-                    floorPattern: 'tiles',
-                    wallColor: '#991B1B',
-                    roofLabel: 'Toiture à deux versants en tuiles terre cuite & solaire',
-                    fixedWalls: [
-                        { x: 135, y: 190, w: 170, h: 10 },
-                        { x: 305, y: 65, w: 10, h: 90 }
-                    ],
-                    movableWalls: [
+                    halfW: 155,
+                    halfD: 120,
+                    wallHeight: 58,
+                    terraceOffsetZ: 138,
+                    terraceWidth: 155,
+                    terraceDepth: 44,
+                    terraceLabel: 'Jardin & terrasse',
+                    floorPatternId: 'texTiles',
+                    wallColor: '#881337',
+                    wallSideColor: '#BE123C',
+                    roofColor: '#1B2E4B',
+                    roofPeakHeight: 44,
+                    roofLabel: 'Toiture à deux versants',
+                    interiorWalls: [
                         {
                             id: 'wall-brique-1',
-                            label: 'Cloison Cuisine / Salle à manger',
-                            orientation: 'vertical',
-                            x: 360, y: 65, w: 12, h: 125,
-                            minX: 325, maxX: 465, minY: 65, maxY: 65
+                            label: 'Cloison Hall / Séjour',
+                            axis: 'z',
+                            pos: -15,
+                            spanStart: -148,
+                            spanEnd: -20,
+                            min: -85,
+                            max: 35
                         },
                         {
                             id: 'wall-brique-2',
+                            label: 'Cloison Cuisine / Salle à manger',
+                            axis: 'x',
+                            pos: 32,
+                            spanStart: -114,
+                            spanEnd: -15,
+                            min: -85,
+                            max: 110
+                        },
+                        {
+                            id: 'wall-brique-3',
                             label: 'Cloison Salon / Coin lecture',
-                            orientation: 'horizontal',
-                            x: 135, y: 255, w: 165, h: 12,
-                            minX: 135, maxX: 135, minY: 215, maxY: 290
+                            axis: 'z',
+                            pos: 52,
+                            spanStart: -148,
+                            spanEnd: 15,
+                            min: 5,
+                            max: 92
                         }
                     ],
                     windows: [
-                        { x: 185, y: 60, w: 95, h: 10, label: 'Fenêtre façade' },
-                        { x: 365, y: 320, w: 145, h: 10, label: 'Grande baie jardin' },
-                        { x: 130, y: 105, w: 10, h: 70, label: 'Châssis latéral' }
+                        { x1: -110, z1: -120, x2: -25, z2: -120 },
+                        { x1: 15, z1: 120, x2: 120, z2: 120 },
+                        { x1: -155, z1: -75, x2: -155, z2: -15 }
                     ],
                     roomsLabels: [
-                        { x: 220, y: 125, name: 'Hall & Buanderie' },
-                        { x: 445, y: 125, name: 'Cuisine familiale' },
-                        { x: 220, y: 230, name: 'Coin lecture' },
-                        { x: 425, y: 260, name: 'Séjour traversant' }
-                    ],
-                    spacesSummary: [
-                        { label: 'Pièce de vie', value: '51 m² traversants' },
-                        { label: 'Chambres', value: '3 grandes chambres' },
-                        { label: 'Cloisons mobiles', value: '2 parois modulables' },
-                        { label: 'Performance', value: 'PEB A+ basse conso' }
+                        { x: -80, z: -68, name: 'Hall' },
+                        { x: 88, z: -68, name: 'Cuisine' },
+                        { x: -82, z: 85, name: 'Coin lecture' },
+                        { x: 65, z: 58, name: 'Séjour' }
                     ]
                 }
             },
@@ -635,54 +680,67 @@
                         text: 'Charpentiers, menuisiers et équipes de finition se succèdent selon un planning clair, évitant les temps morts et garantissant des finitions soignées.'
                     },
                     {
-                        theme: 'La rénovation & le réemploi',
+                        theme: 'La rénovation & l’avenir',
                         title: 'Des choix durables qui gardent du sens',
                         text: 'En privilégiant des matériaux fiables et réparables plutôt que jetables, la maison offre un cadre de vie durable et rassurant pour les années à venir.'
                     }
                 ],
                 blueprint: {
-                    outline: { x: 120, y: 75, w: 440, h: 240 },
-                    terrace: { x: 215, y: 315, w: 250, h: 45, label: 'Passerelle bois & Verger' },
-                    floorColor: '#FEF3C7',
-                    floorPattern: 'deck',
+                    halfW: 160,
+                    halfD: 114,
+                    wallHeight: 56,
+                    terraceOffsetZ: 132,
+                    terraceWidth: 165,
+                    terraceDepth: 44,
+                    terraceLabel: 'Passerelle & Verger',
+                    floorPatternId: 'texDeck',
                     wallColor: '#1E3A5F',
-                    roofLabel: 'Charpente bois ardennais & isolation biosourcée',
-                    fixedWalls: [
-                        { x: 275, y: 75, w: 10, h: 105 },
-                        { x: 405, y: 75, w: 10, h: 105 }
-                    ],
-                    movableWalls: [
+                    wallSideColor: '#2E588A',
+                    roofColor: '#2E7D5B',
+                    roofPeakHeight: 40,
+                    roofLabel: 'Charpente bois & toiture verte',
+                    interiorWalls: [
                         {
                             id: 'wall-verger-1',
-                            label: 'Cloison Atelier / Salon',
-                            orientation: 'vertical',
-                            x: 260, y: 185, w: 12, h: 130,
-                            minX: 185, maxX: 375, minY: 185, maxY: 185
+                            label: 'Cloison Cuisine / Atelier',
+                            axis: 'z',
+                            pos: -10,
+                            spanStart: -154,
+                            spanEnd: -18,
+                            min: -82,
+                            max: 35
                         },
                         {
                             id: 'wall-verger-2',
-                            label: 'Cloison Chambre / Salle d’eau',
-                            orientation: 'horizontal',
-                            x: 415, y: 145, w: 145, h: 12,
-                            minX: 415, maxX: 415, minY: 110, maxY: 195
+                            label: 'Cloison Atelier / Séjour',
+                            axis: 'x',
+                            pos: -35,
+                            spanStart: -10,
+                            spanEnd: 108,
+                            min: -120,
+                            max: 95
+                        },
+                        {
+                            id: 'wall-verger-3',
+                            label: 'Cloison Chambre / Bureau',
+                            axis: 'z',
+                            pos: -48,
+                            spanStart: 20,
+                            spanEnd: 154,
+                            min: -85,
+                            max: 55
                         }
                     ],
                     windows: [
-                        { x: 155, y: 70, w: 90, h: 10, label: 'Châssis Nord' },
-                        { x: 245, y: 310, w: 190, h: 10, label: 'Baie panoramique verger' },
-                        { x: 555, y: 195, w: 10, h: 85, label: 'Ouverture jardin' }
+                        { x1: -115, z1: -114, x2: -35, z2: -114 },
+                        { x1: -55, z1: 114, x2: 100, z2: 114 },
+                        { x1: 160, z1: -35, x2: 160, z2: 45 }
                     ],
                     roomsLabels: [
-                        { x: 195, y: 125, name: 'Cuisine & Cellier' },
-                        { x: 190, y: 250, name: 'Atelier / Chambre 3' },
-                        { x: 395, y: 250, name: 'Séjour ouvert verger' },
-                        { x: 485, y: 115, name: 'Chambre principale' }
-                    ],
-                    spacesSummary: [
-                        { label: 'Séjour + Atelier', value: '49 m² reconfigurables' },
-                        { label: 'Chambres', value: '3 chambres lumineuses' },
-                        { label: 'Cloisons mobiles', value: '2 cloisons glissantes' },
-                        { label: 'Extérieur', value: 'Passerelle & verger' }
+                        { x: -88, z: -62, name: 'Cuisine' },
+                        { x: -98, z: 55, name: 'Atelier' },
+                        { x: 58, z: 55, name: 'Séjour verger' },
+                        { x: 85, z: -82, name: 'Chambre 1' }
                     ]
                 }
             }
@@ -691,33 +749,45 @@
         const ASSEMBLY_STEPS = [
             {
                 step: 1,
-                shortLabel: '1. Dalle & terrasse',
-                title: '1. Fondations, dalle isolée & terrasse',
-                desc: 'Tout commence par une base parfaitement plane et isolée, prolongée par la terrasse extérieure pour ancrer la maison sur son terrain.'
+                shortLabel: '1. Terrasse',
+                title: '1. Terrasse extérieure & abords',
+                desc: 'Première couche superposée : l’espace extérieur et la terrasse texturée se posent en continuité du jardin.'
             },
             {
                 step: 2,
-                shortLabel: '2. Sols & revêtements',
-                title: '2. Pose des sols & zonage des pièces',
-                desc: 'Les lames de parquet revalorisé ou dalles de grès cérame viennent habiller la surface habitable selon l’usage de chaque pièce.'
+                shortLabel: '2. Dalle',
+                title: '2. Dalle structurelle & fondations',
+                desc: 'Deuxième couche : la dalle isolée s’emboîte avec effet LEGO et constitue la base stable de la maison.'
             },
             {
                 step: 3,
-                shortLabel: '3. Murs & cloisons',
-                title: '3. Murs porteurs & cloisons amovibles',
-                desc: 'Les murs périphériques s’emboîtent sur la dalle. Astuce interactive : attrapez les cloisons orange sur le plan et faites-les glisser pour adapter les volumes !'
+                shortLabel: '3. Sols',
+                title: '3. Revêtements de sol texturés',
+                desc: 'Troisième couche : parquet revalorisé, carrelage ou lames bois viennent habiller la surface habitable.'
             },
             {
                 step: 4,
-                shortLabel: '4. Châssis & vitrages',
-                title: '4. Pose des châssis & baies vitrées',
-                desc: 'Les menuiseries haute performance s’insèrent dans les réservations pour apporter lumière naturelle, isolation acoustique et étanchéité.'
+                shortLabel: '4. Cloisons',
+                title: '4. Cloisons intérieures ajustables (tous les murs intérieurs)',
+                desc: 'Quatrième couche : toutes les cloisons intérieures restent pleines et visibles, et peuvent être glissées pour moduler les pièces.'
             },
             {
                 step: 5,
-                shortLabel: '5. Toiture & finition',
-                title: '5. Charpente, toiture & maison prête à vivre',
-                desc: 'La couverture vient coiffer l’ensemble et finaliser l’enveloppe thermique. Vous pouvez continuer à déplacer les cloisons intérieures à tout moment.'
+                shortLabel: '5. Murs porteurs',
+                title: '5. Murs périphériques porteurs (seuls les murs porteurs peuvent devenir transparents)',
+                desc: 'Cinquième couche : les murs extérieurs s’élèvent ; seuls les murs porteurs adaptent leur transparence côté caméra.'
+            },
+            {
+                step: 6,
+                shortLabel: '6. Châssis',
+                title: '6. Châssis vitrés & baies',
+                desc: 'Sixième couche : les ouvertures vitrées s’insèrent dans l’enveloppe en pleine opacité.'
+            },
+            {
+                step: 7,
+                shortLabel: '7. Toiture',
+                title: '7. Toiture 3D & volume complet',
+                desc: 'Septième couche : la toiture couronne l’ensemble de la maquette 3D.'
             }
         ];
 
@@ -746,11 +816,18 @@
         };
 
         let selectedHouseId = HOUSES[0].id;
-        let currentAssemblyStep = 5; // Démarre assemblé pour permettre l'interaction immédiate
-        let isAutoLooping = false;
+        let currentAssemblyStep = 1;
+        let isAutoLooping = true;
+        let isAutoSpinning = true;
         let autoLoopInterval = null;
-        let customWallPositions = {}; // Stocke les positions glissées par maison
-        let activeDragState = null;
+        let autoSpinRafId = null;
+        let customWallPositions = {};
+        let activeWallDrag = null;
+        let activeSceneDrag = null;
+        let stepTransitionNonce = 0;
+
+        let yawDeg = 36;
+        let pitchDeg = 56;
 
         function getHouseById(id) {
             return HOUSES.find(h => h.id === id) || HOUSES[0];
@@ -759,10 +836,64 @@
         function ensureCustomWallPositions(house) {
             if (!customWallPositions[house.id]) {
                 customWallPositions[house.id] = {};
-                house.blueprint.movableWalls.forEach(w => {
-                    customWallPositions[house.id][w.id] = { x: w.x, y: w.y };
+                house.blueprint.interiorWalls.forEach(w => {
+                    customWallPositions[house.id][w.id] = { pos: w.pos };
                 });
             }
+        }
+
+        function project3D(x, y, z) {
+            const centerX = 440;
+            const centerY = 266;
+            const yaw = (yawDeg * Math.PI) / 180;
+            const pitch = (pitchDeg * Math.PI) / 180;
+
+            const cosY = Math.cos(yaw);
+            const sinY = Math.sin(yaw);
+            const sinP = Math.sin(pitch);
+
+            const rx = x * cosY - z * sinY;
+            const rz = x * sinY + z * cosY;
+
+            return {
+                x: centerX + rx,
+                y: centerY + rz * sinP - y,
+                rz
+            };
+        }
+
+        function pointsToAttr(pts) {
+            return pts.map(p => `${p.x.toFixed(1)},${p.y.toFixed(1)}`).join(' ');
+        }
+
+        function getCardinalLabelFromAngle(deg) {
+            const norm = ((deg % 360) + 360) % 360;
+            const dirs = ['Sud', 'Sud-Est', 'Est', 'Nord-Est', 'Nord', 'Nord-Ouest', 'Ouest', 'Sud-Ouest'];
+            const idx = Math.round(norm / 45) % 8;
+            return dirs[idx];
+        }
+
+        function renderCompass() {
+            const svg = document.getElementById('compassRoseSvg');
+            const normYaw = ((yawDeg % 360) + 360) % 360;
+            const roseAngle = -normYaw;
+
+            svg.innerHTML = `
+                <circle cx="42" cy="42" r="38" fill="#F8F9FA" stroke="#CBD5E1" stroke-width="1.5" />
+                <circle cx="42" cy="42" r="30" fill="none" stroke="#E2E8F0" stroke-width="1" stroke-dasharray="2 2" />
+                <g transform="translate(42,42) rotate(${roseAngle.toFixed(1)})">
+                    <polygon points="0,-27 5,-9 -5,-9" fill="#D8232A" />
+                    <polygon points="0,27 5,9 -5,9" fill="#64748B" />
+                    <text x="0" y="-29" text-anchor="middle" fill="#D8232A" font-size="9.5" font-weight="800" font-family="Inter, sans-serif">N</text>
+                    <text x="0" y="36" text-anchor="middle" fill="#475569" font-size="8.5" font-weight="700" font-family="Inter, sans-serif">S</text>
+                    <text x="32" y="3" text-anchor="middle" fill="#475569" font-size="8.5" font-weight="700" font-family="Inter, sans-serif">E</text>
+                    <text x="-32" y="3" text-anchor="middle" fill="#475569" font-size="8.5" font-weight="700" font-family="Inter, sans-serif">O</text>
+                    <circle cx="0" cy="0" r="3.5" fill="#1B2E4B" />
+                </g>
+            `;
+
+            const facing = getCardinalLabelFromAngle(yawDeg);
+            document.getElementById('compassFacingReadout').textContent = `Terrasse : ${facing} (${Math.round(normYaw)}°)`;
         }
 
         function renderHouses() {
@@ -869,26 +1000,77 @@
             }).join('');
         }
 
-        function renderInteractiveBlueprint(animateNewestLayer = false) {
+        // Génère un prisme 3D avec opacité pleine par défaut (sauf murs porteurs extérieurs si configuré)
+        function createPrism3DItem(x1, z1, x2, z2, yBot, yTop, halfThick, fillTop, fillSideA, fillSideB, strokeColor, options = {}) {
+            const dx = x2 - x1;
+            const dz = z2 - z1;
+            const len = Math.hypot(dx, dz) || 1;
+            const nx = (-dz / len) * halfThick;
+            const nz = (dx / len) * halfThick;
+
+            const p1b = project3D(x1 + nx, yBot, z1 + nz);
+            const p2b = project3D(x2 + nx, yBot, z2 + nz);
+            const p3b = project3D(x2 - nx, yBot, z2 - nz);
+            const p4b = project3D(x1 - nx, yBot, z1 - nz);
+
+            const p1t = project3D(x1 + nx, yTop, z1 + nz);
+            const p2t = project3D(x2 + nx, yTop, z2 + nz);
+            const p3t = project3D(x2 - nx, yTop, z2 - nz);
+            const p4t = project3D(x1 - nx, yTop, z1 - nz);
+
+            const avgDepth = (p1b.rz + p2b.rz + p3b.rz + p4b.rz) / 4;
+            const dashAttr = options.dashed ? 'stroke-dasharray="5 3"' : '';
+            const opacityVal = options.opacity !== undefined ? options.opacity : 1;
+            const dragAttr = options.movable
+                ? `class="movable-wall-3d" data-wall-id="${options.wallId}" onpointerdown="startWallDrag3D(event, '${options.wallId}')"`
+                : `style="pointer-events: none;"`;
+
+            const lightFactor = Math.max(0.76, Math.min(1.1, 1 - (dx * 0.0012 - dz * 0.0014)));
+
+            const midHandle = project3D((x1 + x2) / 2, yTop + 12, (z1 + z2) / 2);
+            const handleMarkup = options.movable ? `
+                <g style="pointer-events: none;">
+                    <circle cx="${midHandle.x.toFixed(1)}" cy="${midHandle.y.toFixed(1)}" r="11" fill="#FFFFFF" stroke="#D97706" stroke-width="2.2" />
+                    <text x="${midHandle.x.toFixed(1)}" y="${(midHandle.y + 3.5).toFixed(1)}" text-anchor="middle" fill="#B45309" font-size="11" font-weight="800" font-family="Inter, sans-serif">
+                        ${options.handleSymbol || '↔'}
+                    </text>
+                </g>
+            ` : '';
+
+            const markup = `
+                <g ${dragAttr} opacity="${opacityVal}">
+                    <polygon points="${pointsToAttr([p1b, p2b, p2t, p1t])}" fill="${fillSideA}" opacity="${(0.95 * lightFactor).toFixed(2)}" stroke="${strokeColor}" stroke-width="1.3" ${dashAttr} />
+                    <polygon points="${pointsToAttr([p2b, p3b, p3t, p2t])}" fill="${fillSideB}" opacity="${(0.88 / lightFactor).toFixed(2)}" stroke="${strokeColor}" stroke-width="1.3" ${dashAttr} />
+                    <polygon points="${pointsToAttr([p3b, p4b, p4t, p3t])}" fill="${fillSideA}" opacity="0.82" stroke="${strokeColor}" stroke-width="1.3" ${dashAttr} />
+                    <polygon points="${pointsToAttr([p4b, p1b, p1t, p4t])}" fill="${fillSideB}" opacity="0.82" stroke="${strokeColor}" stroke-width="1.3" ${dashAttr} />
+                    <polygon points="${pointsToAttr([p1t, p2t, p3t, p4t])}" fill="${fillTop}" stroke="${strokeColor}" stroke-width="1.5" ${dashAttr} />
+                    ${handleMarkup}
+                </g>
+            `;
+
+            return { depth: avgDepth, markup };
+        }
+
+        function renderInteractiveBlueprint(triggerStepFade = false) {
             const house = getHouseById(selectedHouseId);
             ensureCustomWallPositions(house);
             const bp = house.blueprint;
             const stepInfo = ASSEMBLY_STEPS[currentAssemblyStep - 1];
 
-            // Mise à jour des textes & contrôles
+            renderCompass();
+
             document.getElementById('blueprintHouseTag').textContent = house.name;
-            document.getElementById('blueprintPlanTitle').textContent = `Plan modulaire — ${house.name} (${house.rooms})`;
-            document.getElementById('stepCounterBadge').textContent = `Étape ${currentAssemblyStep} / ${ASSEMBLY_STEPS.length}`;
+            document.getElementById('blueprintPlanTitle').textContent = `Maquette 3D — ${house.name} (${house.rooms})`;
+            document.getElementById('stepCounterBadge').textContent = `Couche ${currentAssemblyStep} / ${ASSEMBLY_STEPS.length}`;
             document.getElementById('stepDetailTitle').textContent = stepInfo.title;
             document.getElementById('stepDetailDesc').textContent = stepInfo.desc;
-            document.getElementById('stepModeStatus').textContent = isAutoLooping ? 'Lecture auto en boucle' : 'Mode manuel';
+            document.getElementById('cameraAngleReadout').textContent = `Rotation : ${Math.round(yawDeg)}° • Inclinaison : ${Math.round(pitchDeg)}°`;
+            document.getElementById('stackProgressBar').style.width = `${(currentAssemblyStep / ASSEMBLY_STEPS.length) * 100}%`;
 
             document.getElementById('prevStepBtn').disabled = !isAutoLooping && currentAssemblyStep <= 1;
             document.getElementById('nextStepBtn').disabled = !isAutoLooping && currentAssemblyStep >= ASSEMBLY_STEPS.length;
 
-            // Pilules d'étapes
-            const pillsContainer = document.getElementById('assemblyStepsPills');
-            pillsContainer.innerHTML = ASSEMBLY_STEPS.map(s => {
+            document.getElementById('assemblyStepsPills').innerHTML = ASSEMBLY_STEPS.map(s => {
                 const isCurrent = s.step === currentAssemblyStep;
                 const isDone = s.step < currentAssemblyStep;
                 return `
@@ -905,142 +1087,262 @@
                 `;
             }).join('');
 
-            // Résumé des espaces
-            document.getElementById('houseSpacesSummary').innerHTML = bp.spacesSummary.map(item => `
-                <div class="p-2.5 rounded-xl bg-white border border-slate-200/80">
-                    <span class="text-[10px] font-semibold text-slate-400 block">${item.label}</span>
-                    <span class="font-bold text-tp-navy">${item.value}</span>
-                </div>
-            `).join('');
-
-            // Construction du SVG schématique façon assemblage modulaire
-            const { x, y, w, h } = bp.outline;
+            // Applique une transition fade à chaque changement d'étape sur les couches visibles
+            const fadeClass = triggerStepFade ? 'layer-step-fade' : '';
             const svg = document.getElementById('houseSchematicSvg');
 
-            const animClass = (layerStep) => (animateNewestLayer && currentAssemblyStep === layerStep) ? 'lego-layer-enter' : '';
-
-            // Motifs de sols
-            let defsMarkup = `
+            const defsMarkup = `
                 <defs>
-                    <pattern id="parquetPattern" width="28" height="14" patternUnits="userSpaceOnUse">
-                        <rect width="28" height="14" fill="#FDE68A" />
-                        <path d="M0 7 H28 M14 0 V7 M28 7 V14" stroke="#D97706" stroke-opacity="0.28" stroke-width="1"/>
+                    <pattern id="texParquet" width="24" height="12" patternUnits="userSpaceOnUse">
+                        <rect width="24" height="12" fill="#FDE68A" />
+                        <path d="M0 6 H24 M12 0 V6 M24 6 V12" stroke="#B45309" stroke-opacity="0.34" stroke-width="1"/>
                     </pattern>
-                    <pattern id="tilesPattern" width="24" height="24" patternUnits="userSpaceOnUse">
-                        <rect width="24" height="24" fill="#FFEDD5" />
-                        <path d="M24 0 H0 V24" fill="none" stroke="#C2410C" stroke-opacity="0.22" stroke-width="1"/>
+                    <pattern id="texTiles" width="20" height="20" patternUnits="userSpaceOnUse">
+                        <rect width="20" height="20" fill="#FFEDD5" />
+                        <path d="M20 0 H0 V20" fill="none" stroke="#9A3412" stroke-opacity="0.28" stroke-width="1"/>
+                        <circle cx="10" cy="10" r="1.3" fill="#9A3412" fill-opacity="0.25" />
                     </pattern>
-                    <pattern id="deckPattern" width="16" height="16" patternUnits="userSpaceOnUse">
-                        <rect width="16" height="16" fill="#FEF3C7" />
-                        <path d="M0 8 H16" stroke="#B45309" stroke-opacity="0.28" stroke-width="1.2"/>
+                    <pattern id="texDeck" width="14" height="14" patternUnits="userSpaceOnUse">
+                        <rect width="14" height="14" fill="#FEF3C7" />
+                        <path d="M0 7 H14" stroke="#92400E" stroke-opacity="0.34" stroke-width="1.2"/>
+                    </pattern>
+                    <pattern id="texTerrace" width="16" height="16" patternUnits="userSpaceOnUse">
+                        <rect width="16" height="16" fill="#DCFCE7" />
+                        <path d="M0 16 L16 0" stroke="#15803D" stroke-opacity="0.24" stroke-width="1"/>
+                    </pattern>
+                    <pattern id="texRoof" width="18" height="12" patternUnits="userSpaceOnUse">
+                        <rect width="18" height="12" fill="${bp.roofColor}" fill-opacity="0.38" />
+                        <path d="M0 6 Q4.5 2 9 6 T18 6" fill="none" stroke="#1B2E4B" stroke-opacity="0.38" stroke-width="1.2"/>
                     </pattern>
                 </defs>
             `;
 
-            const floorFill = bp.floorPattern === 'parquet'
-                ? 'url(#parquetPattern)'
-                : bp.floorPattern === 'tiles'
-                    ? 'url(#tilesPattern)'
-                    : 'url(#deckPattern)';
+            const hw = bp.halfW;
+            const hd = bp.halfD;
+            const yTerrace = 2;
+            const ySlabBot = 4;
+            const ySlabTop = 14;
+            const yFloor = 16;
+            const wallH = bp.wallHeight;
+            const yWallTop = yFloor + wallH;
 
-            // Étape 1 : Dalle & terrasse (toujours visible dès étape 1)
-            const step1Markup = `
-                <g class="${animClass(1)}">
-                    <!-- Ombre portée façon maquette 2.5D -->
-                    <rect x="${x + 8}" y="${y + 10}" width="${w}" height="${h}" rx="10" fill="#CBD5E1" opacity="0.65" />
-                    <!-- Dalle de fondation -->
-                    <rect x="${x}" y="${y}" width="${w}" height="${h}" rx="10" fill="#E2E8F0" stroke="#64748B" stroke-width="2" />
-                    <!-- Terrasse -->
-                    <rect x="${bp.terrace.x}" y="${bp.terrace.y}" width="${bp.terrace.w}" height="${bp.terrace.h}" rx="6" fill="#DCFCE7" stroke="#2E7D5B" stroke-width="1.5" stroke-dasharray="5 3" />
-                    <text x="${bp.terrace.x + bp.terrace.w / 2}" y="${bp.terrace.y + 25}" text-anchor="middle" fill="#166534" font-size="11" font-weight="700" font-family="Inter, sans-serif">
-                        ${bp.terrace.label}
-                    </text>
-                    <!-- Tenons façon briques LEGO sur la dalle si étape 1 uniquement -->
-                    ${currentAssemblyStep === 1 ? renderLegoStuds(x + 24, y + 24, w - 48, h - 48) : ''}
-                </g>
-            `;
+            const renderables = [];
 
-            // Étape 2 : Sol & libellés de zones
-            const step2Markup = currentAssemblyStep >= 2 ? `
-                <g class="${animClass(2)}">
-                    <rect x="${x + 8}" y="${y + 8}" width="${w - 16}" height="${h - 16}" rx="6" fill="${floorFill}" stroke="#D97706" stroke-width="1.2" />
-                    ${bp.roomsLabels.map(r => `
-                        <g>
-                            <rect x="${r.x - 56}" y="${r.y - 12}" width="112" height="22" rx="11" fill="rgba(255,255,255,0.86)" stroke="#CBD5E1" stroke-width="1" />
-                            <text x="${r.x}" y="${r.y + 3}" text-anchor="middle" fill="#1B2E4B" font-size="10.5" font-weight="700" font-family="Inter, sans-serif">
-                                ${r.name}
-                            </text>
+            // Ombre portée au sol
+            const sh1 = project3D(-hw + 18, 0, -hd + 18);
+            const sh2 = project3D(hw + 22, 0, -hd + 18);
+            const sh3 = project3D(hw + 22, 0, hd + 22);
+            const sh4 = project3D(-hw + 18, 0, hd + 22);
+            renderables.push({
+                depth: 999,
+                markup: `
+                    <g style="pointer-events: none;">
+                        <polygon points="${pointsToAttr([sh1, sh2, sh3, sh4])}" fill="#0F172A" opacity="0.11" />
+                    </g>
+                `
+            });
+
+            // COUCHE 1 : Terrasse extérieure texturée (pleine opacité)
+            const tHalfW = bp.terraceWidth / 2;
+            const tCenterZ = bp.terraceOffsetZ;
+            const tHalfD = bp.terraceDepth / 2;
+            const t1 = project3D(-tHalfW, yTerrace, tCenterZ - tHalfD);
+            const t2 = project3D(tHalfW, yTerrace, tCenterZ - tHalfD);
+            const t3 = project3D(tHalfW, yTerrace, tCenterZ + tHalfD);
+            const t4 = project3D(-tHalfW, yTerrace, tCenterZ + tHalfD);
+            const tDepth = (t1.rz + t2.rz + t3.rz + t4.rz) / 4;
+
+            renderables.push({
+                depth: tDepth + 24,
+                markup: `
+                    <g class="${fadeClass}" style="pointer-events: none;">
+                        <polygon points="${pointsToAttr([t1, t2, t3, t4])}" fill="url(#texTerrace)" stroke="#2E7D5B" stroke-width="1.6" stroke-dasharray="5 3" />
+                    </g>
+                `
+            });
+
+            // COUCHE 2 : Dalle 3D (pleine opacité)
+            if (currentAssemblyStep >= 2) {
+                const s1t = project3D(-hw, ySlabTop, -hd);
+                const s2t = project3D(hw, ySlabTop, -hd);
+                const s3t = project3D(hw, ySlabTop, hd);
+                const s4t = project3D(-hw, ySlabTop, hd);
+
+                const s1b = project3D(-hw, ySlabBot, -hd);
+                const s2b = project3D(hw, ySlabBot, -hd);
+                const s3b = project3D(hw, ySlabBot, hd);
+                const s4b = project3D(-hw, ySlabBot, hd);
+
+                const slabDepth = (s1t.rz + s2t.rz + s3t.rz + s4t.rz) / 4;
+                renderables.push({
+                    depth: slabDepth + 14,
+                    markup: `
+                        <g class="${fadeClass}" style="pointer-events: none;">
+                            <polygon points="${pointsToAttr([s4t, s3t, s3b, s4b])}" fill="#94A3B8" stroke="#475569" stroke-width="1.2" />
+                            <polygon points="${pointsToAttr([s3t, s2t, s2b, s3b])}" fill="#CBD5E1" stroke="#475569" stroke-width="1.2" />
+                            <polygon points="${pointsToAttr([s1t, s2t, s3t, s4t])}" fill="#E2E8F0" stroke="#475569" stroke-width="1.6" />
                         </g>
-                    `).join('')}
-                </g>
-            ` : '';
+                    `
+                });
+            }
 
-            // Étape 3 : Murs porteurs + Cloisons amovibles (Drag & Drop)
-            const step3Markup = currentAssemblyStep >= 3 ? `
-                <g class="${animClass(3)}">
-                    <!-- Murs périphériques porteurs -->
-                    <rect x="${x}" y="${y}" width="${w}" height="${h}" rx="8" fill="none" stroke="${bp.wallColor}" stroke-width="12" />
-                    <!-- Cloisons fixes intérieures -->
-                    ${bp.fixedWalls.map(fw => `
-                        <rect x="${fw.x}" y="${fw.y}" width="${fw.w}" height="${fw.h}" rx="3" fill="${bp.wallColor}" />
-                    `).join('')}
+            // COUCHE 3 : Sols texturés + étiquettes de pièces (pleine opacité)
+            if (currentAssemblyStep >= 3) {
+                const f1 = project3D(-hw + 5, yFloor, -hd + 5);
+                const f2 = project3D(hw - 5, yFloor, -hd + 5);
+                const f3 = project3D(hw - 5, yFloor, hd - 5);
+                const f4 = project3D(-hw + 5, yFloor, hd - 5);
+                const floorDepth = (f1.rz + f2.rz + f3.rz + f4.rz) / 4;
 
-                    <!-- Cloisons amovibles interactives (Drag & Drop) -->
-                    ${bp.movableWalls.map(mw => {
-                        const pos = customWallPositions[house.id][mw.id] || { x: mw.x, y: mw.y };
-                        const cx = pos.x + mw.w / 2;
-                        const cy = pos.y + mw.h / 2;
-                        return `
-                            <g class="movable-wall-group" data-wall-id="${mw.id}" onpointerdown="startWallDrag(event, '${mw.id}')">
-                                <!-- Zone de préhension élargie pour faciliter le glisser-déposer -->
-                                <rect x="${pos.x - 10}" y="${pos.y - 10}" width="${mw.w + 20}" height="${mw.h + 20}" fill="transparent" />
-                                <!-- Cloison amovible -->
-                                <rect x="${pos.x}" y="${pos.y}" width="${mw.w}" height="${mw.h}" rx="4" fill="#F59E0B" stroke="#92400E" stroke-width="2" stroke-dasharray="4 2" />
-                                <!-- Pastille poignée centrale -->
-                                <circle cx="${cx}" cy="${cy}" r="11" fill="#FFFFFF" stroke="#D97706" stroke-width="2" />
-                                <text x="${cx}" y="${cy + 3.5}" text-anchor="middle" fill="#B45309" font-size="11" font-weight="800" font-family="Inter, sans-serif">
-                                    ${mw.orientation === 'vertical' ? '↔' : '↕'}
-                                </text>
-                            </g>
-                        `;
-                    }).join('')}
-                </g>
-            ` : '';
-
-            // Étape 4 : Châssis & baies vitrées
-            const step4Markup = currentAssemblyStep >= 4 ? `
-                <g class="${animClass(4)}">
-                    ${bp.windows.map(win => `
-                        <g>
-                            <rect x="${win.x}" y="${win.y}" width="${win.w}" height="${win.h}" rx="3" fill="#10B981" stroke="#065F46" stroke-width="1.5" />
-                            <line x1="${win.x + 2}" y1="${win.y + win.h / 2}" x2="${win.x + win.w - 2}" y2="${win.y + win.h / 2}" stroke="#ECFDF5" stroke-width="1.5" />
+                renderables.push({
+                    depth: floorDepth + 10,
+                    markup: `
+                        <g class="${fadeClass}" style="pointer-events: none;">
+                            <polygon points="${pointsToAttr([f1, f2, f3, f4])}" fill="url(#${bp.floorPatternId})" stroke="#B45309" stroke-width="1.4" />
+                            ${bp.roomsLabels.map(r => {
+                                const rp = project3D(r.x, yFloor + 1.5, r.z);
+                                return `
+                                    <g>
+                                        <rect x="${(rp.x - 44).toFixed(1)}" y="${(rp.y - 9.5).toFixed(1)}" width="88" height="18" rx="9" fill="#FFFFFF" stroke="#CBD5E1" stroke-width="1" />
+                                        <text x="${rp.x.toFixed(1)}" y="${(rp.y + 3).toFixed(1)}" text-anchor="middle" fill="#1B2E4B" font-size="9.5" font-weight="700" font-family="Inter, sans-serif">
+                                            ${r.name}
+                                        </text>
+                                    </g>
+                                `;
+                            }).join('')}
                         </g>
-                    `).join('')}
-                </g>
-            ` : '';
+                    `
+                });
+            }
 
-            // Étape 5 : Structure de toiture légère translucide (laisse voir et manipuler l'intérieur)
-            const step5Markup = currentAssemblyStep >= 5 ? `
-                <g class="${animClass(5)}" style="pointer-events: none;">
-                    <rect x="${x - 8}" y="${y - 8}" width="${w + 16}" height="${h + 16}" rx="12" fill="rgba(27, 46, 75, 0.05)" stroke="#1B2E4B" stroke-width="2" stroke-dasharray="8 5" />
-                    <rect x="${x + w / 2 - 145}" y="${y - 22}" width="290" height="22" rx="11" fill="#1B2E4B" />
-                    <text x="${x + w / 2}" y="${y - 8}" text-anchor="middle" fill="#FFFFFF" font-size="10.5" font-weight="700" font-family="Inter, sans-serif">
-                        ${bp.roofLabel}
-                    </text>
-                </g>
-            ` : '';
+            // COUCHE 4 : Tous les murs intérieurs ajustables (toujours 100% opaques)
+            if (currentAssemblyStep >= 4) {
+                bp.interiorWalls.forEach(mw => {
+                    const currentPos = customWallPositions[house.id][mw.id] ? customWallPositions[house.id][mw.id].pos : mw.pos;
+                    const seg = mw.axis === 'x'
+                        ? createPrism3DItem(currentPos, mw.spanStart, currentPos, mw.spanEnd, yFloor, yFloor + wallH * 0.85, 5.5, '#FBBF24', '#D97706', '#B45309', '#78350F', {
+                            movable: true,
+                            wallId: mw.id,
+                            dashed: true,
+                            opacity: 1,
+                            handleSymbol: '↔'
+                        })
+                        : createPrism3DItem(mw.spanStart, currentPos, mw.spanEnd, currentPos, yFloor, yFloor + wallH * 0.85, 5.5, '#FBBF24', '#D97706', '#B45309', '#78350F', {
+                            movable: true,
+                            wallId: mw.id,
+                            dashed: true,
+                            opacity: 1,
+                            handleSymbol: '↕'
+                        });
+                    renderables.push({
+                        depth: seg.depth - 8,
+                        markup: `<g class="${fadeClass}">${seg.markup}</g>`
+                    });
+                });
+            }
 
-            svg.innerHTML = defsMarkup + step1Markup + step2Markup + step3Markup + step4Markup + step5Markup;
+            // COUCHE 5 : Murs périphériques porteurs (SEULS ces murs peuvent devenir semi-transparents côté vue)
+            if (currentAssemblyStep >= 5) {
+                const perimSegments = [
+                    [-hw, -hd, hw, -hd],
+                    [hw, -hd, hw, hd],
+                    [hw, hd, -hw, hd],
+                    [-hw, hd, -hw, -hd]
+                ];
+                perimSegments.forEach(([x1, z1, x2, z2]) => {
+                    const pA = project3D(x1, yFloor, z1);
+                    const pB = project3D(x2, yFloor, z2);
+                    const segMidRz = (pA.rz + pB.rz) / 2;
+                    const exteriorOpacity = segMidRz > 15 ? 0.28 : 0.82;
+                    const seg = createPrism3DItem(x1, z1, x2, z2, yFloor, yWallTop, 5.5, bp.wallColor, bp.wallSideColor, bp.wallColor, '#0F172A', {
+                        opacity: exteriorOpacity
+                    });
+                    renderables.push({
+                        depth: seg.depth + 4,
+                        markup: `<g class="${fadeClass}">${seg.markup}</g>`
+                    });
+                });
+            }
+
+            // COUCHE 6 : Châssis & ouvertures vitrées (pleine opacité)
+            if (currentAssemblyStep >= 6) {
+                bp.windows.forEach(win => {
+                    const seg = createPrism3DItem(win.x1, win.z1, win.x2, win.z2, yFloor + 12, yWallTop - 10, 4.2, '#34D399', '#10B981', '#059669', '#065F46', {
+                        opacity: 1
+                    });
+                    renderables.push({
+                        depth: seg.depth,
+                        markup: `<g class="${fadeClass}">${seg.markup}</g>`
+                    });
+                });
+            }
+
+            // COUCHE 7 : Toiture 3D texturée (pleine opacité de ses faces texturées)
+            if (currentAssemblyStep >= 7) {
+                const r1 = project3D(-hw - 6, yWallTop + 2, -hd - 6);
+                const r2 = project3D(hw + 6, yWallTop + 2, -hd - 6);
+                const r3 = project3D(hw + 6, yWallTop + 2, hd + 6);
+                const r4 = project3D(-hw - 6, yWallTop + 2, hd + 6);
+                const rRidgeTop = project3D(0, yWallTop + bp.roofPeakHeight, -hd - 6);
+                const rRidgeBot = project3D(0, yWallTop + bp.roofPeakHeight, hd + 6);
+                const roofDepth = (r1.rz + r2.rz + r3.rz + r4.rz) / 4 - 16;
+
+                renderables.push({
+                    depth: roofDepth,
+                    markup: `
+                        <g class="${fadeClass}" style="pointer-events: none;">
+                            <polygon points="${pointsToAttr([r1, rRidgeTop, rRidgeBot, r4])}" fill="url(#texRoof)" stroke="#1B2E4B" stroke-width="1.6" />
+                            <polygon points="${pointsToAttr([rRidgeTop, r2, r3, rRidgeBot])}" fill="${bp.roofColor}" stroke="#1B2E4B" stroke-width="1.6" />
+                        </g>
+                    `
+                });
+            }
+
+            renderables.sort((a, b) => b.depth - a.depth);
+            svg.innerHTML = defsMarkup + renderables.map(item => item.markup).join('');
         }
 
-        function renderLegoStuds(startX, startY, width, height) {
-            let studs = '';
-            for (let gx = startX; gx <= startX + width; gx += 46) {
-                for (let gy = startY; gy <= startY + height; gy += 46) {
-                    studs += `<circle cx="${gx}" cy="${gy}" r="6" fill="#CBD5E1" stroke="#94A3B8" stroke-width="1.2" />`;
+        function startAutoSpinLoop() {
+            if (autoSpinRafId) cancelAnimationFrame(autoSpinRafId);
+            let lastTime = performance.now();
+
+            function tick(now) {
+                const dt = (now - lastTime) / 1000;
+                lastTime = now;
+
+                if (isAutoSpinning && !activeSceneDrag && !activeWallDrag) {
+                    yawDeg = (yawDeg + dt * 8.5) % 360;
+                    renderInteractiveBlueprint(false);
                 }
+                autoSpinRafId = requestAnimationFrame(tick);
             }
-            return studs;
+            autoSpinRafId = requestAnimationFrame(tick);
+        }
+
+        function stopAutoSpinByUser() {
+            if (isAutoSpinning) {
+                isAutoSpinning = false;
+                updateAutoSpinUI();
+            }
+        }
+
+        function toggleAutoSpin() {
+            isAutoSpinning = !isAutoSpinning;
+            updateAutoSpinUI();
+        }
+
+        function updateAutoSpinUI() {
+            const badge = document.getElementById('autoSpinBadge');
+            const label = document.getElementById('spinBtnLabel');
+            if (isAutoSpinning) {
+                badge.textContent = 'Rotation auto lente active';
+                badge.className = 'px-3 py-1 rounded-full bg-sky-100 text-sky-900 text-xs font-bold border border-sky-200';
+                label.textContent = 'Stop rotation auto';
+            } else {
+                badge.textContent = 'Angle manuel';
+                badge.className = 'px-3 py-1 rounded-full bg-slate-100 text-slate-700 text-xs font-bold border border-slate-200';
+                label.textContent = 'Relancer rotation auto';
+            }
         }
 
         function changeAssemblyStep(delta) {
@@ -1048,6 +1350,7 @@
             const next = Math.min(ASSEMBLY_STEPS.length, Math.max(1, currentAssemblyStep + delta));
             if (next !== currentAssemblyStep) {
                 currentAssemblyStep = next;
+                stepTransitionNonce += 1;
                 renderInteractiveBlueprint(true);
             }
         }
@@ -1055,6 +1358,7 @@
         function goToAssemblyStep(stepNum) {
             if (isAutoLooping) stopBlueprintLoop();
             currentAssemblyStep = stepNum;
+            stepTransitionNonce += 1;
             renderInteractiveBlueprint(true);
         }
 
@@ -1068,18 +1372,21 @@
 
         function startBlueprintLoop() {
             isAutoLooping = true;
+            if (autoLoopInterval) clearInterval(autoLoopInterval);
             document.getElementById('loopBtnIcon').textContent = '⏸';
-            document.getElementById('loopBtnLabel').textContent = 'Mettre en pause';
+            document.getElementById('loopBtnLabel').textContent = 'Pause vidéo';
             document.getElementById('toggleAutoLoopBtn').classList.replace('bg-tp-sage', 'bg-tp-red');
             document.getElementById('toggleAutoLoopBtn').classList.replace('hover:bg-emerald-700', 'hover:bg-tp-redDark');
 
             currentAssemblyStep = 1;
+            stepTransitionNonce += 1;
             renderInteractiveBlueprint(true);
 
             autoLoopInterval = setInterval(() => {
                 currentAssemblyStep = currentAssemblyStep >= ASSEMBLY_STEPS.length ? 1 : currentAssemblyStep + 1;
+                stepTransitionNonce += 1;
                 renderInteractiveBlueprint(true);
-            }, 1700);
+            }, 1650);
         }
 
         function stopBlueprintLoop() {
@@ -1087,86 +1394,124 @@
             clearInterval(autoLoopInterval);
             autoLoopInterval = null;
             document.getElementById('loopBtnIcon').textContent = '▶';
-            document.getElementById('loopBtnLabel').textContent = 'Lecture auto en boucle';
+            document.getElementById('loopBtnLabel').textContent = 'Lecture vidéo en boucle';
             document.getElementById('toggleAutoLoopBtn').classList.replace('bg-tp-red', 'bg-tp-sage');
             document.getElementById('toggleAutoLoopBtn').classList.replace('hover:bg-tp-redDark', 'hover:bg-emerald-700');
             renderInteractiveBlueprint(false);
         }
 
-        function startWallDrag(event, wallId) {
+        function startScene3DRotation(event) {
+            if (event.target.closest('.movable-wall-3d')) return;
             event.preventDefault();
+            stopAutoSpinByUser();
+
+            activeSceneDrag = {
+                startX: event.clientX,
+                startY: event.clientY,
+                startYaw: yawDeg,
+                startPitch: pitchDeg
+            };
+            window.addEventListener('pointermove', onScene3DRotationMove);
+            window.addEventListener('pointerup', endScene3DRotation);
+        }
+
+        function onScene3DRotationMove(event) {
+            if (!activeSceneDrag) return;
+            const dx = event.clientX - activeSceneDrag.startX;
+            const dy = event.clientY - activeSceneDrag.startY;
+            yawDeg = activeSceneDrag.startYaw + dx * 0.45;
+            pitchDeg = Math.min(78, Math.max(26, activeSceneDrag.startPitch + dy * 0.3));
+            document.getElementById('movableWallCoords').textContent = 'Rotation 3D manuelle';
+            renderInteractiveBlueprint(false);
+        }
+
+        function endScene3DRotation() {
+            activeSceneDrag = null;
+            window.removeEventListener('pointermove', onScene3DRotationMove);
+            window.removeEventListener('pointerup', endScene3DRotation);
+        }
+
+        function manualRotate3D(dYaw, dPitch) {
+            stopAutoSpinByUser();
+            yawDeg += dYaw;
+            pitchDeg = Math.min(78, Math.max(26, pitchDeg + dPitch));
+            renderInteractiveBlueprint(false);
+        }
+
+        function manualSetCamera(yaw, pitch) {
+            stopAutoSpinByUser();
+            yawDeg = yaw;
+            pitchDeg = pitch;
+            renderInteractiveBlueprint(false);
+        }
+
+        function startWallDrag3D(event, wallId) {
+            event.preventDefault();
+            event.stopPropagation();
+            stopAutoSpinByUser();
             if (isAutoLooping) stopBlueprintLoop();
 
             const house = getHouseById(selectedHouseId);
-            const wallDef = house.blueprint.movableWalls.find(w => w.id === wallId);
+            const wallDef = house.blueprint.interiorWalls.find(w => w.id === wallId);
             if (!wallDef) return;
 
-            const svg = document.getElementById('houseSchematicSvg');
-            const pt = getSvgPoint(svg, event.clientX, event.clientY);
-            const currentPos = customWallPositions[house.id][wallId];
-
-            activeDragState = {
+            activeWallDrag = {
                 houseId: house.id,
                 wallDef,
-                offsetX: pt.x - currentPos.x,
-                offsetY: pt.y - currentPos.y
+                startClientX: event.clientX,
+                startClientY: event.clientY,
+                startPos: customWallPositions[house.id][wallId].pos
             };
 
-            window.addEventListener('pointermove', onWallDragMove);
-            window.addEventListener('pointerup', endWallDrag);
+            window.addEventListener('pointermove', onWallDrag3DMove);
+            window.addEventListener('pointerup', endWallDrag3D);
         }
 
-        function onWallDragMove(event) {
-            if (!activeDragState) return;
-            const svg = document.getElementById('houseSchematicSvg');
-            const pt = getSvgPoint(svg, event.clientX, event.clientY);
-            const { houseId, wallDef, offsetX, offsetY } = activeDragState;
+        function onWallDrag3DMove(event) {
+            if (!activeWallDrag) return;
+            const { houseId, wallDef, startClientX, startClientY, startPos } = activeWallDrag;
 
-            // Aimantation douce sur pas de 5px
-            let rawX = Math.round((pt.x - offsetX) / 5) * 5;
-            let rawY = Math.round((pt.y - offsetY) / 5) * 5;
+            const dx = event.clientX - startClientX;
+            const dy = event.clientY - startClientY;
+            const yaw = (yawDeg * Math.PI) / 180;
+            const pitch = (pitchDeg * Math.PI) / 180;
 
-            const clampedX = Math.min(wallDef.maxX, Math.max(wallDef.minX, rawX));
-            const clampedY = Math.min(wallDef.maxY, Math.max(wallDef.minY, rawY));
+            let deltaCoord = 0;
+            if (wallDef.axis === 'x') {
+                deltaCoord = dx * Math.cos(yaw) + dy * Math.sin(yaw) * Math.sin(pitch);
+            } else {
+                deltaCoord = -dx * Math.sin(yaw) + dy * Math.cos(yaw) * Math.sin(pitch);
+            }
 
-            customWallPositions[houseId][wallDef.id] = { x: clampedX, y: clampedY };
+            let nextPos = Math.round((startPos + deltaCoord * 1.15) / 5) * 5;
+            nextPos = Math.min(wallDef.max, Math.max(wallDef.min, nextPos));
 
-            const deltaPx = wallDef.orientation === 'vertical'
-                ? clampedX - wallDef.x
-                : clampedY - wallDef.y;
-            const deltaMeters = (deltaPx / 35).toFixed(2);
+            customWallPositions[houseId][wallDef.id].pos = nextPos;
+
+            const deltaPx = nextPos - wallDef.pos;
+            const deltaMeters = (deltaPx / 42).toFixed(2);
 
             document.getElementById('movableWallCoords').textContent =
                 `${wallDef.label} : ${deltaMeters >= 0 ? '+' : ''}${deltaMeters} m`;
             document.getElementById('movableWallFeedback').textContent =
-                `Vous avez déplacé « ${wallDef.label} » (${deltaMeters >= 0 ? '+' : ''}${deltaMeters} m) : le volume des pièces adjacentes s'adapte sans toucher aux murs porteurs.`;
+                `« ${wallDef.label} » ajustée (${deltaMeters >= 0 ? '+' : ''}${deltaMeters} m) : l'agencement intérieur s'adapte en direct.`;
 
             renderInteractiveBlueprint(false);
         }
 
-        function endWallDrag() {
-            activeDragState = null;
-            window.removeEventListener('pointermove', onWallDragMove);
-            window.removeEventListener('pointerup', endWallDrag);
-        }
-
-        function getSvgPoint(svg, clientX, clientY) {
-            const rect = svg.getBoundingClientRect();
-            const scaleX = 680 / rect.width;
-            const scaleY = 400 / rect.height;
-            return {
-                x: (clientX - rect.left) * scaleX,
-                y: (clientY - rect.top) * scaleY
-            };
+        function endWallDrag3D() {
+            activeWallDrag = null;
+            window.removeEventListener('pointermove', onWallDrag3DMove);
+            window.removeEventListener('pointerup', endWallDrag3D);
         }
 
         function resetMovableWalls() {
             const house = getHouseById(selectedHouseId);
             delete customWallPositions[house.id];
             ensureCustomWallPositions(house);
-            document.getElementById('movableWallCoords').textContent = 'Cloisons replacées';
+            document.getElementById('movableWallCoords').textContent = 'Murs intérieurs replacés';
             document.getElementById('movableWallFeedback').textContent =
-                'Les cloisons amovibles ont retrouvé leur configuration initiale. Glissez-les à nouveau pour tester un autre agencement.';
+                'Tous les murs intérieurs ont retrouvé leur position initiale.';
             renderInteractiveBlueprint(false);
         }
 
@@ -1174,18 +1519,17 @@
             selectedHouseId = id;
             renderHouses();
             renderMaterials();
-            if (!isAutoLooping) {
-                currentAssemblyStep = 5;
+            if (isAutoLooping) {
+                currentAssemblyStep = 1;
             }
-            document.getElementById('movableWallCoords').textContent = 'Cloison modulable prête';
-            document.getElementById('movableWallFeedback').textContent =
-                'Attrapez une cloison amovible (en orange) sur le plan et faites-la glisser pour reconfigurer l\'espace de vie.';
+            stepTransitionNonce += 1;
             renderInteractiveBlueprint(true);
         }
 
         renderHouses();
         renderMaterials();
-        renderInteractiveBlueprint(false);
+        startBlueprintLoop();
+        startAutoSpinLoop();
     </script>
 </body>
 </html>
