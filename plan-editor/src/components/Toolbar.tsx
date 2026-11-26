@@ -1,19 +1,24 @@
 import { useEffect, useRef, useState, type ReactNode } from 'react';
 import { parseProject, snapshot, useStore, type Tool } from '../store';
 import { TEMPLATES } from '../templates';
+import { CATALOG, FURNITURE_TYPES } from '../furniture';
 
 const TOOLS: { id: Tool; label: string; key: string; icon: string }[] = [
   { id: 'select', label: 'Sélection', key: 'V', icon: 'M5 3l14 8-6 2-2 6z' },
   { id: 'wall', label: 'Mur', key: 'M', icon: 'M4 20L20 4M4 20h4M4 20v-4' },
   { id: 'door', label: 'Porte', key: 'P', icon: 'M4 20h16M6 20V4h9v16M12 12h.01' },
+  { id: 'window', label: 'Fenêtre', key: 'F', icon: 'M4 4h16v16H4zM12 4v16M4 12h16' },
   { id: 'stair', label: 'Escalier', key: 'E', icon: 'M4 20h4v-4h4v-4h4V8h4' },
 ];
 
 export function Toolbar() {
   const tool = useStore((s) => s.tool);
+  const mode = useStore((s) => s.mode);
   const canUndo = useStore((s) => s.past.length > 0);
   const canRedo = useStore((s) => s.future.length > 0);
-  const { setTool, undo, redo, requestFit, clearLevel, loadProject } = useStore.getState();
+  const placing = useStore((s) => s.placing);
+  const { setTool, setMode, startPlacing, undo, redo, requestFit, clearLevel, loadProject } = useStore.getState();
+  const embedded = window.self !== window.top;
   const fileInput = useRef<HTMLInputElement>(null);
 
   const exportJson = () => {
@@ -40,10 +45,11 @@ export function Toolbar() {
     <div className="flex flex-wrap items-center gap-2 border-b border-slate-200 bg-white px-4 py-2">
       <Group>
         {TOOLS.map((t) => (
-          <ToolButton key={t.id} active={tool === t.id} onClick={() => setTool(t.id)} title={`${t.label} (${t.key})`}>
+          <ToolButton key={t.id} active={mode === '2d' && tool === t.id} onClick={() => setTool(t.id)} title={`${t.label} (${t.key})`}>
             <Icon d={t.icon} /> {t.label}
           </ToolButton>
         ))}
+        <FurniturePicker active={mode === '2d' && tool === 'furniture'} current={placing} onPick={startPlacing} />
       </Group>
 
       <Group>
@@ -84,14 +90,30 @@ export function Toolbar() {
           }}
         />
       </Group>
+
+      <div className="ml-auto flex items-center gap-2">
+        {embedded && (
+          <ToolButton onClick={() => window.open(window.location.href, '_blank')} title="Ouvrir le configurateur en plein écran">
+            <Icon d="M14 4h6v6M10 20H4v-6M20 4l-7 7M4 20l7-7" /> Plein écran
+          </ToolButton>
+        )}
+        <button
+          type="button"
+          onClick={() => setMode(mode === '3d' ? '2d' : '3d')}
+          className="inline-flex cursor-pointer items-center gap-2 rounded-xl bg-tp-red px-4 py-2 text-sm font-bold text-white shadow-sm transition-colors hover:bg-tp-red-dark"
+        >
+          <Icon d={mode === '3d' ? 'M4 4h16v16H4zM4 12h16M12 4v16' : 'M12 3l8 4.5v9L12 21l-8-4.5v-9zM12 12l8-4.5M12 12v9M12 12L4 7.5'} />
+          {mode === '3d' ? 'Revenir au plan 2D' : 'Voir en 3D'}
+        </button>
+      </div>
     </div>
   );
 }
 
-function TemplatePicker({ onPick }: { onPick: (id: string) => void }) {
+/** Menu déroulant qui se ferme au clic extérieur ou avec Échap. */
+function useDropdown() {
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
-
   useEffect(() => {
     if (!open) return;
     const close = (e: MouseEvent) => {
@@ -105,6 +127,56 @@ function TemplatePicker({ onPick }: { onPick: (id: string) => void }) {
       document.removeEventListener('keydown', esc);
     };
   }, [open]);
+  return { open, setOpen, ref };
+}
+
+function FurniturePicker({ active, current, onPick }: {
+  active: boolean; current: string; onPick: (type: (typeof FURNITURE_TYPES)[number]) => void;
+}) {
+  const { open, setOpen, ref } = useDropdown();
+  return (
+    <div ref={ref} className="relative">
+      <ToolButton active={active || open} onClick={() => setOpen((o) => !o)} title="Ajouter un meuble">
+        <Icon d="M4 11V8a2 2 0 012-2h12a2 2 0 012 2v3M2 11h20v6H2zM5 17v2M19 17v2" /> Mobilier
+        <Icon d="M6 9l6 6 6-6" />
+      </ToolButton>
+      {open && (
+        <div className="absolute left-0 top-full z-20 mt-2 w-72 rounded-2xl border border-slate-200 bg-white p-2 shadow-xl">
+          <p className="px-2 pb-2 pt-1 text-xs text-slate-500">Choisis un meuble puis clique sur le plan pour le poser.</p>
+          <div className="grid grid-cols-2 gap-1.5">
+            {FURNITURE_TYPES.map((type) => {
+              const c = CATALOG[type];
+              return (
+                <button
+                  key={type}
+                  type="button"
+                  onClick={() => {
+                    onPick(type);
+                    setOpen(false);
+                  }}
+                  className={`flex cursor-pointer items-center gap-2 rounded-xl border px-2.5 py-2 text-left transition-colors hover:bg-tp-pearl ${
+                    active && current === type ? 'border-tp-navy' : 'border-slate-200'
+                  }`}
+                >
+                  <span className="grid h-8 w-8 shrink-0 place-items-center rounded-lg text-tp-navy" style={{ background: c.color }}>
+                    <Icon d={c.icon} />
+                  </span>
+                  <span className="min-w-0">
+                    <span className="block text-sm font-semibold text-tp-navy">{c.label}</span>
+                    <span className="block text-[11px] text-slate-500">{c.width} × {c.depth} cm</span>
+                  </span>
+                </button>
+              );
+            })}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+function TemplatePicker({ onPick }: { onPick: (id: string) => void }) {
+  const { open, setOpen, ref } = useDropdown();
 
   return (
     <div ref={ref} className="relative">

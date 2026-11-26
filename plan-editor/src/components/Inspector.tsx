@@ -1,16 +1,31 @@
 import { useEffect, useState, type ReactNode } from 'react';
-import { useStore, type Door, type Point, type Stair, type Wall } from '../store';
+import { useStore, type Door, type Furniture, type Point, type Stair, type Wall } from '../store';
 import { distance, formatLength } from '../geometry';
+import { pointConstraint } from '../rules';
+import {
+  CATALOG,
+  DEFAULT_WALL_COLOR,
+  FLOOR_COLORS,
+  FLOOR_LABELS,
+  FURNITURE_COLORS,
+  WALL_COLORS,
+} from '../furniture';
 
 const THICKNESS_PRESETS = [10, 20, 30];
 
 export function Inspector() {
+  const mode = useStore((s) => s.mode);
   const selection = useStore((s) => s.selection);
   const walls = useStore((s) => s.walls);
   const points = useStore((s) => s.points);
   const doors = useStore((s) => s.doors);
   const stairs = useStore((s) => s.stairs);
+  const furniture = useStore((s) => s.furniture);
 
+  if (mode === '3d') return <View3DPanel />;
+  if (selection?.kind === 'furniture' && furniture[selection.id]) {
+    return <FurniturePanel item={furniture[selection.id]} />;
+  }
   if (selection?.kind === 'wall' && walls[selection.id]) {
     return <WallPanel wall={walls[selection.id]} />;
   }
@@ -26,8 +41,109 @@ export function Inspector() {
   return <OverviewPanel />;
 }
 
+function View3DPanel() {
+  const setMode = useStore((s) => s.setMode);
+  return (
+    <Panel title="Vue 3D">
+      <LevelSection />
+      <p className="text-sm text-slate-600">
+        La 3D affiche le niveau sélectionné et ceux du dessous. Choisis « Rez-de-chaussée » dans
+        les niveaux pour voir l'intérieur du bas.
+      </p>
+      <ul className="space-y-1.5 text-sm text-slate-600">
+        <Help k="Glisser">tourner autour de la maison</Help>
+        <Help k="Clic droit">se déplacer</Help>
+        <Help k="Molette">zoomer</Help>
+      </ul>
+      <ColorSection />
+      <SecondaryButton onClick={() => setMode('2d')}>← Revenir au plan 2D pour modifier</SecondaryButton>
+    </Panel>
+  );
+}
+
+/** Couleurs du niveau : sol et murs (visibles en 3D). */
+function ColorSection() {
+  const floorColor = useStore((s) => s.floorColor);
+  const { setFloorColor, setWallColor } = useStore.getState();
+  return (
+    <div className="flex flex-col gap-4 rounded-xl border border-slate-200 p-3">
+      <div className="flex flex-col gap-2">
+        <span className="text-xs font-bold uppercase tracking-wide text-slate-500">
+          Sol · {FLOOR_LABELS[floorColor] ?? 'Personnalisé'}
+        </span>
+        <Swatches colors={FLOOR_COLORS} value={floorColor} onPick={setFloorColor} titles={FLOOR_LABELS} />
+      </div>
+      <div className="flex flex-col gap-2">
+        <span className="text-xs font-bold uppercase tracking-wide text-slate-500">Peinture des cloisons</span>
+        <Swatches colors={WALL_COLORS} onPick={(c) => setWallColor('partitions', c)} />
+      </div>
+      <div className="flex flex-col gap-2">
+        <span className="text-xs font-bold uppercase tracking-wide text-slate-500">Tous les murs</span>
+        <Swatches colors={WALL_COLORS} onPick={(c) => setWallColor('all', c)} />
+      </div>
+    </div>
+  );
+}
+
+function FurniturePanel({ item }: { item: Furniture }) {
+  const { updateFurniture, deleteSelection } = useStore.getState();
+  const c = CATALOG[item.type];
+  return (
+    <Panel title={c.label}>
+      <div className="grid grid-cols-2 gap-3">
+        <NumberField label="Largeur" suffix="cm" value={Math.round(item.width)} min={20}
+          onCommit={(v) => updateFurniture(item.id, { width: v })} />
+        <NumberField label="Profondeur" suffix="cm" value={Math.round(item.depth)} min={20}
+          onCommit={(v) => updateFurniture(item.id, { depth: v })} />
+      </div>
+      <div className="grid grid-cols-2 gap-2">
+        <SecondaryButton onClick={() => updateFurniture(item.id, { rotation: (item.rotation + 90) % 360 })}>
+          ↻ 90° (R)
+        </SecondaryButton>
+        <SecondaryButton onClick={() => updateFurniture(item.id, { rotation: (item.rotation + 15) % 360 })}>
+          ↻ 15° (Maj+R)
+        </SecondaryButton>
+      </div>
+      <div className="flex flex-col gap-2">
+        <span className="text-xs font-bold uppercase tracking-wide text-slate-500">Couleur</span>
+        <Swatches colors={FURNITURE_COLORS} value={item.color} onPick={(color) => updateFurniture(item.id, { color })} />
+        <CustomColor value={item.color} onPick={(color) => updateFurniture(item.id, { color })} />
+      </div>
+      <button type="button" onClick={() => updateFurniture(item.id, { width: c.width, depth: c.depth, color: c.color })}
+        className="cursor-pointer self-start text-xs font-semibold text-slate-500 hover:text-tp-navy hover:underline">
+        Revenir aux dimensions et à la couleur d'origine
+      </button>
+      <p className="-mt-2 text-xs text-slate-500">Glisse le meuble pour le déplacer.</p>
+      <DeleteButton onClick={deleteSelection}>Supprimer</DeleteButton>
+    </Panel>
+  );
+}
+
 function DoorPanel({ door }: { door: Door }) {
   const { updateDoor, deleteSelection } = useStore.getState();
+  if (door.kind === 'window') {
+    return (
+      <Panel title="Fenêtre sélectionnée">
+        <NumberField label="Largeur" suffix="cm" value={Math.round(door.width)} min={40}
+          onCommit={(v) => updateDoor(door.id, { width: v })} />
+        <Presets values={[60, 100, 140, 240]} current={door.width}
+          onPick={(v) => updateDoor(door.id, { width: v })} />
+        <div className="grid grid-cols-2 gap-3">
+          <NumberField label="Allège" suffix="cm" value={Math.round(door.sill ?? 90)} min={0}
+            onCommit={(v) => updateDoor(door.id, { sill: v })} />
+          <NumberField label="Hauteur" suffix="cm" value={Math.round(door.height ?? 125)} min={30}
+            onCommit={(v) => updateDoor(door.id, { height: v })} />
+        </div>
+        <SecondaryButton onClick={() => updateDoor(door.id, { sill: 20, height: 220 })}>
+          Transformer en baie vitrée (toute hauteur)
+        </SecondaryButton>
+        <p className="-mt-2 text-xs text-slate-500">
+          L'allège est la hauteur du bas de la fenêtre. Glisse la fenêtre pour la déplacer le long du mur.
+        </p>
+        <DeleteButton onClick={deleteSelection}>Supprimer la fenêtre</DeleteButton>
+      </Panel>
+    );
+  }
   return (
     <Panel title="Porte sélectionnée">
       <NumberField label="Largeur" suffix="cm" value={Math.round(door.width)} min={40}
@@ -105,8 +221,28 @@ function LevelSection() {
 function WallPanel({ wall }: { wall: Wall }) {
   const a = useStore((s) => s.points[wall.a]);
   const b = useStore((s) => s.points[wall.b]);
-  const { setWallLength, setWallThickness, deleteSelection } = useStore.getState();
+  const { setWallLength, setWallThickness, deleteSelection, toggleStructural } = useStore.getState();
   const length = distance(a, b);
+
+  if (wall.structural) {
+    return (
+      <Panel title="Mur porteur">
+        <LockNotice>
+          Mur de fondation : il ne peut être ni déplacé, ni redimensionné, ni supprimé.
+          Les cloisons accrochées dessus peuvent glisser le long.
+        </LockNotice>
+        <div className="grid grid-cols-2 gap-3">
+          <Stat label="Longueur" value={formatLength(length)} />
+          <Stat label="Épaisseur" value={`${wall.thickness} cm`} />
+        </div>
+        <WallColor wall={wall} />
+        <button type="button" onClick={() => toggleStructural(wall.id)}
+          className="cursor-pointer self-start text-xs font-semibold text-slate-500 hover:text-tp-navy hover:underline">
+          Déverrouiller ce mur (ce n'est pas un mur porteur)
+        </button>
+      </Panel>
+    );
+  }
 
   return (
     <Panel title="Mur sélectionné">
@@ -117,9 +253,25 @@ function WallPanel({ wall }: { wall: Wall }) {
       </p>
 
       <ThicknessPicker value={wall.thickness} onChange={(t) => setWallThickness(wall.id, t)} />
+      <WallColor wall={wall} />
 
       <DeleteButton onClick={deleteSelection}>Supprimer le mur</DeleteButton>
+      <button type="button" onClick={() => toggleStructural(wall.id)}
+        className="cursor-pointer self-start text-xs font-semibold text-slate-500 hover:text-tp-navy hover:underline">
+        Marquer comme mur porteur (verrouillé)
+      </button>
     </Panel>
+  );
+}
+
+function WallColor({ wall }: { wall: Wall }) {
+  const setWallColor = useStore((s) => s.setWallColor);
+  return (
+    <div className="flex flex-col gap-2">
+      <span className="text-xs font-bold uppercase tracking-wide text-slate-500">Couleur (visible en 3D)</span>
+      <Swatches colors={WALL_COLORS} value={wall.color ?? DEFAULT_WALL_COLOR} onPick={(c) => setWallColor(wall.id, c)} />
+      <CustomColor value={wall.color ?? DEFAULT_WALL_COLOR} onPick={(c) => setWallColor(wall.id, c)} />
+    </div>
   );
 }
 
@@ -128,6 +280,15 @@ function PointPanel({ point }: { point: Point }) {
     (s) => Object.values(s.walls).filter((w) => w.a === point.id || w.b === point.id).length,
   );
   const { setPointPosition, deleteSelection } = useStore.getState();
+  const constraint = useStore((s) => pointConstraint(s, point.id).kind);
+
+  if (constraint === 'locked') {
+    return (
+      <Panel title="Coin porteur">
+        <LockNotice>Coin de mur porteur : il ne peut pas être déplacé.</LockNotice>
+      </Panel>
+    );
+  }
 
   return (
     <Panel title="Coin sélectionné">
@@ -140,7 +301,11 @@ function PointPanel({ point }: { point: Point }) {
       <p className="text-sm text-slate-600">
         {connected} mur{connected > 1 ? 's' : ''} relié{connected > 1 ? 's' : ''} à ce coin.
       </p>
-      <DeleteButton onClick={deleteSelection}>Supprimer le coin et ses murs</DeleteButton>
+      {constraint === 'slide' ? (
+        <p className="-mt-2 text-xs text-slate-500">Ce coin est accroché à un mur porteur : il glisse le long.</p>
+      ) : (
+        <DeleteButton onClick={deleteSelection}>Supprimer le coin et ses murs</DeleteButton>
+      )}
     </Panel>
   );
 }
@@ -155,7 +320,15 @@ function OverviewPanel() {
   const wallList = Object.values(walls);
   const total = wallList.reduce((sum, w) => sum + distance(points[w.a], points[w.b]), 0);
 
-  const titles = { select: 'Plan', wall: 'Dessiner des murs', door: 'Poser une porte', stair: 'Poser un escalier' };
+  const placing = useStore((s) => s.placing);
+  const titles = {
+    select: 'Plan',
+    wall: 'Dessiner des murs',
+    door: 'Poser une porte',
+    window: 'Poser une fenêtre',
+    stair: 'Poser un escalier',
+    furniture: `Poser : ${CATALOG[placing].label}`,
+  };
 
   return (
     <Panel title={titles[tool]}>
@@ -171,11 +344,17 @@ function OverviewPanel() {
           onChange={setNewWallThickness} />
       )}
 
+      {tool === 'select' && <ColorSection />}
+
       <div>
         <h3 className="mb-2 text-xs font-bold uppercase tracking-wide text-slate-500">Mode d'emploi</h3>
         <ul className="space-y-1.5 text-sm text-slate-600">
           {tool === 'door' ? (
             <Help k="Clic">sur un mur pour y poser une porte</Help>
+          ) : tool === 'window' ? (
+            <Help k="Clic">sur un mur pour y poser une fenêtre</Help>
+          ) : tool === 'furniture' ? (
+            <Help k="Clic">pour poser le meuble, puis R pour le tourner</Help>
           ) : tool === 'stair' ? (
             <Help k="Clic">pour poser un escalier, puis R pour le tourner</Help>
           ) : tool === 'wall' ? (
@@ -189,14 +368,15 @@ function OverviewPanel() {
             </>
           ) : (
             <>
-              <Help k="Clic">sélectionner un mur ou un coin</Help>
-              <Help k="Glisser">déplacer un mur ou un coin</Help>
+              <Help k="Clic">sélectionner un mur, un coin, un meuble…</Help>
+              <Help k="Glisser">déplacer l'élément</Help>
+              <Help k="R">tourner un meuble ou un escalier</Help>
               <Help k="Suppr">supprimer la sélection</Help>
               <Help k="Molette">zoomer · glisser le fond pour se déplacer</Help>
             </>
           )}
           <Help k="⌘/Ctrl+Z">annuler</Help>
-          <Help k="V M P E">Sélection · Mur · Porte · Escalier</Help>
+          <Help k="V M P F E">Sélection · Mur · Porte · Fenêtre · Escalier</Help>
         </ul>
       </div>
 
@@ -271,7 +451,8 @@ function NumberField({ label, suffix, value, min, onCommit }: {
   const commit = () => {
     const v = Number(text.replace(',', '.'));
     if (Number.isFinite(v) && (min === undefined || v >= min) && v !== value) onCommit(v);
-    else setText(String(value));
+    // Si la valeur est refusée (règles de construction), on réaffiche la valeur actuelle.
+    setText(String(value));
   };
 
   return (
@@ -295,6 +476,50 @@ function NumberField({ label, suffix, value, min, onCommit }: {
         {suffix && <span className="pr-3 text-sm text-slate-400">{suffix}</span>}
       </div>
     </label>
+  );
+}
+
+function Swatches({ colors, value, onPick, titles }: {
+  colors: string[]; value?: string; onPick: (c: string) => void; titles?: Record<string, string>;
+}) {
+  return (
+    <div className="flex flex-wrap gap-1.5">
+      {colors.map((c) => (
+        <button
+          key={c}
+          type="button"
+          title={titles?.[c] ?? c}
+          onClick={() => onPick(c)}
+          className={`h-7 w-7 cursor-pointer rounded-full border transition-transform hover:scale-110 ${
+            value?.toLowerCase() === c.toLowerCase() ? 'border-tp-navy ring-2 ring-tp-navy ring-offset-1' : 'border-slate-300'
+          }`}
+          style={{ background: c }}
+        />
+      ))}
+    </div>
+  );
+}
+
+function CustomColor({ value, onPick }: { value: string; onPick: (c: string) => void }) {
+  return (
+    <label className="flex cursor-pointer items-center gap-2 text-xs font-semibold text-slate-500 hover:text-tp-navy">
+      <input type="color" value={value} onChange={(e) => onPick(e.target.value)}
+        className="h-6 w-8 cursor-pointer rounded border border-slate-200 bg-transparent p-0" />
+      Autre couleur…
+    </label>
+  );
+}
+
+function LockNotice({ children }: { children: ReactNode }) {
+  return (
+    <div className="flex gap-2.5 rounded-xl border border-slate-200 bg-tp-pearl p-3 text-sm text-slate-600">
+      <svg className="mt-0.5 h-4 w-4 shrink-0 text-tp-navy" fill="none" stroke="currentColor" strokeWidth={2}
+        strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24">
+        <rect x="5" y="11" width="14" height="10" rx="2" />
+        <path d="M8 11V7a4 4 0 018 0v4" />
+      </svg>
+      <span>{children}</span>
+    </div>
   );
 }
 

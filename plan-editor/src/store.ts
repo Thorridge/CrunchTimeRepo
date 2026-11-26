@@ -1,6 +1,10 @@
 import { create } from 'zustand';
-import { clamp, distance, projectOnSegment, type Vec } from './geometry';
+import { distance, projectOnSegment, type Vec } from './geometry';
 import { TEMPLATES } from './templates';
+import { constrainedMove, getPerimeter, insidePerimeter, isStructuralPoint, pointConstraint } from './rules';
+import { CATALOG, DEFAULT_FLOOR_COLOR, type Furniture, type FurnitureType } from './furniture';
+
+export type { Furniture, FurnitureType };
 
 /*
  * Un projet contient plusieurs niveaux (RDC, étages…). Chaque niveau est un plan.
@@ -10,10 +14,25 @@ import { TEMPLATES } from './templates';
  * Toutes les distances sont en centimètres.
  */
 export type Point = { id: string; x: number; y: number };
-export type Wall = { id: string; a: string; b: string; thickness: number };
+export type Wall = {
+  id: string;
+  a: string;
+  b: string;
+  thickness: number;
+  /** Mur porteur / fondation : verrouillé. */
+  structural?: boolean;
+  /** Couleur de peinture (3D). */
+  color?: string;
+};
+/** Ouverture dans un mur : porte ou fenêtre. */
 export type Door = {
   id: string;
   wallId: string;
+  /** Porte (par défaut) ou fenêtre. */
+  kind?: 'door' | 'window';
+  /** Fenêtre : hauteur d'allège (bas de la fenêtre) et hauteur de la fenêtre, en cm. */
+  sill?: number;
+  height?: number;
   /** Distance entre le point `a` du mur et le centre de la porte. */
   offset: number;
   width: number;
@@ -29,12 +48,15 @@ export type Plan = {
   walls: Record<string, Wall>;
   doors: Record<string, Door>;
   stairs: Record<string, Stair>;
+  furniture: Record<string, Furniture>;
+  /** Couleur du sol du niveau. */
+  floorColor: string;
 };
 export type LevelInfo = { id: string; name: string };
 export type Project = { levels: LevelInfo[]; activeLevelId: string; data: Record<string, Plan> };
 
-export type Selection = { kind: 'wall' | 'point' | 'door' | 'stair'; id: string } | null;
-export type Tool = 'select' | 'wall' | 'door' | 'stair';
+export type Selection = { kind: 'wall' | 'point' | 'door' | 'stair' | 'furniture'; id: string } | null;
+export type Tool = 'select' | 'wall' | 'door' | 'window' | 'stair' | 'furniture';
 /** Une position cible : un point existant, un point sur un mur existant, ou une position libre. */
 export type Anchor = Vec & { pointId?: string; onWallId?: string };
 
@@ -42,10 +64,15 @@ const STORAGE_KEY = 'tp-plan-editor:v2';
 const LEGACY_STORAGE_KEY = 'tp-plan-editor:v1';
 const HISTORY_LIMIT = 100;
 const EPS = 0.5;
+/** Épaisseur à partir de laquelle un nouveau mur est considéré comme porteur. */
+export const STRUCTURAL_THICKNESS = 25;
 export const DEFAULT_DOOR_WIDTH = 90;
+export const DEFAULT_WINDOW = { width: 120, sill: 90, height: 125 };
 
 export const uid = () => Math.random().toString(36).slice(2, 10);
-export const emptyPlan = (): Plan => ({ points: {}, walls: {}, doors: {}, stairs: {} });
+export const emptyPlan = (): Plan => ({
+  points: {}, walls: {}, doors: {}, stairs: {}, furniture: {}, floorColor: DEFAULT_FLOOR_COLOR,
+});
 
 /* ---------- Validation / chargement ---------- */
 
@@ -57,12 +84,22 @@ function parsePlan(v: unknown): Plan | null {
   const walls = v.walls as Plan['walls'];
   const doors = (isObj(v.doors) ? v.doors : {}) as Plan['doors'];
   const stairs = (isObj(v.stairs) ? v.stairs : {}) as Plan['stairs'];
+  const furniture = (isObj(v.furniture) ? v.furniture : {}) as Plan['furniture'];
+  const floorColor = typeof v.floorColor === 'string' ? v.floorColor : DEFAULT_FLOOR_COLOR;
   const ok =
     Object.values(points).every((p) => isObj(p) && Number.isFinite(p.x) && Number.isFinite(p.y)) &&
     Object.values(walls).every((w) => isObj(w) && points[w.a] && points[w.b] && Number.isFinite(w.thickness)) &&
     Object.values(doors).every((d) => isObj(d) && walls[d.wallId] && Number.isFinite(d.offset) && Number.isFinite(d.width)) &&
-    Object.values(stairs).every((s) => isObj(s) && [s.x, s.y, s.width, s.length, s.rotation].every(Number.isFinite));
-  return ok ? { points, walls, doors, stairs } : null;
+    Object.values(stairs).every((s) => isObj(s) && [s.x, s.y, s.width, s.length, s.rotation].every(Number.isFinite)) &&
+    Object.values(furniture).every(
+      (f) => isObj(f) && f.type in CATALOG && [f.x, f.y, f.width, f.depth, f.rotation].every(Number.isFinite),
+    );
+  if (!ok) return null;
+  // Anciens plans sans notion de mur porteur : les murs épais (≥ 25 cm) le deviennent.
+  if (!Object.values(walls).some((w) => 'structural' in w)) {
+    for (const w of Object.values(walls)) walls[w.id] = { ...w, structural: w.thickness >= 25 };
+  }
+  return { points, walls, doors, stairs, furniture, floorColor };
 }
 
 /** Accepte un projet multi-niveaux, ou un ancien plan à un seul niveau. */
@@ -104,6 +141,8 @@ const clonePlan = (p: Plan): Plan => ({
   walls: { ...p.walls },
   doors: { ...p.doors },
   stairs: { ...p.stairs },
+  furniture: { ...p.furniture },
+  floorColor: p.floorColor,
 });
 
 function removeOrphans(plan: Plan) {
@@ -126,8 +165,8 @@ export function splitWall(plan: Plan, w: Wall, pointId: string) {
   delete plan.walls[w.id];
   const w1 = uid();
   const w2 = uid();
-  plan.walls[w1] = { id: w1, a: w.a, b: pointId, thickness: w.thickness };
-  plan.walls[w2] = { id: w2, a: pointId, b: w.b, thickness: w.thickness };
+  plan.walls[w1] = { ...w, id: w1, b: pointId };
+  plan.walls[w2] = { ...w, id: w2, a: pointId };
   const split = distance(A, plan.points[pointId]);
   for (const d of Object.values(plan.doors)) {
     if (d.wallId !== w.id) continue;
@@ -180,44 +219,6 @@ function mergeAt(plan: Plan, id: string) {
   removeOrphans(plan);
 }
 
-/**
- * Si le point est une jonction en T (posé au milieu d'un autre mur, c.-à-d. relié à
- * au moins deux autres murs alignés de part et d'autre), renvoie l'axe le long duquel
- * il peut glisser, avec les bornes à ne pas dépasser. Sinon null : le point est libre.
- */
-export function getSlideAxis(plan: Pick<Plan, 'points' | 'walls'>, pointId: string, excludeWallId: string) {
-  const P = plan.points[pointId];
-  const others = Object.values(plan.walls).filter(
-    (w) => w.id !== excludeWallId && (w.a === pointId || w.b === pointId),
-  );
-  if (others.length < 2) return null;
-
-  const ends = others.map((w) => plan.points[w.a === pointId ? w.b : w.a]);
-  const len = distance(P, ends[0]);
-  if (len === 0) return null;
-  const dir = { x: (ends[0].x - P.x) / len, y: (ends[0].y - P.y) / len };
-
-  const ts: number[] = [];
-  for (const Q of ends) {
-    const v = { x: Q.x - P.x, y: Q.y - P.y };
-    const l = Math.hypot(v.x, v.y);
-    if (l === 0 || Math.abs((dir.x * v.y - dir.y * v.x) / l) > 0.01) return null; // pas aligné
-    ts.push(dir.x * v.x + dir.y * v.y);
-  }
-  const min = Math.min(...ts);
-  const max = Math.max(...ts);
-  if (min >= 0 || max <= 0) return null; // tous du même côté : c'est un coin, pas un T
-  return { dir, min, max };
-}
-
-/** Applique un déplacement `d` à un point, contraint à son axe de glissement s'il en a un. */
-export function constrainedMove(origin: Vec, d: Vec, axis: ReturnType<typeof getSlideAxis>): Vec {
-  if (!axis) return { x: origin.x + d.x, y: origin.y + d.y };
-  const margin = 5;
-  const t = clamp(d.x * axis.dir.x + d.y * axis.dir.y, axis.min + margin, axis.max - margin);
-  return { x: origin.x + axis.dir.x * t, y: origin.y + axis.dir.y * t };
-}
-
 /* ---------- Store ---------- */
 
 type State = Plan & {
@@ -227,13 +228,19 @@ type State = Plan & {
   inactive: Record<string, Plan>;
 
   tool: Tool;
+  /** Plan 2D (édition) ou vue 3D. */
+  mode: '2d' | '3d';
   selection: Selection;
   past: Project[];
   future: Project[];
   newWallThickness: number;
   fitToken: number;
+  /** Meuble à poser avec l'outil « furniture ». */
+  placing: FurnitureType;
 
   setTool: (tool: Tool) => void;
+  setMode: (mode: '2d' | '3d') => void;
+  startPlacing: (type: FurnitureType) => void;
   select: (selection: Selection) => void;
   /** Enregistre l'état courant dans l'historique (à appeler avant une modification). */
   checkpoint: () => void;
@@ -249,14 +256,21 @@ type State = Plan & {
   setWallLength: (id: string, length: number) => void;
   setWallThickness: (id: string, thickness: number) => void;
   setNewWallThickness: (thickness: number) => void;
+  toggleStructural: (id: string) => void;
+  setWallColor: (id: string | 'all' | 'partitions', color: string) => void;
+  setFloorColor: (color: string) => void;
 
-  addDoor: (wallId: string, offset: number) => string;
+  addDoor: (wallId: string, offset: number, kind?: 'door' | 'window') => string;
   moveDoor: (id: string, offset: number) => void;
   updateDoor: (id: string, patch: Partial<Omit<Door, 'id' | 'wallId'>>) => void;
 
   addStair: (x: number, y: number) => string;
   moveStair: (id: string, x: number, y: number) => void;
   updateStair: (id: string, patch: Partial<Omit<Stair, 'id'>>) => void;
+
+  addFurniture: (type: FurnitureType, x: number, y: number) => string;
+  moveFurniture: (id: string, x: number, y: number) => void;
+  updateFurniture: (id: string, patch: Partial<Omit<Furniture, 'id' | 'type'>>) => void;
 
   deleteSelection: () => void;
 
@@ -268,7 +282,9 @@ type State = Plan & {
   clearLevel: () => void;
 };
 
-const activePlan = (s: State): Plan => ({ points: s.points, walls: s.walls, doors: s.doors, stairs: s.stairs });
+const activePlan = (s: State): Plan => ({
+  points: s.points, walls: s.walls, doors: s.doors, stairs: s.stairs, furniture: s.furniture, floorColor: s.floorColor,
+});
 
 export const snapshot = (s: State): Project => ({
   levels: s.levels,
@@ -283,20 +299,25 @@ function restore(project: Project) {
 
 const selectionExists = (sel: Selection, plan: Plan) => {
   if (!sel) return false;
-  const table = { point: plan.points, wall: plan.walls, door: plan.doors, stair: plan.stairs }[sel.kind];
+  const table = { point: plan.points, wall: plan.walls, door: plan.doors, stair: plan.stairs, furniture: plan.furniture }[sel.kind];
   return !!table[sel.id];
 };
 
 export const useStore = create<State>((set, get) => ({
   ...restore(loadInitial()),
   tool: 'select',
+  mode: '2d',
   selection: null,
   past: [],
   future: [],
   newWallThickness: 20,
   fitToken: 0,
+  placing: 'sofa',
 
-  setTool: (tool) => set({ tool, selection: tool === 'select' ? get().selection : null }),
+  // Choisir un outil d'édition repasse en 2D.
+  setTool: (tool) => set({ tool, mode: '2d', selection: tool === 'select' ? get().selection : null }),
+  setMode: (mode) => set({ mode, tool: 'select', selection: null }),
+  startPlacing: (placing) => set({ placing, tool: 'furniture', mode: '2d', selection: null }),
   select: (selection) => set({ selection }),
 
   checkpoint: () =>
@@ -327,7 +348,8 @@ export const useStore = create<State>((set, get) => ({
     const b = resolveAnchor(plan, end);
     if (a !== b && !hasWallBetween(plan, a, b)) {
       const id = uid();
-      plan.walls[id] = { id, a, b, thickness: get().newWallThickness };
+      const thickness = get().newWallThickness;
+      plan.walls[id] = { id, a, b, thickness, structural: thickness >= STRUCTURAL_THICKNESS };
     }
     removeOrphans(plan);
     set(plan);
@@ -357,44 +379,83 @@ export const useStore = create<State>((set, get) => ({
   },
 
   setPointPosition: (id, x, y) => {
-    get().checkpoint();
-    get().movePoint(id, x, y);
-    get().mergePoint(id);
+    const s = get();
+    const P = s.points[id];
+    const c = pointConstraint(s, id);
+    if (!P || c.kind === 'locked') return;
+    const target = constrainedMove(P, { x: x - P.x, y: y - P.y }, c);
+    const per = getPerimeter(s);
+    if (per && !isStructuralPoint(s, id) && !insidePerimeter(per, target)) return;
+    s.checkpoint();
+    s.movePoint(id, target.x, target.y);
+    s.mergePoint(id);
   },
 
   setWallLength: (id, length) => {
     const s = get();
     const w = s.walls[id];
-    if (!w || length < 1) return;
-    const A = s.points[w.a];
-    const B = s.points[w.b];
-    const d = distance(A, B);
+    if (!w || w.structural || length < 1) return;
+    // On déplace l'extrémité libre dans l'axe du mur (l'autre reste fixe).
+    const moveB = pointConstraint(s, w.b, w.id).kind === 'free';
+    const moveA = pointConstraint(s, w.a, w.id).kind === 'free';
+    if (!moveB && !moveA) return;
+    const [fixedId, movingId] = moveB ? [w.a, w.b] : [w.b, w.a];
+    const F = s.points[fixedId];
+    const M = s.points[movingId];
+    const d = distance(F, M);
     if (d === 0) return;
+    const target = { x: F.x + ((M.x - F.x) / d) * length, y: F.y + ((M.y - F.y) / d) * length };
+    const per = getPerimeter(s);
+    if (per && !insidePerimeter(per, target)) return;
     s.checkpoint();
-    // On garde le point de départ et on déplace le point d'arrivée dans l'axe du mur.
-    s.movePoint(w.b, A.x + ((B.x - A.x) / d) * length, A.y + ((B.y - A.y) / d) * length);
+    s.movePoint(movingId, target.x, target.y);
   },
 
   setWallThickness: (id, thickness) => {
     const w = get().walls[id];
-    if (!w || thickness < 1) return;
+    if (!w || w.structural || thickness < 1) return;
     get().checkpoint();
     set((s) => ({ walls: { ...s.walls, [id]: { ...w, thickness } } }));
   },
 
+  toggleStructural: (id) => {
+    const w = get().walls[id];
+    if (!w) return;
+    get().checkpoint();
+    set((s) => ({ walls: { ...s.walls, [id]: { ...w, structural: !w.structural } } }));
+  },
+
   setNewWallThickness: (newWallThickness) => set({ newWallThickness }),
 
-  /* ----- Portes ----- */
+  setWallColor: (target, color) => {
+    get().checkpoint();
+    set((s) => {
+      const walls = { ...s.walls };
+      for (const w of Object.values(walls)) {
+        const match = target === 'all' || (target === 'partitions' ? !w.structural : w.id === target);
+        if (match) walls[w.id] = { ...w, color };
+      }
+      return { walls };
+    });
+  },
 
-  addDoor: (wallId, offset) => {
+  setFloorColor: (floorColor) => {
+    if (floorColor === get().floorColor) return;
+    get().checkpoint();
+    set({ floorColor });
+  },
+
+  /* ----- Portes et fenêtres ----- */
+
+  addDoor: (wallId, offset, kind = 'door') => {
     get().checkpoint();
     const id = uid();
-    set((s) => ({
-      doors: {
-        ...s.doors,
-        [id]: { id, wallId, offset, width: DEFAULT_DOOR_WIDTH, flip: false, hingeAtEnd: false },
-      },
-    }));
+    const opening: Door =
+      kind === 'window'
+        ? { id, wallId, offset, kind, width: DEFAULT_WINDOW.width, sill: DEFAULT_WINDOW.sill,
+            height: DEFAULT_WINDOW.height, flip: false, hingeAtEnd: false }
+        : { id, wallId, offset, kind, width: DEFAULT_DOOR_WIDTH, flip: false, hingeAtEnd: false };
+    set((s) => ({ doors: { ...s.doors, [id]: opening } }));
     return id;
   },
 
@@ -423,16 +484,45 @@ export const useStore = create<State>((set, get) => ({
     set((s) => ({ stairs: { ...s.stairs, [id]: { ...s.stairs[id], ...patch } } }));
   },
 
+  /* ----- Mobilier ----- */
+
+  addFurniture: (type, x, y) => {
+    get().checkpoint();
+    const id = uid();
+    const c = CATALOG[type];
+    set((s) => ({
+      furniture: {
+        ...s.furniture,
+        [id]: { id, type, x, y, width: c.width, depth: c.depth, rotation: 0, color: c.color },
+      },
+    }));
+    return id;
+  },
+
+  moveFurniture: (id, x, y) =>
+    set((s) => ({ furniture: { ...s.furniture, [id]: { ...s.furniture[id], x, y } } })),
+
+  updateFurniture: (id, patch) => {
+    if (!get().furniture[id]) return;
+    get().checkpoint();
+    set((s) => ({ furniture: { ...s.furniture, [id]: { ...s.furniture[id], ...patch } } }));
+  },
+
   /* ----- Suppression ----- */
 
   deleteSelection: () => {
     const s = get();
     const sel = s.selection;
     if (!sel) return;
+    // Les murs porteurs et leurs coins ne se suppriment pas.
+    if (sel.kind === 'wall' && s.walls[sel.id]?.structural) return;
+    if (sel.kind === 'point' && isStructuralPoint(s, sel.id)) return;
     s.checkpoint();
     const plan = clonePlan(activePlan(s));
     if (sel.kind === 'door') {
       delete plan.doors[sel.id];
+    } else if (sel.kind === 'furniture') {
+      delete plan.furniture[sel.id];
     } else if (sel.kind === 'stair') {
       delete plan.stairs[sel.id];
     } else if (sel.kind === 'wall') {
@@ -459,12 +549,12 @@ export const useStore = create<State>((set, get) => ({
     const s = get();
     s.checkpoint();
     // Le nouvel étage (ajouté tout en haut) reprend les murs extérieurs (les plus épais) du niveau actuel.
-    const plan = emptyPlan();
+    const plan = { ...emptyPlan(), floorColor: s.floorColor };
     const walls = Object.values(s.walls);
     const maxThickness = Math.max(0, ...walls.map((w) => w.thickness));
     for (const w of walls) {
       if (w.thickness !== maxThickness) continue;
-      plan.walls[w.id] = w;
+      plan.walls[w.id] = { ...w, structural: true };
       plan.points[w.a] = s.points[w.a];
       plan.points[w.b] = s.points[w.b];
     }
@@ -510,7 +600,8 @@ export const useStore = create<State>((set, get) => ({
 useStore.subscribe((s, prev) => {
   if (
     s.points === prev.points && s.walls === prev.walls && s.doors === prev.doors &&
-    s.stairs === prev.stairs && s.levels === prev.levels && s.inactive === prev.inactive &&
+    s.stairs === prev.stairs && s.furniture === prev.furniture && s.floorColor === prev.floorColor &&
+    s.levels === prev.levels && s.inactive === prev.inactive &&
     s.activeLevelId === prev.activeLevelId
   ) return;
   try {

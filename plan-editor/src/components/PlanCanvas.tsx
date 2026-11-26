@@ -1,10 +1,9 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { Circle, Group, Layer, Line, Rect, Stage, Text } from 'react-konva';
+import { Circle, Group, Label, Layer, Line, Rect, Stage, Tag, Text } from 'react-konva';
 import type Konva from 'konva';
 import type { KonvaEventObject } from 'konva/lib/Node';
 import {
-  constrainedMove,
-  getSlideAxis,
+  STRUCTURAL_THICKNESS,
   useStore,
   type Anchor,
   type Door,
@@ -21,9 +20,26 @@ import {
   snapValue,
   type Vec,
 } from '../geometry';
+import {
+  constrainedMove,
+  fitWallMove,
+  getPerimeter,
+  isStructuralPoint,
+  keepInside,
+  floorOutline,
+  limitDelta,
+  pointConstraint,
+  type PointConstraint,
+} from '../rules';
+import { CATALOG } from '../furniture';
+import { FurnitureShape } from './FurnitureShape';
 
 const COLORS = {
   wall: '#1B2E4B',
+  partition: '#4B5B70',
+  canvas: '#F1F4F8',
+  window: '#0EA5E9',
+  windowFill: '#E0F2FE',
   selected: '#D8232A',
   preview: '#D8232A',
   gridMinor: '#EEF1F5',
@@ -35,6 +51,7 @@ const COLORS = {
   stair: '#263F66',
   ghost: '#94A3B8',
   background: '#FFFFFF',
+  invalid: '#94A3B8',
 };
 
 const MIN_SCALE = 0.05;
@@ -43,9 +60,8 @@ const MAX_SCALE = 5;
 const SNAP_PX = 12;
 
 type View = { x: number; y: number; scale: number };
-type Snap = Anchor & { kind: 'point' | 'wall' | 'grid' };
+type Snap = Anchor & { kind: 'point' | 'wall' | 'grid'; invalid?: boolean };
 type SnapOptions = { from?: Vec | null; ortho?: boolean; excludePointId?: string; allowWall?: boolean };
-type SlideAxis = ReturnType<typeof getSlideAxis>;
 
 /*
  * Glisser « maison » : on ne laisse pas Konva déplacer les formes lui-même.
@@ -53,10 +69,11 @@ type SlideAxis = ReturnType<typeof getSlideAxis>;
  * d'un coup à partir de cet état (sinon les murs attachés clignotent).
  */
 type DragTarget =
-  | { kind: 'wall'; id: string; a: Vec; b: Vec; axisA: SlideAxis; axisB: SlideAxis }
-  | { kind: 'point'; id: string; origin: Vec }
+  | { kind: 'wall'; id: string; a: Vec; b: Vec; ca: PointConstraint; cb: PointConstraint }
+  | { kind: 'point'; id: string; origin: Vec; c: PointConstraint; structural: boolean }
   | { kind: 'door'; id: string }
-  | { kind: 'stair'; id: string; origin: Vec };
+  | { kind: 'stair'; id: string; origin: Vec }
+  | { kind: 'furniture'; id: string; origin: Vec };
 type DragState = DragTarget & { start: Vec; started: boolean };
 
 export function PlanCanvas() {
@@ -74,6 +91,9 @@ export function PlanCanvas() {
   const walls = useStore((s) => s.walls);
   const doors = useStore((s) => s.doors);
   const stairs = useStore((s) => s.stairs);
+  const furniture = useStore((s) => s.furniture);
+  const floorColor = useStore((s) => s.floorColor);
+  const placing = useStore((s) => s.placing);
   const tool = useStore((s) => s.tool);
   const selection = useStore((s) => s.selection);
   const fitToken = useStore((s) => s.fitToken);
@@ -83,7 +103,7 @@ export function PlanCanvas() {
     const i = s.levels.findIndex((l) => l.id === s.activeLevelId);
     return i > 0 ? s.inactive[s.levels[i - 1].id] : null;
   });
-  const { select, checkpoint, addWall, mergePoint, addDoor, addStair, setTool } = useStore.getState();
+  const { select, checkpoint, addWall, mergePoint, addDoor, addStair, addFurniture, setTool } = useStore.getState();
 
   const sizeReady = size.width > 0 && size.height > 0;
 
@@ -167,11 +187,16 @@ export function PlanCanvas() {
         s.setTool('wall');
       } else if (key === 'p') {
         s.setTool('door');
+      } else if (key === 'f') {
+        s.setTool('window');
       } else if (key === 'e') {
         s.setTool('stair');
       } else if (key === 'r' && s.selection?.kind === 'stair') {
         const st = s.stairs[s.selection.id];
         s.updateStair(st.id, { rotation: (st.rotation + 90) % 360 });
+      } else if (key === 'r' && s.selection?.kind === 'furniture') {
+        const f = s.furniture[s.selection.id];
+        s.updateFurniture(f.id, { rotation: (f.rotation + (e.shiftKey ? 15 : 90)) % 360 });
       }
     };
     window.addEventListener('keydown', onKey);
@@ -285,12 +310,22 @@ export function PlanCanvas() {
       const s = useStore.getState();
       const snapped = { x: snapValue(delta.x), y: snapValue(delta.y) };
       if (d.kind === 'wall') {
-        s.moveWall(d.id, constrainedMove(d.a, snapped, d.axisA), constrainedMove(d.b, snapped, d.axisB));
+        // Les extrémités respectent leurs contraintes, et le mur reste dans le périmètre.
+        const r = fitWallMove(
+          getPerimeter(s),
+          (m) => ({ a: constrainedMove(d.a, m, d.ca), b: constrainedMove(d.b, m, d.cb) }),
+          limitDelta(snapped, [d.ca, d.cb]),
+        );
+        s.moveWall(d.id, r.a, r.b);
       } else if (d.kind === 'point') {
         const p = snap({ x: d.origin.x + delta.x, y: d.origin.y + delta.y }, { excludePointId: d.id });
-        s.movePoint(d.id, p.x, p.y);
+        let target = constrainedMove(d.origin, { x: p.x - d.origin.x, y: p.y - d.origin.y }, d.c);
+        if (!d.structural) target = keepInside(getPerimeter(s), target);
+        s.movePoint(d.id, target.x, target.y);
       } else if (d.kind === 'stair') {
         s.moveStair(d.id, d.origin.x + snapped.x, d.origin.y + snapped.y);
+      } else if (d.kind === 'furniture') {
+        s.moveFurniture(d.id, d.origin.x + snapValue(delta.x, 5), d.origin.y + snapValue(delta.y, 5));
       } else {
         const door = s.doors[d.id];
         const w = door && s.walls[door.wallId];
@@ -331,11 +366,20 @@ export function PlanCanvas() {
   }, [dragging]);
 
   /* ----- Événements du canvas ----- */
+  /** Les cloisons (murs fins) ne peuvent pas être tracées hors du périmètre porteur. */
+  const drawSnap = (pos: Vec, shift: boolean): Snap => {
+    const s = snap(pos, { from: drawStart, ortho: shift, allowWall: true });
+    const per = getPerimeter(useStore.getState());
+    const thin = newWallThickness < STRUCTURAL_THICKNESS;
+    return thin && per && !insideOrOn(per, s) ? { ...s, invalid: true } : s;
+  };
+
   const handleMouseMove = (e: KonvaEventObject<MouseEvent>) => {
-    if (tool !== 'wall') return;
+    if (tool !== 'wall' && tool !== 'furniture') return;
     const pos = worldPointer();
     if (!pos) return;
-    setCursor(snap(pos, { from: drawStart, ortho: e.evt.shiftKey, allowWall: true }));
+    if (tool === 'furniture') setCursor({ x: snapValue(pos.x, 5), y: snapValue(pos.y, 5), kind: 'grid' });
+    else setCursor(drawSnap(pos, e.evt.shiftKey));
   };
 
   const handleClick = (e: KonvaEventObject<MouseEvent>) => {
@@ -348,12 +392,20 @@ export function PlanCanvas() {
       return;
     }
 
-    if (tool === 'door') {
+    if (tool === 'door' || tool === 'window') {
       const hit = wallAt(pos);
       if (!hit) return;
-      const id = addDoor(hit.wall.id, clampDoorOffset(hit.offset, 90, wallLength(hit.wall)));
+      const width = tool === 'window' ? 120 : 90;
+      const id = addDoor(hit.wall.id, clampDoorOffset(hit.offset, width, wallLength(hit.wall)), tool);
       setTool('select');
       select({ kind: 'door', id });
+      return;
+    }
+
+    if (tool === 'furniture') {
+      const id = addFurniture(placing, snapValue(pos.x, 5), snapValue(pos.y, 5));
+      setTool('select');
+      select({ kind: 'furniture', id });
       return;
     }
 
@@ -364,7 +416,8 @@ export function PlanCanvas() {
       return;
     }
 
-    const s = snap(pos, { from: drawStart, ortho: e.evt.shiftKey, allowWall: true });
+    const s = drawSnap(pos, e.evt.shiftKey);
+    if (s.invalid) return;
     if (!drawStart) {
       setDrawStart(s);
       return;
@@ -426,12 +479,13 @@ export function PlanCanvas() {
   const pointList = Object.values(points);
   const isSelect = tool === 'select';
   const handleRadius = 6 / view.scale;
-  const pointerTools = tool === 'wall' || tool === 'door' || tool === 'stair';
+  const pointerTools = tool !== 'select';
+  const outline = useMemo(() => floorOutline({ points, walls }), [points, walls]);
 
   return (
     <div
       ref={containerRef}
-      className="absolute inset-0 bg-white"
+      className="absolute inset-0 bg-[#F1F4F8]"
       style={{ cursor: pointerTools ? 'crosshair' : 'default' }}
       onContextMenu={(e) => e.preventDefault()}
     >
@@ -461,6 +515,17 @@ export function PlanCanvas() {
           </Layer>
 
           <Layer>
+            {/* Sol de l'étage */}
+            {outline && (
+              <Line
+                points={outline.flatMap((p) => [p.x, p.y])}
+                closed
+                fill={floorColor}
+                opacity={0.55}
+                listening={false}
+              />
+            )}
+
             {/* Escaliers (sous les murs) */}
             {Object.values(stairs).map((st) => (
               <StairShape
@@ -475,6 +540,30 @@ export function PlanCanvas() {
               />
             ))}
 
+            {/* Mobilier */}
+            {Object.values(furniture).map((f) => (
+              <FurnitureShape
+                key={f.id}
+                item={f}
+                scale={view.scale}
+                selected={selection?.kind === 'furniture' && selection.id === f.id}
+                isSelectTool={isSelect}
+                onSelect={() => select({ kind: 'furniture', id: f.id })}
+                onMouseDown={(e) => beginDrag(e, { kind: 'furniture', id: f.id, origin: { x: f.x, y: f.y } })}
+                onHover={(on) => isSelect && setPointerStyle(on ? 'move' : '')}
+              />
+            ))}
+            {tool === 'furniture' && cursor && (
+              <FurnitureShape
+                ghost
+                scale={view.scale}
+                item={{
+                  id: 'ghost', type: placing, x: cursor.x, y: cursor.y, rotation: 0,
+                  width: CATALOG[placing].width, depth: CATALOG[placing].depth, color: CATALOG[placing].color,
+                }}
+              />
+            )}
+
             {/* Murs */}
             {wallList.map((w) => {
               const A = points[w.a];
@@ -484,11 +573,11 @@ export function PlanCanvas() {
                 <Line
                   key={w.id}
                   points={[A.x, A.y, B.x, B.y]}
-                  stroke={selected ? COLORS.selected : COLORS.wall}
+                  stroke={selected ? COLORS.selected : w.structural ? COLORS.wall : COLORS.partition}
                   strokeWidth={w.thickness}
                   lineCap="square"
                   hitStrokeWidth={Math.max(w.thickness, 16 / view.scale)}
-                  onMouseEnter={() => isSelect && setPointerStyle('move')}
+                  onMouseEnter={() => isSelect && setPointerStyle(w.structural ? 'not-allowed' : 'move')}
                   onMouseLeave={() => isSelect && setPointerStyle('')}
                   onClick={(e) => {
                     if (!isSelect) return;
@@ -496,6 +585,11 @@ export function PlanCanvas() {
                     select({ kind: 'wall', id: w.id });
                   }}
                   onMouseDown={(e) => {
+                    if (w.structural) {
+                      // Mur porteur : sélectionnable, mais pas déplaçable.
+                      if (isSelect) e.cancelBubble = true;
+                      return;
+                    }
                     const plan = useStore.getState();
                     // Une extrémité posée au milieu d'un autre mur glisse le long de celui-ci
                     // au lieu de le déformer.
@@ -504,8 +598,8 @@ export function PlanCanvas() {
                       id: w.id,
                       a: { x: A.x, y: A.y },
                       b: { x: B.x, y: B.y },
-                      axisA: getSlideAxis(plan, w.a, w.id),
-                      axisB: getSlideAxis(plan, w.b, w.id),
+                      ca: pointConstraint(plan, w.a, w.id),
+                      cb: pointConstraint(plan, w.b, w.id),
                     });
                   }}
                 />
@@ -538,7 +632,7 @@ export function PlanCanvas() {
               <>
                 <Line
                   points={[drawStart.x, drawStart.y, cursor.x, cursor.y]}
-                  stroke={COLORS.preview}
+                  stroke={cursor.invalid ? COLORS.invalid : COLORS.preview}
                   opacity={0.55}
                   strokeWidth={newWallThickness}
                   lineCap="square"
@@ -558,6 +652,8 @@ export function PlanCanvas() {
             {/* Coins (poignées) */}
             {pointList.map((p) => {
               const selected = selection?.kind === 'point' && selection.id === p.id;
+              const c = pointConstraint({ points, walls }, p.id);
+              if (c.kind === 'locked') return null; // coin de mur porteur : pas de poignée
               return (
                 <Circle
                   key={p.id}
@@ -569,13 +665,21 @@ export function PlanCanvas() {
                   strokeWidth={1.5 / view.scale}
                   hitStrokeWidth={8 / view.scale}
                   listening={isSelect}
-                  onMouseEnter={() => setPointerStyle('grab')}
+                  onMouseEnter={() => setPointerStyle(c.kind === 'slide' ? 'ew-resize' : 'grab')}
                   onMouseLeave={() => setPointerStyle('')}
                   onClick={(e) => {
                     e.cancelBubble = true;
                     select({ kind: 'point', id: p.id });
                   }}
-                  onMouseDown={(e) => beginDrag(e, { kind: 'point', id: p.id, origin: { x: p.x, y: p.y } })}
+                  onMouseDown={(e) =>
+                    beginDrag(e, {
+                      kind: 'point',
+                      id: p.id,
+                      origin: { x: p.x, y: p.y },
+                      c,
+                      structural: isStructuralPoint({ points, walls }, p.id),
+                    })
+                  }
                 />
               );
             })}
@@ -586,8 +690,8 @@ export function PlanCanvas() {
                 x={cursor.x}
                 y={cursor.y}
                 radius={(cursor.kind === 'grid' ? 4 : 7) / view.scale}
-                fill={cursor.kind === 'point' ? COLORS.preview : undefined}
-                stroke={cursor.kind === 'wall' ? COLORS.snapWall : COLORS.preview}
+                fill={cursor.kind === 'point' && !cursor.invalid ? COLORS.preview : undefined}
+                stroke={cursor.invalid ? COLORS.invalid : cursor.kind === 'wall' ? COLORS.snapWall : COLORS.preview}
                 strokeWidth={2 / view.scale}
                 listening={false}
               />
@@ -597,6 +701,10 @@ export function PlanCanvas() {
       )}
     </div>
   );
+}
+
+function insideOrOn(per: NonNullable<ReturnType<typeof getPerimeter>>, p: Vec) {
+  return keepInside(per, p) === p;
 }
 
 /** Garde la porte entièrement sur son mur. */
@@ -643,7 +751,9 @@ function DoorShape({ door, wall, a, b, scale, selected, isSelectTool, onSelect, 
     );
   }
   const leafEnd = { x: hinge.x + n.x * side * width, y: hinge.y + n.y * side * width };
-  const color = selected ? COLORS.selected : COLORS.door;
+  const isWindow = door.kind === 'window';
+  const color = selected ? COLORS.selected : isWindow ? COLORS.window : COLORS.door;
+  const t = wall.thickness;
 
   return (
     <Group
@@ -661,16 +771,27 @@ function DoorShape({ door, wall, a, b, scale, selected, isSelectTool, onSelect, 
         x={center.x}
         y={center.y}
         width={width}
-        height={wall.thickness + 2 / scale}
+        height={t + 2 / scale}
         offsetX={width / 2}
-        offsetY={(wall.thickness + 2 / scale) / 2}
+        offsetY={(t + 2 / scale) / 2}
         rotation={angle}
-        fill={COLORS.background}
+        fill={isWindow ? COLORS.windowFill : COLORS.background}
         stroke={color}
-        strokeWidth={1 / scale}
+        strokeWidth={(selected ? 2 : 1) / scale}
       />
-      <Line points={arc} stroke={color} strokeWidth={1 / scale} dash={[6 / scale, 4 / scale]} />
-      <Line points={[hinge.x, hinge.y, leafEnd.x, leafEnd.y]} stroke={color} strokeWidth={4 / scale} lineCap="round" />
+      {isWindow ? (
+        // Fenêtre : cadre + double vitrage au milieu du mur
+        <Group x={center.x} y={center.y} rotation={angle}>
+          <Line points={[-width / 2, -t * 0.12, width / 2, -t * 0.12]} stroke={color} strokeWidth={1.5 / scale} />
+          <Line points={[-width / 2, t * 0.12, width / 2, t * 0.12]} stroke={color} strokeWidth={1.5 / scale} />
+          <Line points={[0, -t / 2, 0, t / 2]} stroke={color} strokeWidth={1 / scale} />
+        </Group>
+      ) : (
+        <>
+          <Line points={arc} stroke={color} strokeWidth={1 / scale} dash={[6 / scale, 4 / scale]} />
+          <Line points={[hinge.x, hinge.y, leafEnd.x, leafEnd.y]} stroke={color} strokeWidth={4 / scale} lineCap="round" />
+        </>
+      )}
     </Group>
   );
 }
@@ -753,23 +874,30 @@ function DimensionLabel({ a, b, thickness, scale, color }: {
   let angle = (Math.atan2(b.y - a.y, b.x - a.x) * 180) / Math.PI;
   if (angle > 90) angle -= 180;
   if (angle <= -90) angle += 180;
-  const fontSize = 12 / scale;
-  const width = 120 / scale;
+  const fontSize = 11 / scale;
+  const pad = 3 / scale;
+  const text = formatLength(len);
+  const width = text.length * fontSize * 0.6 + 2 * pad;
   return (
-    <Text
+    <Label
       x={(a.x + b.x) / 2}
       y={(a.y + b.y) / 2}
       rotation={angle}
-      text={formatLength(len)}
-      fontSize={fontSize}
-      fontFamily="Inter, sans-serif"
-      fontStyle="600"
-      fill={color}
-      width={width}
-      align="center"
       offsetX={width / 2}
-      offsetY={thickness / 2 + fontSize + 4 / scale}
+      offsetY={thickness / 2 + fontSize + 2 * pad + 3 / scale}
       listening={false}
-    />
+    >
+      <Tag fill="#FFFFFF" opacity={0.9} cornerRadius={4 / scale} />
+      <Text
+        text={text}
+        fontSize={fontSize}
+        fontFamily="Inter, sans-serif"
+        fontStyle="600"
+        fill={color}
+        padding={pad}
+        width={width}
+        align="center"
+      />
+    </Label>
   );
 }
