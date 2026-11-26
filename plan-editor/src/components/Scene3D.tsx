@@ -362,8 +362,14 @@ function FurnitureModel({ item }: { item: Furniture }) {
         <>
           <Box p={[0, 43, 1]} s={[w, 86, d - 2]} c={color} />
           <Box p={[0, 88, 0]} s={[w, 4, d]} c="#3F3F46" rough={0.4} />
-          <Box p={[-w / 4, 89, 0]} s={[46, 2, d * 0.6]} c="#CBD5E1" rough={0.2} />
-          <Box p={[w / 4, 90.2, 0]} s={[58, 1, d * 0.75]} c="#111827" rough={0.3} />
+          {/* Évier : rebord inox posé sur le plan de travail (dessus à 90 cm), cuve plus sombre et robinet.
+              Aucune face au même niveau qu'une autre, sinon elles scintillent (z-fighting). */}
+          <Box p={[-w / 4, 90.3, 0]} s={[50, 0.6, d * 0.62]} c="#CBD5E1" rough={0.25} />
+          <Box p={[-w / 4, 90.45, 1]} s={[40, 0.5, d * 0.46]} c="#7C8794" rough={0.35} />
+          <Box p={[-w / 4, 97, -d / 2 + 7]} s={[2.2, 14, 2.2]} c="#9CA3AF" rough={0.2} />
+          <Box p={[-w / 4, 103, -d / 2 + 12]} s={[2.2, 2.2, 12]} c="#9CA3AF" rough={0.2} />
+          {/* Plaque de cuisson */}
+          <Box p={[w / 4, 90.4, 0]} s={[58, 0.8, d * 0.75]} c="#111827" rough={0.3} />
           {/* Meubles hauts */}
           <Box p={[0, 185, -d / 2 + 17]} s={[w, 70, 34]} c={color} />
           {/* Façades */}
