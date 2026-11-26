@@ -86,6 +86,7 @@
                 <a href="#differenciation" class="text-tp-sage font-bold hover:text-tp-navy transition-colors whitespace-nowrap">Ce qui nous distingue</a>
                 <a href="#engagements" class="hover:text-tp-navy transition-colors whitespace-nowrap">Nos 6 Engagements</a>
                 <a href="#les-etapes" class="hover:text-tp-navy transition-colors whitespace-nowrap">Les Étapes</a>
+                <a href="#configurateur" class="text-tp-red font-bold hover:text-tp-navy transition-colors whitespace-nowrap">Configurateur</a>
                 <a href="#certifications" class="hover:text-tp-navy transition-colors whitespace-nowrap">Labels &amp; Climat</a>
                 <a href="#contact" class="hover:text-tp-navy transition-colors whitespace-nowrap">Contact</a>
             </nav>
@@ -101,7 +102,7 @@
                     <span class="hidden sm:inline">Retour à l'accueil</span>
                 </a>
 
-                <a href="editeur-plan/index.html"
+                <a href="#configurateur"
                     class="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-semibold border border-tp-navy/20 bg-white text-tp-navy hover:bg-slate-100 transition-colors whitespace-nowrap"
                     title="Personnaliser le plan de votre logement">
                     <svg class="w-3.5 h-3.5 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
@@ -536,6 +537,39 @@
 
                     </div>
                 </div>
+            </div>
+        </section>
+
+        <!-- CONFIGURATEUR : plan modifiable + vue 3D (application React construite dans editeur-plan/) -->
+        <section id="configurateur" class="py-14 sm:py-20 bg-tp-pearl border-t border-slate-200/80 scroll-mt-20">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="flex flex-col lg:flex-row lg:items-end justify-between gap-6 mb-8">
+                    <div class="max-w-2xl space-y-3">
+                        <span class="inline-block px-3 py-1 rounded-full bg-tp-red/10 text-tp-red text-xs font-bold uppercase tracking-wider">
+                            Configurateur
+                        </span>
+                        <h2 class="font-display font-bold text-2xl sm:text-3xl tracking-tight text-tp-navy">
+                            Configurez le logement que vous voulez construire
+                        </h2>
+                        <p class="text-slate-600 text-sm sm:text-base leading-relaxed">
+                            Partez d'un modèle (maison, loft, appartement, studio), déplacez les cloisons, ajoutez des portes,
+                            des étages et un escalier. Les murs porteurs restent en place. Quand votre plan vous plaît,
+                            cliquez sur <strong class="text-tp-navy">« Voir en 3D »</strong> pour vous projeter.
+                        </p>
+                    </div>
+                    <button onclick="openCallbackModal('Faire étudier mon plan')"
+                        class="inline-flex items-center justify-center gap-2 px-5 py-3 rounded-xl text-sm font-semibold bg-tp-navy text-white hover:bg-tp-slate transition-colors cursor-pointer whitespace-nowrap shrink-0">
+                        Faire étudier mon plan par un conseiller
+                    </button>
+                </div>
+
+                <div class="rounded-3xl overflow-hidden border border-slate-200 bg-white shadow-soft">
+                    <iframe src="editeur-plan/index.html" title="Configurateur de plan Thomas &amp; Piron"
+                        class="block w-full h-[80vh] min-h-[560px] max-h-[900px]" loading="lazy"></iframe>
+                </div>
+                <p class="text-xs text-slate-500 mt-3">
+                    Votre plan est enregistré automatiquement dans ce navigateur. Plan indicatif, non contractuel.
+                </p>
             </div>
         </section>
 
