@@ -829,6 +829,14 @@
         let yawDeg = 36;
         let pitchDeg = 56;
 
+        const FADE_MS = 550;
+        let fadeStartedAt = 0;
+        let fadeStep = 0;
+
+        function fadeProgress() {
+            return Math.min(1, (performance.now() - fadeStartedAt) / FADE_MS);
+        }
+
         function getHouseById(id) {
             return HOUSES.find(h => h.id === id) || HOUSES[0];
         }
@@ -851,13 +859,17 @@
             const cosY = Math.cos(yaw);
             const sinY = Math.sin(yaw);
             const sinP = Math.sin(pitch);
+            // Les hauteurs se projettent avec cos(inclinaison) : en vue de dessus les murs s'aplatissent.
+            // Normalisé sur l'angle par défaut (56°) pour garder les proportions d'origine.
+            const heightScale = Math.cos(pitch) / Math.cos((56 * Math.PI) / 180);
 
             const rx = x * cosY - z * sinY;
             const rz = x * sinY + z * cosY;
 
+            // rz grand = plus bas à l'écran = plus proche de la caméra.
             return {
                 x: centerX + rx,
-                y: centerY + rz * sinP - y,
+                y: centerY + rz * sinP - y * heightScale,
                 rz
             };
         }
@@ -1037,12 +1049,20 @@
                 </g>
             ` : '';
 
+            // Faces latérales triées de la plus éloignée à la plus proche (sinon une face
+            // arrière peut recouvrir une face avant selon l'angle), le dessus en dernier.
+            const sideFaces = [
+                { pts: [p1b, p2b, p2t, p1t], fill: fillSideA, op: (0.95 * lightFactor).toFixed(2) },
+                { pts: [p2b, p3b, p3t, p2t], fill: fillSideB, op: (0.88 / lightFactor).toFixed(2) },
+                { pts: [p3b, p4b, p4t, p3t], fill: fillSideA, op: '0.82' },
+                { pts: [p4b, p1b, p1t, p4t], fill: fillSideB, op: '0.82' }
+            ]
+                .map(f => ({ ...f, depth: f.pts.reduce((sum, p) => sum + p.rz, 0) / 4 }))
+                .sort((a, b) => a.depth - b.depth);
+
             const markup = `
                 <g ${dragAttr} opacity="${opacityVal}">
-                    <polygon points="${pointsToAttr([p1b, p2b, p2t, p1t])}" fill="${fillSideA}" opacity="${(0.95 * lightFactor).toFixed(2)}" stroke="${strokeColor}" stroke-width="1.3" ${dashAttr} />
-                    <polygon points="${pointsToAttr([p2b, p3b, p3t, p2t])}" fill="${fillSideB}" opacity="${(0.88 / lightFactor).toFixed(2)}" stroke="${strokeColor}" stroke-width="1.3" ${dashAttr} />
-                    <polygon points="${pointsToAttr([p3b, p4b, p4t, p3t])}" fill="${fillSideA}" opacity="0.82" stroke="${strokeColor}" stroke-width="1.3" ${dashAttr} />
-                    <polygon points="${pointsToAttr([p4b, p1b, p1t, p4t])}" fill="${fillSideB}" opacity="0.82" stroke="${strokeColor}" stroke-width="1.3" ${dashAttr} />
+                    ${sideFaces.map(f => `<polygon points="${pointsToAttr(f.pts)}" fill="${f.fill}" opacity="${f.op}" stroke="${strokeColor}" stroke-width="1.3" ${dashAttr} />`).join('')}
                     <polygon points="${pointsToAttr([p1t, p2t, p3t, p4t])}" fill="${fillTop}" stroke="${strokeColor}" stroke-width="1.5" ${dashAttr} />
                     ${handleMarkup}
                 </g>
@@ -1087,8 +1107,13 @@
                 `;
             }).join('');
 
-            // Applique une transition fade à chaque changement d'étape sur les couches visibles
-            const fadeClass = triggerStepFade ? 'layer-step-fade' : '';
+            // Fondu de la couche qui vient d'apparaître : calculé ici à chaque image (une classe CSS
+            // serait recréée à chaque rendu de la rotation auto et l'animation ne se verrait jamais).
+            if (triggerStepFade) {
+                fadeStartedAt = performance.now();
+                fadeStep = currentAssemblyStep;
+            }
+            const fadeClass = '';
             const svg = document.getElementById('houseSchematicSvg');
 
             const defsMarkup = `
@@ -1134,7 +1159,8 @@
             const sh3 = project3D(hw + 22, 0, hd + 22);
             const sh4 = project3D(-hw + 18, 0, hd + 22);
             renderables.push({
-                depth: 999,
+                layer: 0, order: 0, step: 0,
+                depth: 0,
                 markup: `
                     <g style="pointer-events: none;">
                         <polygon points="${pointsToAttr([sh1, sh2, sh3, sh4])}" fill="#0F172A" opacity="0.11" />
@@ -1153,7 +1179,8 @@
             const tDepth = (t1.rz + t2.rz + t3.rz + t4.rz) / 4;
 
             renderables.push({
-                depth: tDepth + 24,
+                layer: 0, order: 1, step: 1,
+                depth: tDepth,
                 markup: `
                     <g class="${fadeClass}" style="pointer-events: none;">
                         <polygon points="${pointsToAttr([t1, t2, t3, t4])}" fill="url(#texTerrace)" stroke="#2E7D5B" stroke-width="1.6" stroke-dasharray="5 3" />
@@ -1175,7 +1202,8 @@
 
                 const slabDepth = (s1t.rz + s2t.rz + s3t.rz + s4t.rz) / 4;
                 renderables.push({
-                    depth: slabDepth + 14,
+                    layer: 0, order: 2, step: 2,
+                    depth: slabDepth,
                     markup: `
                         <g class="${fadeClass}" style="pointer-events: none;">
                             <polygon points="${pointsToAttr([s4t, s3t, s3b, s4b])}" fill="#94A3B8" stroke="#475569" stroke-width="1.2" />
@@ -1195,7 +1223,8 @@
                 const floorDepth = (f1.rz + f2.rz + f3.rz + f4.rz) / 4;
 
                 renderables.push({
-                    depth: floorDepth + 10,
+                    layer: 0, order: 3, step: 3,
+                    depth: floorDepth,
                     markup: `
                         <g class="${fadeClass}" style="pointer-events: none;">
                             <polygon points="${pointsToAttr([f1, f2, f3, f4])}" fill="url(#${bp.floorPatternId})" stroke="#B45309" stroke-width="1.4" />
@@ -1235,7 +1264,8 @@
                             handleSymbol: '↕'
                         });
                     renderables.push({
-                        depth: seg.depth - 8,
+                        layer: 1, order: 0, step: 4,
+                        depth: seg.depth,
                         markup: `<g class="${fadeClass}">${seg.markup}</g>`
                     });
                 });
@@ -1258,7 +1288,8 @@
                         opacity: exteriorOpacity
                     });
                     renderables.push({
-                        depth: seg.depth + 4,
+                        layer: 1, order: 1, step: 5,
+                        depth: seg.depth,
                         markup: `<g class="${fadeClass}">${seg.markup}</g>`
                     });
                 });
@@ -1267,10 +1298,12 @@
             // COUCHE 6 : Châssis & ouvertures vitrées (pleine opacité)
             if (currentAssemblyStep >= 6) {
                 bp.windows.forEach(win => {
-                    const seg = createPrism3DItem(win.x1, win.z1, win.x2, win.z2, yFloor + 12, yWallTop - 10, 4.2, '#34D399', '#10B981', '#059669', '#065F46', {
+                    // Un peu plus épais que le mur (5.5) pour dépasser de la façade au lieu d'être caché dedans.
+                    const seg = createPrism3DItem(win.x1, win.z1, win.x2, win.z2, yFloor + 12, yWallTop - 10, 6.5, '#34D399', '#10B981', '#059669', '#065F46', {
                         opacity: 1
                     });
                     renderables.push({
+                        layer: 1, order: 2, step: 6,
                         depth: seg.depth,
                         markup: `<g class="${fadeClass}">${seg.markup}</g>`
                     });
@@ -1285,21 +1318,37 @@
                 const r4 = project3D(-hw - 6, yWallTop + 2, hd + 6);
                 const rRidgeTop = project3D(0, yWallTop + bp.roofPeakHeight, -hd - 6);
                 const rRidgeBot = project3D(0, yWallTop + bp.roofPeakHeight, hd + 6);
-                const roofDepth = (r1.rz + r2.rz + r3.rz + r4.rz) / 4 - 16;
+                const roofDepth = (r1.rz + r2.rz + r3.rz + r4.rz) / 4;
+                const avgRz = pts => pts.reduce((sum, p) => sum + p.rz, 0) / pts.length;
+                // Deux pans + deux pignons (triangles aux extrémités), du fond vers l'avant.
+                const roofFaces = [
+                    { pts: [r1, rRidgeTop, rRidgeBot, r4], fill: 'url(#texRoof)' },
+                    { pts: [rRidgeTop, r2, r3, rRidgeBot], fill: bp.roofColor },
+                    { pts: [r1, r2, rRidgeTop], fill: bp.wallSideColor },
+                    { pts: [r4, r3, rRidgeBot], fill: bp.wallSideColor }
+                ].sort((a, b) => avgRz(a.pts) - avgRz(b.pts));
 
                 renderables.push({
+                    layer: 2, order: 0, step: 7,
                     depth: roofDepth,
                     markup: `
                         <g class="${fadeClass}" style="pointer-events: none;">
-                            <polygon points="${pointsToAttr([r1, rRidgeTop, rRidgeBot, r4])}" fill="url(#texRoof)" stroke="#1B2E4B" stroke-width="1.6" />
-                            <polygon points="${pointsToAttr([rRidgeTop, r2, r3, rRidgeBot])}" fill="${bp.roofColor}" stroke="#1B2E4B" stroke-width="1.6" />
+                            ${roofFaces.map(f => `<polygon points="${pointsToAttr(f.pts)}" fill="${f.fill}" stroke="#1B2E4B" stroke-width="1.6" stroke-linejoin="round" />`).join('')}
                         </g>
                     `
                 });
             }
 
-            renderables.sort((a, b) => b.depth - a.depth);
-            svg.innerHTML = defsMarkup + renderables.map(item => item.markup).join('');
+            // Peintre : sol d'abord, puis du plus éloigné (rz petit) au plus proche, toiture en dernier.
+            renderables.sort((a, b) => (a.layer - b.layer) || (a.depth - b.depth) || (a.order - b.order));
+
+            const p = fadeProgress();
+            const eased = 1 - Math.pow(1 - p, 3);
+            svg.innerHTML = defsMarkup + renderables.map(item => {
+                if (p >= 1 || item.step !== fadeStep) return item.markup;
+                // Couche qui apparaît : fondu + petite descente façon brique qui s'emboîte.
+                return `<g opacity="${eased.toFixed(3)}" transform="translate(0 ${(-16 * (1 - eased)).toFixed(2)})">${item.markup}</g>`;
+            }).join('');
         }
 
         function startAutoSpinLoop() {
@@ -1310,10 +1359,9 @@
                 const dt = (now - lastTime) / 1000;
                 lastTime = now;
 
-                if (isAutoSpinning && !activeSceneDrag && !activeWallDrag) {
-                    yawDeg = (yawDeg + dt * 8.5) % 360;
-                    renderInteractiveBlueprint(false);
-                }
+                const spinning = isAutoSpinning && !activeSceneDrag && !activeWallDrag;
+                if (spinning) yawDeg = (yawDeg + dt * 8.5) % 360;
+                if (spinning || fadeProgress() < 1) renderInteractiveBlueprint(false);
                 autoSpinRafId = requestAnimationFrame(tick);
             }
             autoSpinRafId = requestAnimationFrame(tick);

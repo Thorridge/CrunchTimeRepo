@@ -42,6 +42,8 @@
             background-color: #FFFFFF;
             color: #1B2E4B;
             -webkit-font-smoothing: antialiased;
+            /* Filet de sécurité : jamais de défilement horizontal (clip ne casse pas le header sticky) */
+            overflow-x: clip;
         }
         .pillar-card {
             transition: transform 0.22s ease, box-shadow 0.22s ease, border-color 0.22s ease;
@@ -62,7 +64,7 @@
 
     <!-- 1. BARRE DE NAVIGATION ÉPURÉE -->
     <header class="sticky top-0 z-40 w-full bg-white/95 backdrop-blur-md border-b border-slate-200/80">
-        <div class="w-full px-4 sm:px-8 lg:px-12 h-20 flex items-center justify-between gap-6">
+        <div class="w-full px-4 sm:px-8 lg:px-12 h-20 flex items-center justify-between gap-3 sm:gap-6">
             <!-- Logo Thomas & Piron -->
             <a href="#" class="flex items-center gap-3 shrink-0">
                 <div class="w-10 h-10 bg-tp-navy rounded-xl flex items-center justify-center relative overflow-hidden shadow-xs">
@@ -79,53 +81,65 @@
                 </div>
             </a>
 
-            <!-- Liens simples -->
-            <nav class="hidden lg:flex items-center justify-center flex-1 gap-5 xl:gap-8 px-4 text-sm font-medium text-slate-600">
+            <!-- Liens principaux (grand écran uniquement, pour ne pas déborder) -->
+            <nav class="hidden xl:flex items-center justify-center flex-1 min-w-0 gap-6 2xl:gap-8 px-2 text-sm font-medium text-slate-600">
                 <a href="#le-projet" class="hover:text-tp-navy transition-colors whitespace-nowrap">Le Projet</a>
-                <a href="#vos-avantages" class="hover:text-tp-navy transition-colors whitespace-nowrap">Vos Avantages</a>
                 <a href="#differenciation" class="text-tp-sage font-bold hover:text-tp-navy transition-colors whitespace-nowrap">Ce qui nous distingue</a>
-                <a href="#engagements" class="hover:text-tp-navy transition-colors whitespace-nowrap">Nos 6 Engagements</a>
-                <a href="#les-etapes" class="hover:text-tp-navy transition-colors whitespace-nowrap">Les Étapes</a>
+                <a href="#engagements" class="hover:text-tp-navy transition-colors whitespace-nowrap">Engagements</a>
                 <a href="#configurateur" class="text-tp-red font-bold hover:text-tp-navy transition-colors whitespace-nowrap">Configurateur</a>
-                <a href="#certifications" class="hover:text-tp-navy transition-colors whitespace-nowrap">Labels &amp; Climat</a>
                 <a href="#contact" class="hover:text-tp-navy transition-colors whitespace-nowrap">Contact</a>
             </nav>
 
             <!-- Boutons d'action -->
-            <div class="flex items-center gap-2.5 shrink-0">
+            <div class="flex items-center gap-2 shrink-0">
+                <!-- Menu : tous les liens de la page -->
+                <details class="relative group">
+                    <summary class="list-none [&::-webkit-details-marker]:hidden inline-flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-semibold border border-slate-200 bg-tp-pearl text-tp-navy hover:bg-slate-100 transition-colors cursor-pointer select-none"
+                        title="Menu">
+                        <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16"></path>
+                        </svg>
+                        <span class="hidden sm:inline">Menu</span>
+                    </summary>
+                    <nav class="absolute right-0 top-full mt-2 w-60 rounded-2xl border border-slate-200 bg-white p-2 shadow-xl text-sm font-medium text-slate-700 flex flex-col"
+                        onclick="if (event.target.closest('a')) this.closest('details').removeAttribute('open')">
+                        <a href="#le-projet" class="px-3 py-2 rounded-lg hover:bg-tp-pearl">Le Projet</a>
+                        <a href="#vos-avantages" class="px-3 py-2 rounded-lg hover:bg-tp-pearl">Vos Avantages</a>
+                        <a href="#differenciation" class="px-3 py-2 rounded-lg hover:bg-tp-pearl text-tp-sage font-bold">Ce qui nous distingue</a>
+                        <a href="#engagements" class="px-3 py-2 rounded-lg hover:bg-tp-pearl">Nos 6 Engagements</a>
+                        <a href="#les-etapes" class="px-3 py-2 rounded-lg hover:bg-tp-pearl">Les Étapes</a>
+                        <a href="#configurateur" class="px-3 py-2 rounded-lg hover:bg-tp-pearl text-tp-red font-bold">Configurateur 3D</a>
+                        <a href="#certifications" class="px-3 py-2 rounded-lg hover:bg-tp-pearl">Labels &amp; Climat</a>
+                        <a href="#contact" class="px-3 py-2 rounded-lg hover:bg-tp-pearl">Contact</a>
+                        <div class="my-1 border-t border-slate-100"></div>
+                        <a href="index.html" class="px-3 py-2 rounded-lg hover:bg-tp-pearl text-slate-500">← Retour à l'accueil</a>
+                    </nav>
+                </details>
+
                 <a href="index.html"
-                    class="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-semibold border border-slate-200 bg-tp-pearl text-tp-navy hover:bg-slate-100 transition-colors whitespace-nowrap"
+                    class="hidden md:inline-flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-semibold border border-slate-200 bg-tp-pearl text-tp-navy hover:bg-slate-100 transition-colors whitespace-nowrap"
                     title="Retour à l'accueil">
                     <svg class="w-3.5 h-3.5 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
                     </svg>
-                    <span class="hidden sm:inline">Retour à l'accueil</span>
-                </a>
-
-                <a href="#configurateur"
-                    class="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-semibold border border-tp-navy/20 bg-white text-tp-navy hover:bg-slate-100 transition-colors whitespace-nowrap"
-                    title="Personnaliser le plan de votre logement">
-                    <svg class="w-3.5 h-3.5 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M3 3h18v18H3zM3 12h9m0-9v13"></path>
-                    </svg>
-                    <span class="hidden sm:inline">Personnaliser mon plan</span>
+                    <span class="hidden 2xl:inline">Accueil</span>
                 </a>
 
                 <button onclick="toggleDemoDrawer()"
                     class="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-medium border border-slate-200 bg-tp-pearl text-slate-600 hover:text-tp-navy hover:bg-slate-100 transition-colors cursor-pointer whitespace-nowrap"
-                    title="Personnaliser le nom du projet en direct">
+                    title="Mode Démo : personnaliser le nom du projet en direct">
                     <svg class="w-3.5 h-3.5 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"></path>
                     </svg>
-                    <span class="hidden sm:inline">Mode Démo</span>
+                    <span class="hidden 2xl:inline">Mode Démo</span>
                 </button>
 
                 <button onclick="openCallbackModal('Être rappelé gratuitement')"
-                    class="inline-flex items-center gap-2 px-4 sm:px-5 py-2.5 rounded-xl text-xs sm:text-sm font-semibold bg-tp-red text-white hover:bg-tp-redDark transition-colors shadow-xs cursor-pointer whitespace-nowrap">
+                    class="inline-flex items-center gap-2 px-3 sm:px-5 py-2.5 rounded-xl text-xs sm:text-sm font-semibold bg-tp-red text-white hover:bg-tp-redDark transition-colors shadow-xs cursor-pointer whitespace-nowrap">
                     <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"></path>
                     </svg>
-                    <span>Être rappelé</span>
+                    <span class="hidden sm:inline">Être rappelé</span>
                 </button>
             </div>
         </div>
