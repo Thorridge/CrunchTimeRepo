@@ -92,7 +92,7 @@
             grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
             gap: 24px;
             width: 100%;
-            max-width: 760px;
+            max-width: 1060px;
         }
         .choice {
             display: flex;
@@ -113,6 +113,7 @@
         }
         .choice.client:hover, .choice.client:focus-visible { border-color: var(--tp-red); }
         .choice.interne:hover, .choice.interne:focus-visible { border-color: var(--tp-green); }
+        .choice.materiaux:hover, .choice.materiaux:focus-visible { border-color: var(--tp-slate); }
         .icon {
             width: 52px; height: 52px;
             border-radius: 12px;
@@ -120,11 +121,13 @@
         }
         .client .icon { background: #FDECEC; color: var(--tp-red); }
         .interne .icon { background: #DCFCE7; color: var(--tp-green); }
+        .materiaux .icon { background: #EFF6FF; color: var(--tp-navy); }
         .choice h2 { font-family: 'Montserrat', sans-serif; font-size: 22px; font-weight: 700; }
         .choice p { color: var(--muted); font-size: 15px; line-height: 1.5; flex: 1; }
         .cta { font-weight: 600; font-size: 15px; display: inline-flex; align-items: center; gap: 6px; }
         .client .cta { color: var(--tp-red); }
         .interne .cta { color: var(--tp-green); }
+        .materiaux .cta { color: var(--tp-navy); }
         .choice:hover .cta span { transform: translateX(4px); }
         .cta span { transition: transform .2s; }
         footer {
@@ -169,6 +172,15 @@
                 <h2>Espace Interne</h2>
                 <p>Portail collaborateurs : suivi de chantier, indicateurs et engagements.</p>
                 <span class="cta">Accéder <span>→</span></span>
+            </a>
+
+            <a class="choice materiaux" href="Maquette-Materieux-Historique.html">
+                <div class="icon">
+                    <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>
+                </div>
+                <h2>Origine des Matériaux</h2>
+                <p>Choisissez une maison et découvrez d'où viennent vos sols, murs et châssis.</p>
+                <span class="cta">Découvrir <span>→</span></span>
             </a>
         </div>
     </main>
